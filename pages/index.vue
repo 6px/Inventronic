@@ -12,14 +12,21 @@
         variant="black"
         @click="auth.signInWithOAuth({ provider: 'github', options: { redirectTo } })"
       />
-      <div>
-    <button @click="signInWithOtp">
-      Sign In with E-Mail
-    </button>
-    <input
+      
+    <div>
+      <input
       v-model="email"
       type="email"
     />
+      <UButton
+        class="mt-3"
+        icon="i-mdi-email"
+        block
+        label="E-mail"
+        variant="black"
+        @click="signInWithOtp"
+      />
+    
   </div>
     </LoginCard>
   </div>

@@ -5,17 +5,15 @@
       <div class="hidden md:block">
         <UButton
           label="INVENTRONIC"
-          variant="transparent"
-          target="_blank"
+          variant="link"
           to="/"
-          icon="i-heroicons-outline"
+          icon="i-heroicons-outline-bolt"
         />
         <UButton
-          label="Hosted on Netlify"
-          variant="transparent"
-          target="_blank"
-          to="https://netlify.com"
-          icon="i-heroicons-outline-external-link"
+          label="Parts"
+          variant="link"
+          to="/parts"
+          icon="i-heroicons-outline-cpu-chip"
         />
       </div>
       <div class="flex items-center">
