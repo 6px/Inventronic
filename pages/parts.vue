@@ -7,7 +7,11 @@
       v-if="parts?.length > 0"
       body-class="overflow-hidden"
     >
-    <UTable :rows="parts" @select="editPart" />
+    <UTable
+      :rows="parts"
+      :columns="columns"
+      @select="editPart"
+    />
     </UContainer>
     <UButton
       class="mt-6"
@@ -15,49 +19,13 @@
       @click="createPart"
     />
   </div>
-  <UModal v-model="partModal">
-    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-      <template #header>
-        <h2>Create new part</h2>
-      </template>
-
-      <UForm class="space-y-4" @submit="savePart" :validate="validate" :state="selectedPart">
-        <UFormGroup label="Name" name="name">
-          <UInput v-model=selectedPart.name color="white" variant="outline" placeholder="Part name" />
-        </UFormGroup>
-        <UFormGroup label="Description" name="description">
-          <UInput v-model=selectedPart.description color="white" variant="outline" placeholder="Description" />
-        </UFormGroup>
-        <UFormGroup label="Footprint" name="footprint">
-          <UInput v-model=selectedPart.footprint color="white" variant="outline" placeholder="Footprint" />
-        </UFormGroup>
-        <UFormGroup label="Quantity" name="quantity">
-          <UInput v-model=selectedPart.quantity color="white" variant="outline" placeholder="1000" />
-        </UFormGroup>
-        <UFormGroup label="Minimum quantity" name="min_quantity">
-          <UInput v-model=selectedPart.min_quantity color="white" variant="outline" placeholder="0" />
-        </UFormGroup>
-      </UForm>
-
-      <template #footer>
-        <UButton
-          class="mx-4"
-          label="Save"
-          @click="savePart"
-        />
-        <UButton
-          class="mx-4"
-          label="Cancel"
-          @click="partModal = false"
-        />
-      </template>
-    </UCard>
-  </UModal>
+  <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
 </template>
 
 <script lang="ts" setup>
 
 import type { FormError, FormSubmitEvent } from '#ui/types'
+
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
@@ -68,13 +36,42 @@ let selectedPart: Part = reactive({
   footprint: '',
   quantity: 0,
   min_quantity: 0,
+  location_id: null,
   id:null,
   owner_id: null,
 })
 
+const columns = [
+  {
+    key: "name",
+    label: "Name"
+  },
+  {
+    key: "description",
+    label: "Description",
+  },
+  {
+    key: "Locations.name",
+    label: "Location",
+  },
+  {
+    key: "footprint",
+    label: "Footprint",
+  },
+  {
+    key: "quantity",
+    label: "Quantity",
+  },
+  {
+    key: "min_quantity",
+    label: "Min Quantity",
+  },
+]
+
+const partFields = `id, name, description, footprint,quantity, min_quantity, Locations(id, name), location_id`
 
 const {data: parts} = await useAsyncData('parts', async () => {
-  const { data } = await client.from('Parts').select().order('created_at')
+  const { data } = await client.from('Parts').select(partFields).order('created_at')
 
   return data
 })
@@ -85,33 +82,41 @@ const createPart = () => {
 
 const editPart = (row: Part) => {
   selectedPart = row
+  console.log(selectedPart)
   partModal.value = true
 }
 
 const savePart = async () => {
   console.log("saving part", selectedPart)
   const p = { ...selectedPart }
+
+  delete p.Locations
+
   if (p.id) {
     p.owner_id = user.value.id
-    const r = await client.from('Parts').update({ ...p })
+    const r = await client.from('Parts').update({ ...p }).select(partFields)
     .eq('id', p.id)
     if (r.error) {
       alert(r.error.message)
     } else {
       partModal.value = false;
-      parts.value.push(r.data[0])
+      console.log(r)
+      const newPart = r.data[0]
+
+      const np = parts.value.findIndex((p) => p.id === newPart.id)
+
+      parts.value[np] = newPart
     }
   } else {
     p.owner_id = user.value.id
     delete p.id
-    const r = await client.from('Parts').insert({ ...p }).select()
+    const r = await client.from('Parts').insert({ ...p }).select(partFields)
     if (r.error) {
       alert(r.error.message)
     } else {
       partModal.value = false;
       parts.value.push(r.data[0])
     }
-    
   }
 }
 
