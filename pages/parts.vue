@@ -10,8 +10,25 @@
     <UTable
       :rows="parts"
       :columns="columns"
-      @select="editPart"
-    />
+      
+    >
+    <template #quantity-data="{ row }">
+      <UBadge
+        :color="row.quantity <= row.min_quantity ? 'red': 'primary'"
+        :variant="row.quantity <= row.min_quantity ? 'solid': 'outline'"
+      >
+      {{ row.quantity }}
+    </UBadge>
+
+    </template>
+    <template #name-data="{ row }">
+      <strong>{{ row.name }}</strong>
+    </template>
+    <template #id-data="{ row }">
+      <UButton class="mr-2" label="" icon="i-heroicons-outline-tag" @click="printTag(row)" />
+      <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
+    </template>
+    </UTable>
     </UContainer>
     <UButton
       class="mt-6"
@@ -20,6 +37,8 @@
     />
   </div>
   <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
+  <PartsQRCodeModal :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
+
 </template>
 
 <script lang="ts" setup>
@@ -30,6 +49,9 @@ import type { FormError, FormSubmitEvent } from '#ui/types'
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 const partModal = ref(false)
+const qrModal = ref(false)
+const qrPart = ref()
+
 let selectedPart: Part = reactive({
   name: '',
   description: '',
@@ -66,6 +88,10 @@ const columns = [
     key: "min_quantity",
     label: "Min Quantity",
   },
+  {
+    key: "id",
+    label: "Tools",
+  },
 ]
 
 const partFields = `id, name, description, footprint,quantity, min_quantity, Locations(id, name), location_id`
@@ -84,6 +110,11 @@ const editPart = (row: Part) => {
   selectedPart = row
   console.log(selectedPart)
   partModal.value = true
+}
+
+const printTag = (row: Part) => {
+  qrPart.value = row
+  qrModal.value = true
 }
 
 const savePart = async () => {

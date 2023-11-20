@@ -15,15 +15,23 @@
           to="/parts"
           icon="i-heroicons-outline-cpu-chip"
         />
+
+        <UButton
+          label="Locations"
+          variant="link"
+          to="/locations"
+          icon="i-heroicons-outline-map-pin"
+        />
       </div>
-      <div class="flex items-center">
+      <div class="flex items">
         <UButton
           :icon="colorModeIcon"
           @click="toggleDark"
         />
+        
         <UButton
           v-if="user"
-          class="u-text-white"
+          class="u-text-white ml-2"
           @click="logout"
         >
           Logout
