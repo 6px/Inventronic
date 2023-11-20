@@ -26,7 +26,7 @@
           <USelectMenu v-model="selectedPart.location_id" :options="locations" value-attribute="id"
     option-attribute="name">
     <template #label>
-      {{ current.name }}
+      {{ current ? current.name : 'None' }}
     </template>
           </USelectMenu>
         </UFormGroup>
@@ -34,12 +34,23 @@
 
       <template #footer>
         <UButton
-          class="mx-4"
-          label="Save"
+          class="mr-4"
           @click="$emit('save')"
-        />
+        >
+          <span v-if="saving">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Saving...
+          </span>
+          <span v-else>Save</span>
+        </UButton>
+        or
         <UButton
-          class="mx-4"
+          variant="link"
+          color="white"
+          class="ml-0"
           label="Cancel"
           @click="$emit('close')"
         />
@@ -52,6 +63,10 @@
 
 const props = defineProps({
   partModal: {
+    type: Boolean,
+    required: true,
+  },
+  saving: {
     type: Boolean,
     required: true,
   },

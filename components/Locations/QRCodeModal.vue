@@ -2,7 +2,7 @@
   <UModal v-model="open">
     <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
-        <h2>Label for {{ selectedPart.name }}</h2>
+        <h2>Label for {{ location.name }}</h2>
       </template>
 
       <div id="image">
@@ -35,12 +35,12 @@ const emit = defineEmits()
 const mul = 12
 
 const props = defineProps({
-  partModal: {
+  open: {
     type: Boolean,
     required: true,
   },
-  selectedPart: {
-    type: Object as Part,
+  location: {
+    type: Object as Location,
     required: true,
   },
 });
@@ -70,7 +70,7 @@ const generateLabel = () => {
   ctx.fillRect(0, 0, 62*mul, 15*mul)
 
   const p1 = new Promise((resolve, reject) => {
-    QRCode.toDataURL(`${req.public.baseUrl}${route.fullPath}/${props.selectedPart.id}`)
+    QRCode.toDataURL(`${req.public.baseUrl}${route.fullPath}/${props.location.id}`)
     .then(url => {
       const img = new Image()
       img.onload = () => {
@@ -93,8 +93,8 @@ const generateLabel = () => {
       console.log('Font loaded');
       ctx.textAlign = "right"
       ctx.fillStyle = "rgb(0, 0, 0)";
-      ctx.font = `${4.5*mul}px monaspaceBold`;
-      ctx.fillText(props.selectedPart.name, 50*mul, 5*mul);
+      ctx.font = `${4*mul}px monaspaceBold`;
+      ctx.fillText(props.location.name, 50*mul, 5*mul);
       resolve(null)
     });
   })
@@ -107,8 +107,8 @@ const generateLabel = () => {
       ctx.textAlign = "right"
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `normal 400 ${3*mul}px ${f2.family}`;
-      ctx.fillText(props.selectedPart.Locations.name, 50*mul, 10*mul);
-      ctx.fillText(props.selectedPart.footprint, 50*mul, 13*mul);
+      ctx.fillText(props.location.Parts.length + " part" + (props.location.Parts.length > 1 ? 's' : ''), 50*mul, 10*mul);
+      ctx.fillText(props.location.description, 50*mul, 13*mul);
       resolve(null)
     });
   })
@@ -123,21 +123,15 @@ const print = () => {
   mywindow.document.body.innerHTML = document.getElementById('image').innerHTML
   mywindow.print();
   mywindow.close();
-  emit('close')
+  emit('close');
 }
 
 watch(
-  () => props.partModal,
-  () => {open.value = props.partModal}
+  () => props.open,
+  () => {open.value = props.open}
 )
 </script>
 
 <style>
-@font-face {
-    font-family: 'monaspaceBold';
-    src: url('/fonts/MonaspaceKrypton-ExtraBold.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-}
 </style>
 

@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full my-[50px]">
-    <h1 class="mb-12 text-6xl font-bold u-text-white">
+  <div class="w-full my-2">
+    <h1 class="mb-6 text-4xl font-bold u-text-white">
       Locations
     </h1>
     <UContainer
@@ -34,7 +34,7 @@ let selectedLocation: Location = reactive({
 })
 
 
-const locationFields = `id, name, description, Parts(id), Locations(id, name, description, Locations(id, name, description, Locations(id, name, description, Locations(id, name, description, Locations(id, name, description, Locations(id, name, description ))))))`
+const locationFields = `id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id) ))))))`
 
 const {data: locations} = await useAsyncData('locations', async () => {
   const { data } = await client.from('Locations').select(locationFields).is('parent_id', null).order('created_at')
