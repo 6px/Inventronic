@@ -6,9 +6,10 @@
     <UContainer
       v-if="locations?.length > 0"
       body-class="overflow-hidden"
+      class="px-2 md:px-4 lg:px-6"
     >
 
-    <LocationsTree :locations="locations" :depth="0" />
+    <LocationsTree :locations="locations" :depth="0" @refresh="refresh" />
 
     </UContainer>
     <UButton
@@ -34,13 +35,18 @@ let selectedLocation: Location = reactive({
 })
 
 
-const locationFields = `id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id), Locations(id, name, description, Parts(id) ))))))`
+const locationFields = `id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name) ))))))`
 
-const {data: locations} = await useAsyncData('locations', async () => {
+const {data: locations, error, execute, refresh} = await useAsyncData('locations', async () => {
   const { data } = await client.from('Locations').select(locationFields).is('parent_id', null).order('created_at')
 
   return data
 })
+
+// const refresh = async () => {
+//   console.log('resfresh index')
+//   locations.value = await client.from('Locations').select(locationFields).is('parent_id', null).order('created_at')
+// }
 
 const create = () => {
   locationModal.value = true;

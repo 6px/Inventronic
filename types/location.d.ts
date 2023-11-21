@@ -4,4 +4,6 @@ declare interface Location {
     description?: string
     owner_id?: string
     created_at?: string
+    Locations?: Array
+    Parts?: Array
   }
