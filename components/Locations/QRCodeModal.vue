@@ -116,6 +116,9 @@ const generateLabel = () => {
       const lines = getLines(ctx, text, 50*mul - 15*mul)
       let i=0;
       for (const n in lines) {
+        if (n > 3) {
+          break;
+        }
         console.log(lines[n])
         ctx.fillText(lines[n], 50*mul, (6+i)*mul);
         i+=2;
@@ -129,7 +132,9 @@ const generateLabel = () => {
       const descLines = getLines(ctx, props.location.description, 50*mul)
       i=0;
       for (const n in descLines) {
-        console.log(descLines[n])
+        if (n > 2) {
+          break;
+        }
         ctx.fillText(descLines[n], 0, (13+i)*mul);
         i+=2;
       }

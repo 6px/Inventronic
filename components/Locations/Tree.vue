@@ -6,7 +6,7 @@
           <strong>{{ location.name }}</strong>
           <UBadge color="teal" class="ml-3">{{ location.Locations ? location.Locations.length : '0' }} <span class="hidden md:inline ml-1"> location{{ location.Locations.length > 1 ? 's' : '' }}</span></UBadge>
           <UBadge color="yellow" class="ml-3">
-            {{ partsCount(location) }}<span class="hidden md:inline"> part{{ partsCount(location) > 1 ? 's' : '' }} </span>
+            {{ partsCount(location) }}<span class="hidden md:inline ml-1"> part{{ partsCount(location) > 1 ? 's' : '' }} </span>
             <!-- <span class="text-xs ml-1" v-if="location.Locations && location.Locations.length > 0">
               (total)
             </span> -->
@@ -18,16 +18,16 @@
 
             <template #panel>
               <div class="p-4">
-                <UButton variant="solid" icon="i-heroicons-outline-eye" label="View" :to="`/locations/${location.id}`" />
-                <UButton class="ml-2" variant="solid" label="Create" icon="i-heroicons-outline-folder-plus" @click="createModal=location.id" />
+                <UButton variant="solid" icon="i-heroicons-outline-eye" :to="`/locations/${location.id}`" />
+                <UButton class="ml-2" variant="solid" icon="i-heroicons-outline-folder-plus" @click="createModal=location.id" />
                 <UButton class="ml-2" label="" icon="i-heroicons-outline-qr-code" @click="qrModal=location.id" />
                 <UButton class="ml-3" variant="solid" color="red" label="" icon="i-heroicons-outline-trash" @click="remove(location)" />
               </div>
             </template>
           </UPopover>
           <div class="hidden md:block">
-            <UButton variant="solid" icon="i-heroicons-outline-eye" label="View" :to="`/locations/${location.id}`" />
-            <UButton class="ml-2" variant="solid" label="Create" icon="i-heroicons-outline-folder-plus" @click="createModal=location.id" />
+            <UButton variant="solid" icon="i-heroicons-outline-eye" :to="`/locations/${location.id}`" />
+            <UButton class="ml-2" variant="solid" icon="i-heroicons-outline-folder-plus" @click="createModal=location.id" />
             <UButton class="ml-2" label="" icon="i-heroicons-outline-qr-code" @click="qrModal=location.id" />
             <UButton class="ml-3" variant="solid" color="red" label="" icon="i-heroicons-outline-trash" @click="remove(location)" />
           </div>

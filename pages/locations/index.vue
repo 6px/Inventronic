@@ -9,7 +9,7 @@
       class="px-2 md:px-4 lg:px-6"
     >
 
-    <LocationsTree :locations="locations" :depth="0" @refresh="refresh" />
+      <LocationsTree :locations="locations" :depth="0" @refresh="refresh" />
 
     </UContainer>
     <UButton
@@ -17,6 +17,7 @@
       label="Create location"
       @click="create"
     />
+    <LocationsCreate :open="locationModal" @refresh="refresh"/>
   </div>
 </template>
 
@@ -37,60 +38,16 @@ let selectedLocation: Location = reactive({
 
 const locationFields = `id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name) ))))))`
 
-const {data: locations, error, execute, refresh} = await useAsyncData('locations', async () => {
+const {data: locations, refresh} = await useAsyncData('locations', async () => {
   const { data } = await client.from('Locations').select(locationFields).is('parent_id', null).order('created_at')
 
   return data
 })
 
-// const refresh = async () => {
-//   console.log('resfresh index')
-//   locations.value = await client.from('Locations').select(locationFields).is('parent_id', null).order('created_at')
-// }
-
 const create = () => {
   locationModal.value = true;
 }
 
-const edit = (row: Part) => {
-  selectedLocation = row
-  console.log(selectedLocation)
-  locationModal.value = true
-}
-
-const savePart = async () => {
-  console.log("selectedLocation", selectedLocation)
-  const p = { ...selectedLocation }
-
-  delete p.Locations
-
-  if (p.id) {
-    p.owner_id = user.value.id
-    const r = await client.from('Locations').update({ ...p }).select(locationFields)
-    .eq('id', p.id)
-    if (r.error) {
-      alert(r.error.message)
-    } else {
-      locationModal.value = false;
-      console.log(r)
-      const newPart = r.data[0]
-
-      const np = locations.value.findIndex((p) => p.id === newPart.id)
-
-      locations.value[np] = newPart
-    }
-  } else {
-    p.owner_id = user.value.id
-    delete p.id
-    const r = await client.from('Parts').insert({ ...p }).select(locationFields)
-    if (r.error) {
-      alert(r.error.message)
-    } else {
-      locationModal.value = false;
-      locations.value.push(r.data[0])
-    }
-  }
-}
 
 
 
