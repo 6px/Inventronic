@@ -33,7 +33,7 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "Locations_owner_id_fkey"
+            foreignKeyName: "locations_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "users"

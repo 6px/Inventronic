@@ -1,7 +1,7 @@
 <template>
   <div class="w-full my-2">
-    <h1 class="mb-6 text-4xl font-bold u-text-white">
-      Location {{ route.params.id }}
+    <h1 class="mb-1 text-4xl font-bold u-text-white">
+      {{ location.name }} 
         <UButton
           class="ml-3 sm"
           label="Print label"
@@ -9,21 +9,26 @@
           @click="qrcode=true"
         />
     </h1>
+    <div class="mb-6 text-sm text-slate-500">{{ location.description }}</div>
     
     <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
-        <h2>Parts at this location</h2>
+        <h2>Parts in <strong>{{ location.name }}</strong></h2>
       </template>
-      <PartsTable :parts="parts" />
+      <PartsTable :parts="parts" :location="location" @refresh="refreshParts" />
     </UCard>
     <div class="lg:flex lg:flex-row mt-4">
       <UCard class="w-full lg:w-1/2 mr-2" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
         <template #header>
-          <h2>Child locations</h2>
+          <h2>Locations in <strong>{{ location.name }}</strong></h2>
         </template>
-        <LocationsTree :locations="location.Locations" :depth="0" @refresh="refresh" />
+        <LocationsTree v-if="location.locations && location.locations.length > 0" :locations="location.locations" :depth="0" @refresh="refresh" />
+        <div v-else class="text-center text-slate-500 text-lg my-6">
+          No locations here
+        </div>
         <UButton
           class="mt-6"
+          icon="i-heroicons-outline-plus"
           label="Create location here"
           @click="create=true"
         />
@@ -31,7 +36,7 @@
     
       <UCard class="w-full lg:w-1/2 ml-2" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
         <template #header>
-          <h2>Modify location</h2>
+          <h2>Modify location <strong>{{ location.name }}</strong></h2>
         </template>
         <UForm class="space-y-4" @submit="save" :validate="validate" :state="location">
           <UFormGroup label="Name" name="name">
@@ -59,7 +64,7 @@
       </UCard>
     </div>
 
-    <LocationsCreate :open="create" :parent="location" @close="create=false" />
+    <LocationsCreate :open="create" :parent="location" @close="create=false" @refresh="refresh" />
     <LocationsQrCodeModal :open="qrcode" :location="location" @close="qrcode=false" />
   </div>
 </template>
@@ -73,17 +78,17 @@
   const create = ref(false)
   const qrcode = ref(false)
   const saving = ref(false)
-  const partFields = `id, name, description, footprint,quantity, min_quantity, Locations(id, name), location_id`
-  const locationFields = `id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name) ))))))`
+  const partFields = `id, part, value, description, footprint,quantity, min_quantity, locations(id, name), location_id`
+  const locationFields = `id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value) ))))))`
 
-  const {data: parts} = await useAsyncData('parts', async () => {
-    const { data } = await client.from('Parts').select(partFields).eq('location_id', route.params.id).order('created_at')
+  const {data: parts, refresh: refreshParts} = await useAsyncData(`location-${route.params.id}-parts`, async () => {
+    const { data } = await client.from('parts').select(partFields).eq('location_id', route.params.id).order('created_at')
 
     return data
   })
 
-  const {data: location, refresh} = await useAsyncData('location', async () => {
-    const { data } = await client.from('Locations').select(locationFields).eq('id', route.params.id).order('created_at')
+  const {data: location, refresh} = await useAsyncData(`location-${route.params.id}`, async () => {
+    const { data } = await client.from('locations').select(locationFields).eq('id', route.params.id).order('created_at')
 
     return data[0]
   })
@@ -95,7 +100,7 @@ const save = async () => {
 
   if (p.id) {
     p.owner_id = user.value.id
-    const r = await client.from('Locations').update({ ...p }).select('id, name')
+    const r = await client.from('locations').update({ ...p }).select('id, name')
     .eq('id', p.id)
     if (r.error) {
       alert(r.error.message)

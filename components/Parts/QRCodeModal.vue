@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="open">
-    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+    <UCard :ui="{ ring: '', body: {background: 'bg-slate-200 dark:bg-slate-800'}, divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
         <h2>Label for {{ selectedPart.name }}</h2>
       </template>
@@ -70,11 +70,11 @@ const generateLabel = () => {
   ctx.fillRect(0, 0, 62*mul, 15*mul)
 
   const p1 = new Promise((resolve, reject) => {
-    QRCode.toDataURL(`${req.public.baseUrl}${route.fullPath}/${props.selectedPart.id}`)
+    QRCode.toDataURL(`${req.public.baseUrl}${route.fullPath}/${props.selectedPart.id}`, {margin:0})
     .then(url => {
       const img = new Image()
       img.onload = () => {
-        ctx.drawImage(img, 0, 0, 15*mul, 15*mul)
+        ctx.drawImage(img, 0, 0, 11*mul, 11*mul)
         resolve(null)
       }
 
@@ -90,11 +90,10 @@ const generateLabel = () => {
 
     monaspaceBold.load().then(function(font){
       document.fonts.add(font);
-      console.log('Font loaded');
       ctx.textAlign = "right"
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `${4.5*mul}px monaspaceBold`;
-      ctx.fillText(props.selectedPart.name, 50*mul, 5*mul);
+      ctx.fillText(props.selectedPart.part +' ' + props.selectedPart.value, 50*mul, 4*mul);
       resolve(null)
     });
   })
@@ -107,8 +106,11 @@ const generateLabel = () => {
       ctx.textAlign = "right"
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `normal 400 ${3*mul}px ${f2.family}`;
-      ctx.fillText(props.selectedPart.Locations.name, 50*mul, 10*mul);
-      ctx.fillText(props.selectedPart.footprint, 50*mul, 13*mul);
+      ctx.fillText(props.selectedPart.locations.name, 50*mul, 7*mul);
+      ctx.fillText(props.selectedPart.description, 50*mul, 10*mul);
+      ctx.font = `normal 400 ${2.5*mul}px ${f2.family}`;
+      ctx.textAlign = "left"
+      ctx.fillText(props.selectedPart.footprint, 0*mul, 14*mul);
       resolve(null)
     });
   })

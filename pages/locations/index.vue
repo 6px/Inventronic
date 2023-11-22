@@ -36,10 +36,10 @@ let selectedLocation: Location = reactive({
 })
 
 
-const locationFields = `id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name), Locations(id, name, description, Parts(id, name) ))))))`
+const locationFields = `id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value)))))))`
 
 const {data: locations, refresh} = await useAsyncData('locations', async () => {
-  const { data } = await client.from('Locations').select(locationFields).is('parent_id', null).order('created_at')
+  const { data } = await client.from('locations').select(locationFields).is('parent_id', null).order('created_at')
 
   return data
 })

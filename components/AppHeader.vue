@@ -22,12 +22,18 @@
           to="/locations"
           icon="i-heroicons-outline-map-pin"
         />
+        <UButton
+          label="Projects"
+          variant="link"
+          to="/projects"
+          icon="i-heroicons-outline-light-bulb"
+        />
       </div>
       <div class="flex items">
-        <UButton
+        <!-- <UButton
           :icon="colorModeIcon"
           @click="toggleDark"
-        />
+        /> -->
         
         <UButton
           v-if="user"
@@ -44,13 +50,13 @@
 <script lang="ts" setup>
 const client = useSupabaseClient()
 const user = useSupabaseUser()
-const colorMode = useColorMode()
+// const colorMode = useColorMode()
 
-const toggleDark = () => {
-    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-}
+// const toggleDark = () => {
+//     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+// }
 
-const colorModeIcon = computed(() => colorMode.preference === 'dark' ? 'i-heroicons-outline-moon' : 'i-heroicons-outline-sun')
+// const colorModeIcon = computed(() => colorMode.preference === 'dark' ? 'i-heroicons-outline-moon' : 'i-heroicons-outline-sun')
 
 const logout = async () => {
 await client.auth.signOut()

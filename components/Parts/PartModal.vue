@@ -6,9 +6,12 @@
         <h2 v-else>Create new part</h2>
       </template>
 
-      <UForm class="space-y-4" @submit="savePart" :validate="validate" :state="selectedPart">
-        <UFormGroup label="Name" name="name">
-          <UInput v-model=selectedPart.name color="white" variant="outline" placeholder="Part name" />
+      <UForm class="space-y-4" @submit="emit('save')" :validate="validate" :state="selectedPart">
+        <UFormGroup label="Part" name="part">
+          <UInput v-model=selectedPart.part color="white" variant="outline" placeholder="Part type" />
+        </UFormGroup>
+        <UFormGroup label="Value" name="value">
+          <UInput v-model=selectedPart.value color="white" variant="outline" placeholder="Part value" />
         </UFormGroup>
         <UFormGroup label="Description" name="description">
           <UInput v-model=selectedPart.description color="white" variant="outline" placeholder="Description" />
@@ -35,7 +38,7 @@
       <template #footer>
         <UButton
           class="mr-4"
-          @click="$emit('save')"
+          @click="emit('save')"
           :loading="saving"
         >
           <span v-if="saving">Saving...</span>
@@ -56,6 +59,8 @@
 
 <script lang="ts" setup>
 
+const emit = defineEmits()
+
 const props = defineProps({
   partModal: {
     type: Boolean,
@@ -74,7 +79,7 @@ const props = defineProps({
 const client = useSupabaseClient()
 
 const {data: locations} = await useAsyncData('locations', async () => {
-  const { data } = await client.from('Locations').select().order('created_at')
+  const { data } = await client.from('locations').select().order('created_at')
 
   console.log(data)
   return data

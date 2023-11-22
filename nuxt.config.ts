@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/supabase', '@nuxt/ui'],
+  modules: ['@nuxtjs/supabase', '@nuxt/ui', '@nuxtjs/color-mode'],
   runtimeConfig: {
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:3000'
@@ -12,6 +12,10 @@ export default defineNuxtConfig({
       login: '/',
       callback: '/confirm'
     },
+  },
+  colorMode: {
+    preference: 'system',
+    fallback: 'light',
   },
   ui: {
     colors: {

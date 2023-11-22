@@ -75,7 +75,7 @@ const save = async () => {
 
   if (p.id) {
     p.owner_id = user.value.id
-    const r = await client.from('Locations').update({ ...p }).select('id, name')
+    const r = await client.from('locations').update({ ...p }).select('id, name')
     .eq('id', p.id)
     if (r.error) {
       alert(r.error.message)
@@ -89,7 +89,7 @@ const save = async () => {
   } else {
     p.owner_id = user.value.id
     delete p.id
-    const r = await client.from('Locations').insert({ ...p }).select('id, name')
+    const r = await client.from('locations').insert({ ...p }).select('id, name')
     if (r.error) {
       alert(r.error.message)
     } else {

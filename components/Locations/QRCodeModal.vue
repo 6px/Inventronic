@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="open">
-    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+    <UCard :ui="{ body: {background: 'bg-slate-200 dark:bg-slate-800'}, divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
         <h2>Label for {{ location.name }}</h2>
       </template>
@@ -110,8 +110,8 @@ const generateLabel = () => {
       ctx.textAlign = "right"
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `normal 400 ${2*mul}px ${f2.family}`;
-      console.log(props.location.Parts)
-      const text = props.location.Parts.map((p: Part) => p.name).join(', ')
+
+      const text = props.location.parts.map((p: Part) => p.name).join(', ')
       console.log(text)
       const lines = getLines(ctx, text, 50*mul - 15*mul)
       let i=0;
