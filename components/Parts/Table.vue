@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UTable :rows="parts" :columns="columns">
+    <UTable :rows="parts" :columns="columns" :ui="{td: {base:''}}">
       <template #quantity-data="{ row }">
         <UBadge
           :color="row.quantity <= row.min_quantity ? 'red': 'primary'"
@@ -13,9 +13,16 @@
       <template #part-data="{ row }">
         <strong>{{ row.part }}</strong>
       </template>
+      <template #locations.name-data="{ row }">
+        <UButton v-if="row.locations && row.locations.name" variant="link" :to="`/locations/${row.locations.id}`">{{ row.locations.name }}</UButton>
+        <span v-else></span>
+      </template>
       <template #id-data="{ row }">
-        <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
-        <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
+        <div class="whitespace-nowrap">
+          <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
+          <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
+          <UButton class="ml-2" label="" icon="i-heroicons-outline-trash" color="red" @click="deletePart(row)" />
+        </div>
       </template>
     </UTable>
     <UButton
@@ -39,6 +46,8 @@
 </template>
 
 <script lang="ts" setup>
+import type { UButton } from '#ui-colors/components';
+
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 
@@ -118,8 +127,12 @@ const createPart = () => {
 
 const editPart = (row: Part) => {
   selectedPart = row
-  console.log(selectedPart)
   partModal.value = true
+}
+
+const deletePart = async (row: Part) => {
+  await client.from('parts').delete().eq('id', row.id)
+  emit('refresh')
 }
 
 const printTag = (row: Part) => {

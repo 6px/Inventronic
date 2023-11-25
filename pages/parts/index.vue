@@ -4,12 +4,9 @@
       Parts
     </h1>
     <UContainer
-      v-if="parts?.length > 0"
       body-class="overflow-hidden"
     >
-
-    <PartsTable :parts="parts" @refresh="refresh" />
-
+      <PartsTable :parts="parts" @refresh="refresh" />
     </UContainer>
     
   </div>

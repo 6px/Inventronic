@@ -24,3 +24,4 @@ export default defineNuxtConfig({
     icons: ['mdi', 'heroicons', 'heroicons-outline']
   },
 })
+

@@ -17,7 +17,7 @@
       label="Create location"
       @click="create"
     />
-    <LocationsCreate :open="locationModal" @refresh="refresh"/>
+    <LocationsCreate :open="locationModal" @refresh="refresh" @close="locationModal=false"/>
   </div>
 </template>
 

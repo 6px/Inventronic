@@ -80,8 +80,7 @@ const save = async () => {
     if (r.error) {
       alert(r.error.message)
     } else {
-      open.value = false;
-      const newPart = r.data[0]
+      emit('close')
       // TODO trigger refresh
       emit('refresh')
     }
@@ -93,7 +92,7 @@ const save = async () => {
     if (r.error) {
       alert(r.error.message)
     } else {
-      open.value = false;
+      emit('close')
       // TODO refresh locations
       emit('refresh')
     }
