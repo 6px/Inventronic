@@ -46,8 +46,9 @@
         <span v-if="saving">Saving...</span>
         <span v-else>Save</span>
       </UButton>
-      or
+      <span v-if="modal!==false">or</span>
       <UButton
+        v-if="modal!==false"
         variant="link"
         color="white"
         class="ml-0"
@@ -71,6 +72,10 @@ const props = defineProps({
   selectedPart: {
     type: Object as Part,
     required: true,
+  },
+  modal: {
+    type: Boolean,
+    required: false,
   },
 });
 

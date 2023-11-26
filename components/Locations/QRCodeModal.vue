@@ -111,7 +111,7 @@ const generateLabel = () => {
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `normal 400 ${2*mul}px ${f2.family}`;
 
-      const text = props.location.parts.map((p: Part) => p.name).join(', ')
+      const text = props.location.parts.map((p: Part) => p.part + ' ' + p.value).join(', ')
       console.log(text)
       const lines = getLines(ctx, text, 50*mul - 15*mul)
       let i=0;

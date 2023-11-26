@@ -1,6 +1,6 @@
 <template>
 
-    <PartsForm :selectedPart="part" :saving="saving" @save="savePart" />
+    <PartsForm :modal="false" :selectedPart="part" :saving="saving" @save="savePart" />
 
     <PartsQRCodeModal :partModal="qrModal" :selectedPart="part" @close="qrModal=false" />
 
@@ -28,8 +28,8 @@
 
   const savePart = async () => {
     saving.value = true
-    const p: Part = { ...part }
-
+    const p: Part = { ...part.value }
+    console.log('saving', p)
     delete p.locations
 
     if (p.id) {

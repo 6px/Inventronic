@@ -107,7 +107,8 @@ const generateLabel = () => {
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `normal 400 ${3*mul}px ${f2.family}`;
       ctx.fillText(props.selectedPart.locations.name, 50*mul, 7*mul);
-      ctx.fillText(props.selectedPart.description, 50*mul, 10*mul);
+      ctx.textAlign = "left"
+      ctx.fillText(props.selectedPart.description, 11*mul, 10*mul);
       ctx.font = `normal 400 ${2.5*mul}px ${f2.family}`;
       ctx.textAlign = "left"
       ctx.fillText(props.selectedPart.footprint, 0*mul, 14*mul);

@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="open">
-    <PartsForm :selectedPart="selectedPart" :saving="saving" @save="emit('save')" />
+    <PartsForm :selectedPart="selectedPart" @close="emit('close')" :saving="saving" @save="emit('save')" />
   </UModal>
 </template>
 
