@@ -146,8 +146,8 @@ const saveQuantity = async (row: ProjectPart) => {
 
 const removeProjectPart = async (row) => {
   await client.from('project_parts').delete().eq('id', row.id)
-  const pps = props.projectParts.filter((pp: ProjectPart) => pp.id !== row.id)
-  emit('setParts', pps)
+  projectParts.value = projectParts.value.filter((pp: ProjectPart) => pp.id !== row.id)
+  emit('refresh')
 }
 
 const addAll = () => {

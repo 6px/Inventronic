@@ -5,11 +5,11 @@
     </h1>
     <UContainer>
       <div class="grid grid-cols-2 gap-x-2">
-        <ProjectsForm :project="project" @refresh="refresh" @setParts="projectParts=$event" />
+        <ProjectsForm :project="project" @refresh="refresh" />
         <ProjectsDetails :project="project" />
       </div>
       
-      <ProjectsParts class="mt-8" :project="project" :projectParts="projectParts" @refresh="refresh" />
+      <ProjectsParts class="mt-8" :project="project" @refresh="refresh" />
 
     </UContainer>
 
@@ -33,7 +33,6 @@
     return data[0]
   })
 
-  const projectParts = ref(project.value.project_parts)
 
 
 
