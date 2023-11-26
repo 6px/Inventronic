@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
+  target: 'static',
   modules: ['@nuxtjs/supabase', '@nuxt/ui', '@nuxtjs/color-mode'],
   runtimeConfig: {
     public: {

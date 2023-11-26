@@ -16,11 +16,11 @@ jobs:
           node-version: "20"
       # Pick your own package manager and build script
       - run: npm install
-      - run: npm run build --preset=github_pages
+      - run: npm run generate
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./.output/public
+          path: ./dist/
   # Deployment job
   deploy:
     # Add a dependency to the build job
