@@ -10,16 +10,33 @@
       </UBadge>
 
       </template>
+
+      <template #locations.name-data="{ row }">
+        <UButton v-if="row.locations && row.locations.name" variant="link" :to="`/locations/${row.locations.id}`">
+          {{ row.locations.name }}
+        </UButton>
+        <div v-else>
+          <USelect :options="locations" option-attribute="name" value-attribute="id" v-model="row.location_id" @change="changeLocation(row)" />
+        </div>
+      </template>
+
+
+      <template #footprint-data="{ row }">
+        <UTooltip :text="row.footprint">
+          <div class="max-w-[200px] truncate overflow-hidden">
+          
+            {{ row.footprint }}
+            
+          </div>
+        </UTooltip>
+      </template>
+
       <template #part-data="{ row }">
         <strong>{{ row.part }}</strong>
       </template>
-      <template #locations.name-data="{ row }">
-        <UButton v-if="row.locations && row.locations.name" variant="link" :to="`/locations/${row.locations.id}`">{{ row.locations.name }}</UButton>
-        <span v-else></span>
-      </template>
       <template #id-data="{ row }">
         <div class="whitespace-nowrap">
-          <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
+          <UButton v-if="row.locations" class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
           <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
           <UButton class="ml-2" label="" icon="i-heroicons-outline-trash" color="red" @click="deletePart(row)" />
         </div>
@@ -106,6 +123,12 @@ const qrPart = ref(null)
 const saving = ref(false)
 const emit = defineEmits()
 
+const {data: locations} = await useAsyncData('locations', async () => {
+  const { data } = await client.from('locations').select().order('created_at')
+
+  return data
+})
+
 
 let selectedPart: Part = reactive({
   part: '',
@@ -119,7 +142,11 @@ let selectedPart: Part = reactive({
   owner_id: null,
 })
 
-
+const changeLocation = async (row) => {
+  console.log(row.location_id)
+  await client.from('parts').update({'location_id': row.location_id}).eq('id', row.id)
+  emit('refresh')
+}
 
 const createPart = () => {
   partModal.value = true;
