@@ -14,7 +14,7 @@
           {{ (new Date(row.created_at)).toLocaleString() }}
         </template>
         <template #buildable-data="{row}">
-          <UBadge color="white">{{ nparts(row) }}</UBadge>
+          <UBadge color="white">{{ nparts(row) }} PCBs</UBadge>
         </template>
 
         <template #project_parts-data="{row}">
@@ -77,7 +77,7 @@ const columns = [
   },
   {
     key: 'project_parts',
-    label: "Parts",
+    label: "Parts used",
   },
   {
     key: 'buildable',

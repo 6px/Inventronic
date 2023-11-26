@@ -50,7 +50,8 @@
               </div>
               <UButton
                 class="u-text-white"
-                variant="outline"
+                color="white"
+                variant="soft"
                 @click="logout"
               >
                 Logout
@@ -80,7 +81,6 @@ async function digestMessage(message: String) {
 }
 
 const setHash = async () => {
-  console.log(user.value.email)
   hash.value = await digestMessage(user.value.email.toLowerCase())
 }
 
@@ -88,14 +88,6 @@ onMounted(setHash)
 
 onUpdated(setHash)
 
-
-// const colorMode = useColorMode()
-
-// const toggleDark = () => {
-//     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-// }
-
-// const colorModeIcon = computed(() => colorMode.preference === 'dark' ? 'i-heroicons-outline-moon' : 'i-heroicons-outline-sun')
 
 const logout = async () => {
   await client.auth.signOut()
