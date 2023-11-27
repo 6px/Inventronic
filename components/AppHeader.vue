@@ -95,7 +95,7 @@ onUpdated(setHash)
 
 const logout = async () => {
   await client.auth.signOut()
-  navigateTo('/')
+  navigateTo('/login')
 }
 </script>
 

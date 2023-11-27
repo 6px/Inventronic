@@ -18,6 +18,7 @@ const client = useSupabaseClient()
 const user = useSupabaseUser()
 
 watchEffect(() => {
+  console.log(user, user.value)
   if (!user.value) {
     navigateTo('/login')
   }
