@@ -66,23 +66,21 @@
 </template>
 
 <script lang="ts" setup>
+import sha256 from 'crypto-js/sha256';
+
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 const hash = ref('')
 
-async function digestMessage(message: String) {
-  const msgUint8 = new TextEncoder().encode(message); // encode as (utf-8) Uint8Array
-  const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8); // hash the message
-  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join(""); // convert bytes to hex string
-  return hashHex;
+function digestMessage(message: String) {
+  const hashDigest = sha256(message);
+  console.log(hashDigest)
+  return hashDigest
 }
 
 const setHash = async () => {
   if (user && user.value && user.value.email) {
-    hash.value = await digestMessage(user.value.email.toLowerCase())
+    hash.value = digestMessage(user.value.email.toLowerCase())
   } else {
     hash.value = ''
   }

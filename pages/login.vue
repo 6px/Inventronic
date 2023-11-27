@@ -69,6 +69,7 @@ import type { FormError, FormSubmitEvent } from '#ui/types'
 
 const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
+const router = useRouter()
 
 const emailSignInOk = ref(false)
 const emailLoading = ref(false)
@@ -78,8 +79,10 @@ const otpLoading=ref(false)
 const redirectTo = `${useRuntimeConfig().public.baseUrl}/confirm`
 
 watchEffect(() => {
+  console.log('user',user.value)
   if (user.value && user.value.id) {
-    navigateTo('/')
+    //navigateTo('/')
+    window.location='/'
   }
 })
 

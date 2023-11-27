@@ -111,33 +111,38 @@ const generateLabel = () => {
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `normal 400 ${2*mul}px ${f2.family}`;
 
-      const text = props.location.parts.map((p: Part) => p.part + ' ' + p.value).join(', ')
-      console.log(text)
-      const lines = getLines(ctx, text, 50*mul - 15*mul)
-      let i=0;
-      for (const n in lines) {
-        if (n > 3) {
-          break;
+      if (props.location.parts) {
+        const text = props.location.parts.map((p: Part) => p.part + ' ' + p.value).join(', ')
+        const lines = getLines(ctx, text, 50*mul - 15*mul)
+        let i=0;
+        for (const n in lines) {
+          if (n > 3) {
+            break;
+          }
+          console.log(lines[n])
+          ctx.fillText(lines[n], 50*mul, (6+i)*mul);
+          i+=2;
         }
-        console.log(lines[n])
-        ctx.fillText(lines[n], 50*mul, (6+i)*mul);
-        i+=2;
       }
+      
       ctx.fillStyle = "rgb(255, 255, 255)";
       ctx.fillRect(0, 11*mul, 61*mul, 15*mul)
       ctx.fillStyle = "rgb(0, 0, 0)";
       // ctx.fillText(props.location.Parts.length + " part" + (props.location.Parts.length > 1 ? 's' : ''), 50*mul, 10*mul);
       ctx.textAlign = "left"
       //ctx.fillText(props.location.description, 0, 12*mul);
-      const descLines = getLines(ctx, props.location.description, 50*mul)
-      i=0;
-      for (const n in descLines) {
-        if (n > 2) {
-          break;
+      if (props.location.description) {
+        const descLines = getLines(ctx, props.location.description, 50*mul)
+        let i=0;
+        for (const n in descLines) {
+          if (n > 2) {
+            break;
+          }
+          ctx.fillText(descLines[n], 0, (13+i)*mul);
+          i+=2;
         }
-        ctx.fillText(descLines[n], 0, (13+i)*mul);
-        i+=2;
       }
+      
       resolve(null)
     });
   })
