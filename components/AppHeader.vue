@@ -13,7 +13,7 @@
           v-if="user"
           label="Parts"
           variant="link"
-          to="/parts"
+          to="/"
           icon="i-heroicons-outline-cpu-chip"
         />
 
@@ -81,7 +81,11 @@ async function digestMessage(message: String) {
 }
 
 const setHash = async () => {
-  hash.value = await digestMessage(user.value.email.toLowerCase())
+  if (user && user.value && user.value.email) {
+    hash.value = await digestMessage(user.value.email.toLowerCase())
+  } else {
+    hash.value = ''
+  }
 }
 
 onMounted(setHash)

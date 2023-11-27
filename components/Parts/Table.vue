@@ -57,8 +57,8 @@
     />
   </div>
   <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal=false" @refresh="emit('refresh')" />
-  <PartsPartModal :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
-  <PartsQRCodeModal :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
+  <PartsPartModal v-if="selectedPart" :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
+  <PartsQRCodeModal v-if="selectedPart" :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
 
 </template>
 
@@ -119,9 +119,9 @@ const partFields = `id, part, value, description, footprint,quantity, min_quanti
 const partModal = ref(false)
 const qrModal = ref(false)
 const moveModal = ref(false)
-const qrPart = ref(null)
+const qrPart = ref({})
 const saving = ref(false)
-const emit = defineEmits()
+const emit = defineEmits(['refresh'])
 
 const {data: locations} = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
@@ -140,6 +140,7 @@ let selectedPart: Part = reactive({
   location_id: props.location ? props.location.id : null,
   id:null,
   owner_id: null,
+  locations: {...props.location}
 })
 
 const changeLocation = async (row) => {

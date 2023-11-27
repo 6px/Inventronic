@@ -89,7 +89,7 @@
     <div class="text-right" v-if="newParts">
       <UButton @click="addAll">Add all</UButton>
     </div>
-    <PartsQRCodeModal :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
+    <PartsQRCodeModal v-if="qrPart" :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
 
   </UCard>
 </template>
@@ -108,7 +108,7 @@ const props = defineProps({
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
-const emit = defineEmits()
+const emit = defineEmits(['refresh'])
 
 const creating=ref({})
 const qrModal = ref(false)

@@ -28,7 +28,7 @@ import type { UInput } from '#ui-colors/components';
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
-const emit = defineEmits()
+const emit = defineEmits(['refresh'])
 
 
 
