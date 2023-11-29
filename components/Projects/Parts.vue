@@ -6,6 +6,7 @@
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
           <UButton color="white" label="Add parts" trailing-icon="i-heroicons-chevron-down-20-solid" />
           <ProjectsUploadModal @change="changed($event)" :open="uploadModal" @close="uploadModal = false" />
+          <PartsPartModal :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" @save="savePart" />
         </UDropdown>
       </div>
     </template>
@@ -82,14 +83,14 @@
           {{ row.parts.locations.name }}
         </UButton>
         <div v-else>
-          <USelect :options="locations" option-attribute="name" value-attribute="id" v-model="row.parts.location_id" />
+          <USelect @change="saveLocation(row)" :options="locations" option-attribute="name" value-attribute="id" v-model="row.parts.location_id" />
         </div>
       </template>
     </UTable>
     <div class="text-right" v-if="newParts">
       <UButton @click="addAll">Add all</UButton>
     </div>
-    <PartsQRCodeModal v-if="qrPart" :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
+    <PartsQRCodeModal :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
 
   </UCard>
 </template>
@@ -112,12 +113,19 @@ const emit = defineEmits(['refresh'])
 
 const creating=ref({})
 const qrModal = ref(false)
-const qrPart = ref(false)
+const selectedPart = ref({})
+const saving = ref(false)
+const partModal = ref(false)
+
+const qrPart = ref({})
 const adding=ref({})
 const saveQty = ref({})
 const projectParts = ref(props.project.project_parts)
 const uploadModal = ref(false)
-const newParts = ref(false)
+
+const newParts = computed(() => {
+  return projectParts.value.find(pp => !pp.id)
+})
 
 const {data: locations} = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
@@ -134,6 +142,7 @@ const {data: parts} = await useAsyncData(`parts`, async () => {
 })
 
 const printTag = (row: ProjectPart) => {
+  console.log(row.parts)
   qrPart.value = row.parts
   qrModal.value = true
 }
@@ -142,6 +151,12 @@ const saveQuantity = async (row: ProjectPart) => {
   saveQty.value[row.id] = true
   await client.from('project_parts').update({quantity: row.quantity}).eq('id', row.id)
   saveQty.value[row.id] = false
+}
+
+const saveLocation = async (row: ProjectPart) => {
+  // TODO update part location in table
+  await client.from('parts').update({location_id: row.parts.location_id}).eq('id', row.id)
+  emit('refresh')
 }
 
 const removeProjectPart = async (row) => {
@@ -160,13 +175,42 @@ const addAll = () => {
   })
 }
 
+
+const savePart = async () => {
+  saving.value = true
+  const p: Part = { ...selectedPart.value }
+
+  delete p.locations
+
+  p.owner_id = user.value.id
+  delete p.id
+  const r = await client.from('parts').insert({ ...p }).select(partFields)
+  if (r.error) {
+    alert(r.error.message)
+  } else {
+    partModal.value = false;
+    const part = r.data[0]
+    const pp: ProjectPart = {
+      part_id: part.id,
+      parts: part,
+      project_id: props.project.id,
+      quantity: 0,
+    } 
+    const np = await addPart(pp)
+    projectParts.value.push(np)
+    
+    emit('refresh')
+  }
+  saving.value = false
+}
+
 const addPart = async (row) => {
   adding.value[row.parts.part + row.parts.value] = true
   const r2 = await client.from('project_parts').insert({
       project_id: props.project.id,
       part_id: row.parts.id,
       quantity: row.quantity,
-    }).select()
+    }).select('id, parts(id, part, value, footprint, description, quantity, locations(id, name)), quantity')
 
   if (r2.error) {
     alert(r2.error.message)
@@ -175,6 +219,7 @@ const addPart = async (row) => {
     emit('refresh')
   }
   adding.value[row.parts.part + row.parts.value] = false
+  return r2.data[0]
 }
 
 const createPart = async (row: ProjectPart) => {
@@ -218,7 +263,15 @@ const items = [
       console.log('Add from kicad BOM')
       uploadModal.value = true
     }
-  }]
+  }],
+  [{
+    label: 'Create part',
+    icon: 'i-heroicons-outline-plus-circle',
+    click: () => {
+      console.log('Manually create part')
+      partModal.value = true
+    }
+  }],
 ]
 
 const columns = [

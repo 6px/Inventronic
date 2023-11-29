@@ -93,7 +93,11 @@ const generateLabel = () => {
       ctx.textAlign = "right"
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `${4.5*mul}px monaspaceBold`;
-      ctx.fillText(props.selectedPart.part +' ' + props.selectedPart.value, 50*mul, 4*mul);
+      let val = props.selectedPart.part;
+      if (props.selectedPart.part != props.selectedPart.value) {
+        val = props.selectedPart.part +' ' + props.selectedPart.value
+      }
+      ctx.fillText(val, 50*mul, 4*mul);
       resolve(null)
     });
   })
@@ -106,7 +110,10 @@ const generateLabel = () => {
       ctx.textAlign = "right"
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.font = `normal 400 ${3*mul}px ${f2.family}`;
-      ctx.fillText(props.selectedPart.locations.name, 50*mul, 7*mul);
+      if (props.selectedPart.locations) {
+        ctx.fillText(props.selectedPart.locations.name, 50*mul, 7*mul);
+      }
+      
       ctx.textAlign = "left"
       ctx.fillText(props.selectedPart.description, 11*mul, 10*mul);
       ctx.font = `normal 400 ${2.5*mul}px ${f2.family}`;

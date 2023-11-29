@@ -1,7 +1,8 @@
 <template>
   <UCard class="mr-2">
     <template #header>
-      <h2 class="text-xl font-bold u-text-white">Edit project</h2>
+      <h2 class="text-xl font-bold u-text-white" v-if="project.id">Edit project</h2>
+      <h2 class="text-xl font-bold u-text-white" v-else>Create project</h2>
     </template>
     <UForm :validate="validate" :state="state" @submit="save" class="space-y-4">
       <UFormGroup label="Project name">
@@ -14,7 +15,7 @@
         Save
       </UButton>
       <span class="pl-2 text-slate-400">or</span>
-      <UButton to="/projects" variant="link" color="white">
+      <UButton to="/projects" @click="emit('saved')" variant="link" color="white">
         Back to list
       </UButton>
     </UForm>
@@ -28,7 +29,7 @@ import type { UInput } from '#ui-colors/components';
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
-const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh', 'saved'])
 
 
 
@@ -52,10 +53,17 @@ const state = reactive({
 
 const save = async () => {
   saving.value = true
-  await client.from('projects')
+  if (props.project.id) {
+    await client.from('projects')
     .update({name: state.name, description: state.description})
     .eq('id', props.project.id)
+  } else {
+    await client.from('projects')
+    .insert({name: state.name, description: state.description})
+  }
+  
   saving.value = false;
+  emit('saved')
 }
 
 const validate = (state: any): FormError[] => {

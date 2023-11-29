@@ -20,7 +20,7 @@ const partFields = `id, part, value, description, footprint, quantity, min_quant
 
 const {data: parts, refresh} = await useAsyncData('parts', async () => {
   const { data } = await client.from('parts').select(partFields).order('created_at')
-
+  
   return data
 })
 
