@@ -14,3 +14,7 @@ Electronic components management
 - Print labels with QR codes to stick on containers, so that you always know where everything is.
 - Add parts to project from a kicad BOM file.
 - Always know how many of each project you can make with the parts in stock.
+
+# Run with Docker
+A docker image is available on docker hub
+Run it like this: `docker run -p 3000:3000 -e SUPABASE_URL=https://yourproject.supabase.co -e SUPABASE_KEY=a_very_long_key_here jonathanfoucher/inventronic:latest`

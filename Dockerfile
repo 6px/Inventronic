@@ -1,31 +1,24 @@
-FROM node:lts as builder
+FROM node:alpine
 
 WORKDIR /app
 
-COPY . .
+ENV HOST 0.0.0.0
+ENV NODE_ENV production
+ENV SUPABASE_KEY SUPABASE_KEY
+ENV SUPABASE_URL SUPABASE_URL
 
-RUN yarn install \
+COPY . /tmp/app/
+
+RUN cd /tmp/app && npm install \
   --prefer-offline \
   --frozen-lockfile \
   --non-interactive \
-  --production=false
+  --production=false \
+  && npm run build \
+  && rm -rf node_modules \
+  && mv /tmp/app/.output/* /app/ \
+  && rm -rf /tmp/app
 
-RUN yarn build
-
-RUN rm -rf node_modules && \
-  NODE_ENV=production yarn install \
-  --prefer-offline \
-  --pure-lockfile \
-  --non-interactive \
-  --production=true
-
-FROM node:lts
-
-WORKDIR /app
-
-COPY --from=builder /app  .
-
-ENV HOST 0.0.0.0
 EXPOSE 3000
 
-CMD [ "yarn", "start" ]
+CMD [ "sh", "-c", "sed -i 's/SUPABASE_KEY/'$SUPABASE_KEY'/g' server/chunks/nitro/node-server.mjs && sed -i 's|SUPABASE_URL|'$SUPABASE_URL'|g' server/chunks/nitro/node-server.mjs && node server/index.mjs" ]
