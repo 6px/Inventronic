@@ -34,6 +34,7 @@
             {{ current ? current.name : 'None' }}
           </template>
         </USelectMenu>
+        <UButton type="submit" class="hidden" @click="emit('save')" />
       </UFormGroup>
     </UForm>
 

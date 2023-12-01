@@ -13,8 +13,37 @@
         {{ (new Date(project.created_at)).toLocaleTimeString() }}
       </p>
       <p>
-        With the current parts inventory, you can build <strong>{{ nparts }}</strong> of this project.
+        With the current parts inventory, 
+        <span v-if="nparts > 0">
+          you can build <strong>{{ nparts }}</strong> of this project.
+        </span>
+        <span v-if="nparts == 0">
+          you cannot build this project. 
+        </span>
       </p>
+      <div v-if="nparts > 0" class="mt-2 flex flex-row">
+        <UFormGroup label="Number to build">
+          <UInput :max="nparts" min="0" v-model="buildnum" type="number"></UInput>
+        </UFormGroup>
+        <UFormGroup label="&nbsp;">
+          <UButton :disabled="buildnum < 1 || nparts < buildnum" @click="build" class="ml-4">Build</UButton>
+        </UFormGroup>
+      </div>
+      <div  v-if="nparts === 0" class="mt-2">
+        <div>
+          <UAccordion :items="[{label: 'Missing parts',content:'', defaultOpen: false,}]" :ui="{ wrapper: 'flex flex-col w-full' }">
+            <template #item="{ item, index, open }">
+              <UVerticalNavigation :links="missing.map(m => {
+                  return {
+                    label: m.part === m.value ? m.part : m.part + ' ' + m.value,
+                    badge: m.quantity || '0',
+                    click: () => { emit('editPart', m) }
+                  }
+                })" />
+            </template>
+          </UAccordion>
+        </div>
+      </div>
     </div>
   </UCard>
 
@@ -27,31 +56,63 @@ const props = defineProps({
     type: Object as Project,
     required: true,
   },
+  parts: {
+    type: Array<Part>,
+    required: true,
+  }
 })
+
+const emit = defineEmits(['editPart', 'refresh'])
 
 const client = useSupabaseClient()
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, locations(id, name), location_id`
+const missing = ref([])
 
-const {data: parts} = await useAsyncData(`parts`, async () => {
-  const { data } = await client.from('parts').select(partFields).order('created_at')
+const buildnum = ref(0)
 
-  return data
-})
+const build = async () => {
+  if (!buildnum.value || buildnum.value > nparts) {
+    alert('you do not have enough parts to build ' + buildnum + ' of this project')
+    return
+  }
+
+  missing.value = []
+
+  for await (const pp of props.project.project_parts) {
+    const part = props.parts.find(p => p.id === pp.parts.id)
+    if(!part) {
+      return
+    }
+    const newQty = part.quantity - pp.quantity * buildnum.value;
+    await client.from('parts').update({ quantity: newQty }).eq('id', part.id)
+    console.log('doing part', part)
+  }
+
+  console.log('doing refresh')
+
+  emit('refresh')
+}
 
 const nparts = computed(() => {
   // For each project parts, get current inventory, 
   // and divide by the quantity required by the project
   let nparts = Infinity;
-  console.log(props.project.project_parts)
+
+  const m: Array<Part> = []
+
   props.project.project_parts.forEach((pp: ProjectPart) => {
-    const part = parts.value.find(p => p.id === pp.parts.id)
+    const part = props.parts.find(p => p.id === pp.parts.id)
     if (!part) {
       nparts = 0
     } else if (Math.floor(part.quantity / pp.quantity) < nparts) {
       nparts = Math.floor(part.quantity / pp.quantity)
     }
+    if (Math.floor(part.quantity / pp.quantity) === 0) {
+      nparts = 0
+      m.push(part)
+    }
   });
+  missing.value = m
   return nparts
 })
 </script>

@@ -6,7 +6,6 @@
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
           <UButton color="white" label="Add parts" trailing-icon="i-heroicons-chevron-down-20-solid" />
           <ProjectsUploadModal @change="changed($event)" :open="uploadModal" @close="uploadModal = false" />
-          <PartsPartModal :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" @save="savePart" />
         </UDropdown>
       </div>
     </template>
@@ -42,13 +41,13 @@
       </template>
 
       <template #parts.part-data="{ row }">
-        <UButton class="p-0" v-if="row.parts.id" variant="link" :to="`/parts/${row.parts.id}`">
+        <UButton class="p-0" v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
           {{ row.parts.part }}
         </UButton>
       </template>
       
       <template #parts.value-data="{ row }">
-        <UButton class="p-0"  v-if="row.parts.id" variant="link" :to="`/parts/${row.parts.id}`">
+        <UButton class="p-0"  v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
           {{ row.parts.value }}
         </UButton>
       </template>
@@ -64,9 +63,8 @@
       </template>
 
       <template #quantity-data="{ row }">
-        <div class="flex flex-row justify-between">
-          <div class="shrink flex flex-row form-input relative block w-18 disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-sm p-0 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400">
-            <UInput v-model="row.quantity" variant="none" class="w-12" />
+          <div class="shrink flex flex-row space-between form-input relative w-18 disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-sm p-0 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400">
+            <UInput v-model="row.quantity" variant="none" class="w-20" />
             <UButton
               class="rounded-s-none m-0"
               @click="saveQuantity(row)"
@@ -74,8 +72,12 @@
               :loading="saveQty[row.id]"
             />
           </div>
-          <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > row.parts.quantity ? 'red' : 'green'" class="ml-2 shrink">{{ row.parts.quantity }}</UBadge>
-        </div>
+      </template>
+
+      
+
+      <template #parts.quantity-data="{ row }">
+        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > row.parts.quantity ? 'red' : 'green'" class="ml-2 shrink">{{ row.parts.quantity }}</UBadge>
       </template>
 
       <template #parts.locations-data="{ row }">
@@ -91,7 +93,7 @@
       <UButton @click="addAll">Add all</UButton>
     </div>
     <PartsQRCodeModal :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
-
+    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
   </UCard>
 </template>
 
@@ -135,11 +137,17 @@ const {data: locations} = await useAsyncData('locations', async () => {
 
 const partFields = `id, part, value, description, footprint, quantity, min_quantity, locations(id, name), location_id`
 
-const {data: parts} = await useAsyncData(`parts`, async () => {
-  const { data } = await client.from('parts').select(partFields).order('created_at')
 
-  return data
-})
+const refresh = () => {
+  emit('refresh')
+}
+
+watch(
+    () => props.project,
+    () => {
+      projectParts.value = props.project.project_parts;
+    }
+  )
 
 const printTag = (row: ProjectPart) => {
   console.log(row.parts)
@@ -156,13 +164,18 @@ const saveQuantity = async (row: ProjectPart) => {
 const saveLocation = async (row: ProjectPart) => {
   // TODO update part location in table
   await client.from('parts').update({location_id: row.parts.location_id}).eq('id', row.id)
-  emit('refresh')
+  refresh()
+}
+
+const editPart = (part: Part) => {
+  selectedPart.value = part
+  partModal.value = true
 }
 
 const removeProjectPart = async (row) => {
   await client.from('project_parts').delete().eq('id', row.id)
   projectParts.value = projectParts.value.filter((pp: ProjectPart) => pp.id !== row.id)
-  emit('refresh')
+  refresh()
 }
 
 const addAll = () => {
@@ -181,25 +194,38 @@ const savePart = async () => {
   const p: Part = { ...selectedPart.value }
 
   delete p.locations
+  if (p.id) {
+    p.owner_id = user.value.id
+    const r = await client.from('parts').update({ ...p }).eq('id', p.id).select(partFields)
+    .eq('id', p.id)
+    if (r.error) {
+      alert(r.error.message)
+    } else {
+      partModal.value = false;
 
-  p.owner_id = user.value.id
-  delete p.id
-  const r = await client.from('parts').insert({ ...p }).select(partFields)
-  if (r.error) {
-    alert(r.error.message)
+      refresh()
+    }
+    saving.value = false
   } else {
-    partModal.value = false;
-    const part = r.data[0]
-    const pp: ProjectPart = {
-      part_id: part.id,
-      parts: part,
-      project_id: props.project.id,
-      quantity: 0,
-    } 
-    const np = await addPart(pp)
-    projectParts.value.push(np)
-    
-    emit('refresh')
+    p.owner_id = user.value.id
+    delete p.id
+    const r = await client.from('parts').insert({ ...p }).select(partFields)
+    if (r.error) {
+      alert(r.error.message)
+    } else {
+      partModal.value = false;
+      const part = r.data[0]
+      const pp: ProjectPart = {
+        part_id: part.id,
+        parts: part,
+        project_id: props.project.id,
+        quantity: 0,
+      } 
+      const np = await addPart(pp)
+      projectParts.value.push(np)
+      
+      refresh()
+    }
   }
   saving.value = false
 }
@@ -216,7 +242,7 @@ const addPart = async (row) => {
     alert(r2.error.message)
   } else {
     row.id = r2.data[0].id
-    emit('refresh')
+    refresh()
   }
   adding.value[row.parts.part + row.parts.value] = false
   return r2.data[0]
@@ -246,7 +272,7 @@ const createPart = async (row: ProjectPart) => {
       alert(r2.error.message)
     } else {
       row.id = r2.data[0].id
-      emit('refresh')
+      refresh()
     }
     
   }
@@ -300,6 +326,10 @@ const columns = [
   {
     key: "quantity",
     label: "Quantity per PCB"
+  },
+  {
+    key: "parts.quantity",
+    label: "Available"
   },
   {
     key: "id",

@@ -8,7 +8,7 @@
 import type { PartsForm } from '#ui-colors/components';
 
 
-const emit = defineEmits()
+const emit = defineEmits(['close', 'save'])
 
 const props = defineProps({
   partModal: {
