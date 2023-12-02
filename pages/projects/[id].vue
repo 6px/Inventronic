@@ -9,7 +9,7 @@
         <ProjectsDetails :project="project" :parts="parts" @editPart="editPart($event)" @refresh="refresh" />
       </div>
       
-      <ProjectsParts class="mt-8" :project="project" @refresh="refresh" />
+      <ProjectsParts class="mt-8" :project="project" :parts="parts" @refresh="refresh" />
 
     </UContainer>
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />

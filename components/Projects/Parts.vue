@@ -100,18 +100,21 @@
 <script lang="ts" setup>
 import type { UButton, UTooltip } from '#ui-colors/components';
 import Papa from 'papaparse';
-import { popScopeId } from 'vue';
 
 const props = defineProps({
   project: {
     type: Object as Project,
     required: true,
-  }
+  },
+  parts: {
+    type: Array<Part>,
+    required: true,
+  },
 })
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
-const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh', 'setParts'])
 
 const creating=ref({})
 const qrModal = ref(false)
@@ -222,7 +225,7 @@ const savePart = async () => {
         quantity: 0,
       } 
       const np = await addPart(pp)
-      projectParts.value.push(np)
+      props.project.project_parts.push(np)
       
       refresh()
     }
@@ -242,7 +245,7 @@ const addPart = async (row) => {
     alert(r2.error.message)
   } else {
     row.id = r2.data[0].id
-    refresh()
+    //refresh()
   }
   adding.value[row.parts.part + row.parts.value] = false
   return r2.data[0]
@@ -272,7 +275,7 @@ const createPart = async (row: ProjectPart) => {
       alert(r2.error.message)
     } else {
       row.id = r2.data[0].id
-      refresh()
+      //refresh()
     }
     
   }
@@ -386,10 +389,9 @@ const changed = (files: Array<File>) => {
                 project_id: props.project.id,
                 quantity: line[qtyCol],
               } 
-              projectParts.value.push(pp)
+              props.project.project_parts.push(pp)
             }
 
-            newParts.value = true
           } else {
             const part: Part = {
               id: null,
@@ -408,15 +410,13 @@ const changed = (files: Array<File>) => {
               quantity: line[qtyCol],
             } 
 
-            projectParts.value.push(pp)
+            props.project.project_parts.push(pp)
           }
           
         }
       }
 
-      console.log('project parts', projectParts.value)
-
-      emit('setParts', projectParts.value)
+      //emit('setParts', projectParts.value)
 
     };
     reader.readAsText(file);

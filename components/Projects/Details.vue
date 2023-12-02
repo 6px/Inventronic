@@ -104,7 +104,7 @@ const nparts = computed(() => {
     } else if (Math.floor(part.quantity / pp.quantity) < nparts) {
       nparts = Math.floor(part.quantity / pp.quantity)
     }
-    if (Math.floor(part.quantity / pp.quantity) === 0) {
+    if (part && Math.floor(part.quantity / pp.quantity) === 0) {
       nparts = 0
       m.push(part)
     }
