@@ -370,14 +370,14 @@ const changed = (files: Array<File>) => {
         } else if (el.toLowerCase() === 'footprint') {
           fpCol = i
         }
-      })
+      }) 
 
       let i = 1;
       for (i=1; i < data.length;i++) {
         const line = data[i]
         const row = parseInt(line[0], 10)
         if (!Number.isNaN(row)) {
-          const existingPart = parts.value.find(p => p.part === line[partCol] && p.value === line[valCol])
+          const existingPart = props.parts.find(p => p.part === line[partCol] && p.value === line[valCol])
           if (existingPart){
             if (!props.project.project_parts.find((pp: ProjectPart) => pp.parts.id === existingPart.id)) {
               const pp: ProjectPart = {

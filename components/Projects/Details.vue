@@ -85,10 +85,7 @@ const build = async () => {
     }
     const newQty = part.quantity - pp.quantity * buildnum.value;
     await client.from('parts').update({ quantity: newQty }).eq('id', part.id)
-    console.log('doing part', part)
   }
-
-  console.log('doing refresh')
 
   emit('refresh')
 }

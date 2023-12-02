@@ -70,7 +70,7 @@ const generateLabel = () => {
   ctx.fillRect(0, 0, 62*mul, 15*mul)
 
   const p1 = new Promise((resolve, reject) => {
-    QRCode.toDataURL(`${req.public.baseUrl}${route.fullPath}/${props.selectedPart.id}`, {margin:0})
+    QRCode.toDataURL(`${req.public.baseUrl}/parts/${props.selectedPart.id}`, {margin:0})
     .then(url => {
       const img = new Image()
       img.onload = () => {
