@@ -34,6 +34,10 @@ const client = useSupabaseClient()
 
 const newModal = ref(false)
 
+useHead({
+  title: 'Projects', 
+})
+
 const partFields = `id, part, value, description, footprint, quantity, min_quantity, locations(id, name), location_id`
 
 const {data: parts} = await useAsyncData('parts', async () => {

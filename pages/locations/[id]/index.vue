@@ -50,14 +50,11 @@
           <UButton
             class="mr-4"
             @click="save"
+            :loading="saving"
           >
-            <span v-if="saving">
-              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+            <div v-if="saving">
               Saving...
-            </span>
+            </div>
             <span v-else>Save</span>
           </UButton>
         </template>
@@ -74,6 +71,7 @@
   const route = useRoute()
   const client = useSupabaseClient()
   const user = useSupabaseUser()
+
 
   const create = ref(false)
   const qrcode = ref(false)
@@ -94,18 +92,26 @@
   })
 
 
+useHead({
+  title: location.value.name,
+})
+
+
 const save = async () => {
   saving.value = true
-  const p = { ...location }
+  const p = { ...location.value }
+
+  delete p.locations
+  delete p.parts
+
+  console.log('saving', p)
 
   if (p.id) {
     p.owner_id = user.value.id
-    const r = await client.from('locations').update({ ...p }).select('id, name')
-    .eq('id', p.id)
+    const r = await client.from('locations').update({ ...p }).eq('id', p.id).select('id, name')
     if (r.error) {
       alert(r.error.message)
     } else {
-      const newPart = r.data[0]
       // TODO trigger refresh
       refresh()
     }

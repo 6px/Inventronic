@@ -26,6 +26,10 @@
     return data[0]
   })
 
+useHead({
+  title: part.value.part + ' ' + part.value.value, 
+})
+
   const savePart = async () => {
     saving.value = true
     const p: Part = { ...part.value }

@@ -24,7 +24,6 @@
 <script lang="ts" setup>
 
 const client = useSupabaseClient()
-const user = useSupabaseUser()
 const locationModal = ref(false)
 
 let selectedLocation: Location = reactive({
@@ -33,6 +32,10 @@ let selectedLocation: Location = reactive({
   parent_id: null,
   id:null,
   owner_id: null,
+})
+
+useHead({
+  title: 'Locations',
 })
 
 

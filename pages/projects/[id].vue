@@ -43,6 +43,10 @@
     return data
   })
 
+useHead({
+  title: project.value.name, 
+})
+
   const refresh = () => {
     refreshParts()
     refreshProject()

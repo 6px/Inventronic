@@ -69,7 +69,11 @@ import type { FormError, FormSubmitEvent } from '#ui/types'
 
 const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
-const router = useRouter()
+
+useHead({
+  title: 'Login', 
+})
+
 
 const emailSignInOk = ref(false)
 const emailLoading = ref(false)
