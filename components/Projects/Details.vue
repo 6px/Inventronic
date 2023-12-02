@@ -15,7 +15,11 @@
       <p>
         With the current parts inventory, 
         <span v-if="nparts > 0">
-          you can build <strong>{{ nparts }}</strong> of this project.
+          you can build <strong>{{ nparts }}</strong> of this project.<br>
+          Limiting part:
+          <strong>
+            {{ limitingPart.part === limitingPart.value ? limitingPart.part : limitingPart.part + ' ' + limitingPart.value }}
+          </strong>
         </span>
         <span v-if="nparts == 0">
           you cannot build this project. 
@@ -65,7 +69,7 @@ const props = defineProps({
 const emit = defineEmits(['editPart', 'refresh'])
 
 const client = useSupabaseClient()
-
+const limitingPart = ref({})
 const missing = ref([])
 
 const buildnum = ref(0)
@@ -103,6 +107,7 @@ const nparts = computed(() => {
       nparts = 0
     } else if (Math.floor(part.quantity / pp.quantity) < nparts) {
       nparts = Math.floor(part.quantity / pp.quantity)
+      limitingPart.value = part
     }
     if (part && Math.floor(part.quantity / pp.quantity) === 0) {
       nparts = 0
