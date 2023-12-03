@@ -10,10 +10,10 @@
 
       <CommonQrCode
         :subtitle="project.description"
-        :description="`${req.public.baseUrl}/projects/${project.id}`"
-        :description-size="2"
+        :description="project.url"
+        :description-size="1.75"
         :subtitle-size="2.5"
-        :url="`${req.public.baseUrl}/projects/${project.id}`"
+        :url="project.url"
       >
         <template #title>
           {{ project.name }}

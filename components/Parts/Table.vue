@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UTable :rows="parts" :columns="columns" :ui="{td: {base:''}}">
+    <UTable :rows="rows" :columns="columns" :ui="{td: {base:''}}">
       <template #quantity-data="{ row }">
         <UBadge
           :color="row.quantity <= row.min_quantity ? 'red': 'primary'"
@@ -42,6 +42,11 @@
         </div>
       </template>
     </UTable>
+
+    <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+      <UPagination v-model="page" :page-count="pageCount" :total="parts.length" />
+    </div>
+
     <UButton
       icon="i-heroicons-outline-plus"
       class="mt-6"
@@ -81,34 +86,48 @@ const props = defineProps({
   },
 })
 
+const page = ref(1)
+const pageCount = 20
+
+const rows = computed(() => {
+  return props.parts.slice((page.value - 1) * pageCount, (page.value) * pageCount)
+})
+
 const columns = [
   {
     key: "part",
-    label: "Part"
+    label: "Part",
+    sortable: true,
   },
   {
     key: "value",
-    label: "Value"
+    label: "Value",
+    sortable: true,
   },
   {
     key: "description",
     label: "Description",
+    sortable: true,
   },
   {
     key: "locations.name",
     label: "Location",
+    sortable: true,
   },
   {
     key: "footprint",
     label: "Footprint",
+    sortable: true,
   },
   {
     key: "quantity",
     label: "Quantity",
+    sortable: true,
   },
   {
     key: "min_quantity",
     label: "Min Quantity",
+    sortable: true,
   },
   {
     key: "id",
@@ -116,7 +135,7 @@ const columns = [
   },
 ]
 
-const partFields = `id, part, value, description, footprint,quantity, min_quantity, locations(id, name), location_id`
+const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, locations(id, name), location_id`
 
 const partModal = ref(false)
 const qrModal = ref(false)
@@ -139,6 +158,8 @@ let selectedPart: Part = reactive({
   footprint: '',
   quantity: 0,
   min_quantity: 0,
+  price: 0,
+  ordering_url: '',
   location_id: props.location ? props.location.id : null,
   id:null,
   owner_id: null,

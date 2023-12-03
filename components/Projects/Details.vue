@@ -33,9 +33,9 @@
           <UButton :disabled="buildnum < 1 || nparts < buildnum" @click="build" class="ml-4">Build</UButton>
         </UFormGroup>
       </div>
-      <div  v-if="nparts === 0" class="mt-2">
+      <div  v-if="nparts === 0" class="mt-4">
         <div>
-          <UAccordion :items="[{label: 'Missing parts',content:'', defaultOpen: false,}]" :ui="{ wrapper: 'flex flex-col w-full' }">
+          <UAccordion :items="[{label: missing.length + ' missing parts',content:'', defaultOpen: false,}]" :ui="{ wrapper: 'flex flex-col w-full' }">
             <template #item="{ item, index, open }">
               <UVerticalNavigation :links="missing.map(m => {
                   return {

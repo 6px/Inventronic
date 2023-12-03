@@ -8,6 +8,8 @@ declare interface Part {
     value?: string
     owner_id?: string
     created_at?: string
+    ordering_url?: string
+    price?: number
     locations: Location
     location_id: number
   }

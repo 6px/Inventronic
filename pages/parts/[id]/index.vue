@@ -18,7 +18,7 @@
 
   const saving = ref(false)
 
-  const partFields = `id, part, value, description, footprint, quantity, min_quantity, locations(id, name), location_id`
+  const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
 
   const {data: part, refresh} = await useAsyncData(`part-${route.params.id}`, async () => {
     const { data } = await client.from('parts').select(partFields).eq('id', route.params.id).order('created_at')

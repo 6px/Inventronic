@@ -14,6 +14,9 @@
       <UFormGroup label="Description">
         <UInput v-model="state.description" />
       </UFormGroup>
+      <UFormGroup label="URL">
+        <UInput v-model="state.url" type="url" />
+      </UFormGroup>
       <UButton type="submit" :loading="saving" class="mr-2">
         Save
       </UButton>
@@ -43,26 +46,23 @@ const props = defineProps({
   },
 })
 
-
-
 const saving = ref(false)
 
 const state = reactive({
   name: props.project.name,
   description: props.project.description,
+  url: props.project.url,
 })
-
-
 
 const save = async () => {
   saving.value = true
   if (props.project.id) {
     await client.from('projects')
-    .update({name: state.name, description: state.description})
+    .update({...state})
     .eq('id', props.project.id)
   } else {
     await client.from('projects')
-    .insert({name: state.name, description: state.description})
+    .insert({...state})
   }
   
   saving.value = false;

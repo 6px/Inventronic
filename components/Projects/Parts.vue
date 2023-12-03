@@ -2,14 +2,14 @@
   <UCard>
     <template #header>
       <div class="flex flex-row justify-between">
-        <h2 class="text-xl font-bold u-text-white">Project parts</h2>
+        <h2 class="text-xl font-bold u-text-white">{{ project.project_parts.length}} project parts</h2>
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
           <UButton color="white" label="Add parts" trailing-icon="i-heroicons-chevron-down-20-solid" />
           <ProjectsUploadModal @change="changed($event)" :open="uploadModal" @close="uploadModal = false" />
         </UDropdown>
       </div>
     </template>
-    <UTable :rows="projectParts" :columns="columns" :ui="{td:{base:''}}">
+    <UTable :rows="rows" :columns="columns" :ui="{td:{base:''}}">
       <template #id-data="{ row }">
         <div class="flex flex-row">
           <UTooltip v-if="row.id" text="Print part label">
@@ -92,7 +92,10 @@
     <div class="text-right" v-if="newParts">
       <UButton @click="addAll">Add all</UButton>
     </div>
-    {{ partModal }} {{ selectedPart.id }}
+
+    <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+      <UPagination v-model="page" :page-count="pageCount" :total="project.project_parts.length" />
+    </div>
     <PartsQRCodeModal v-if="selectedPart" :open="qrModal" :part="qrPart" @close="qrModal=false" />
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
   </UCard>
@@ -133,13 +136,20 @@ const newParts = computed(() => {
   return projectParts.value.find(pp => !pp.id)
 })
 
+const page = ref(1)
+const pageCount = 20
+
+const rows = computed(() => {
+  return props.project.project_parts.slice((page.value - 1) * pageCount, (page.value) * pageCount)
+})
+
 const {data: locations} = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
 
   return data
 })
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, locations(id, name), location_id`
+const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
 
 
 const refresh = () => {
@@ -307,33 +317,40 @@ const items = [
 const columns = [
   {
     key: "parts.part",
-    label: "Part"
+    label: "Part",
+    sortable: true,
   },
   {
     key: "parts.value",
-    label: "Value"
+    label: "Value",
+    sortable: true,
   },
   {
     key: "parts.footprint",
     label: "Footprint",
     class: "max-w-xs",
+    sortable: true,
   },
   {
     key: "parts.description",
     label: "Description",
     class: "max-w-md",
+    sortable: true,
   },
   {
     key: "parts.locations",
-    label: "Location"
+    label: "Location",
+    sortable: true,
   },
   {
     key: "quantity",
-    label: "Quantity per PCB"
+    label: "Quantity per PCB",
+    sortable: true,
   },
   {
     key: "parts.quantity",
-    label: "Available"
+    label: "Available",
+    sortable: true,
   },
   {
     key: "id",

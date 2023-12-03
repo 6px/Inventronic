@@ -27,6 +27,12 @@
       <UFormGroup label="Minimum quantity" name="min_quantity">
         <UInput v-model=selectedPart.min_quantity color="white" variant="outline" placeholder="0" />
       </UFormGroup>
+      <UFormGroup label="Price" name="price">
+        <UInput v-model=selectedPart.price step="0.01" color="white" type="number" variant="outline" placeholder="" />
+      </UFormGroup>
+      <UFormGroup label="Ordering URL" name="ordering_url">
+        <UInput v-model=selectedPart.ordering_url color="white" variant="outline" placeholder="" />
+      </UFormGroup>
       <UFormGroup label="Location" name="location">
         <USelectMenu
           v-model="selectedPart.location_id"
@@ -82,6 +88,10 @@ const props = defineProps({
     required: false,
   },
 });
+
+onMounted(() => {
+  console.log('selected part', props.selectedPart)
+})
 
 const {data: locations} = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')

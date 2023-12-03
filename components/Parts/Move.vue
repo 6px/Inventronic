@@ -77,7 +77,7 @@ watch(
   () => {open.value = props.open}
 )
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, locations(id, name), location_id`
+const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
 
 const {data: parts} = await useAsyncData('parts', async () => {
   const { data } = await client.from('parts').select(partFields).neq('location_id', props.location.id).order('created_at')

@@ -76,7 +76,7 @@
   const create = ref(false)
   const qrcode = ref(false)
   const saving = ref(false)
-  const partFields = `id, part, value, description, footprint,quantity, min_quantity, locations(id, name), location_id`
+  const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
   const locationFields = `id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value) ))))))`
 
   const {data: parts, refresh: refreshParts} = await useAsyncData(`location-${route.params.id}-parts`, async () => {
