@@ -1,10 +1,13 @@
 <template>
-  <UModal v-model="open">
+  <UModal v-model="open" @close="emit('close')">
     <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
-        <h2 v-if="location.id">Editing {{ location.name }}</h2>
-        <h2 v-else-if="parent">Create new location in <strong>{{ parent.name }}</strong></h2>
-        <h2 v-else>Create new top-level location</h2>
+        <div class="flex items-center justify-between">
+          <h2 v-if="location.id">Editing {{ location.name }}</h2>
+          <h2 v-else-if="parent">Create new location in <strong>{{ parent.name }}</strong></h2>
+          <h2 v-else>Create new top-level location</h2>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
+        </div>
       </template>
 
       <UForm class="space-y-4" @submit="save" :validate="validate" :state="location">

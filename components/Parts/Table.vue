@@ -55,10 +55,12 @@
       label="Move part here"
       @click="moveModal=true"
     />
+    <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal=false" @refresh="emit('refresh')" />
+    
+    <PartsPartModal :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
+    <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal=false" />
+
   </div>
-  <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal=false" @refresh="emit('refresh')" />
-  <PartsPartModal v-if="selectedPart" :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
-  <PartsQRCodeModal v-if="selectedPart" :open="qrModal" :part="qrPart" @close="qrModal=false" />
 
 </template>
 

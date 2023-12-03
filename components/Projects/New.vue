@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model="open">
+  <UModal v-model="open" @close="emit('close')">
     <ProjectsForm :project="project" @saved="emit('close')" />
   </UModal>
 </template>

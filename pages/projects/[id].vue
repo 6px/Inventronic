@@ -20,6 +20,7 @@
 <script lang="ts" setup>
 
   const route = useRoute()
+  const router = useRouter()
   const client = useSupabaseClient()
   const user = useSupabaseUser()
 
@@ -43,8 +44,15 @@
     return data
   })
 
+  if (!project.value) {
+    showError({
+      statusCode: 404,
+      statusMessage: 'Page Not Found'
+    })
+  }
+
 useHead({
-  title: project.value.name, 
+  title: project.value ? project.value.name : '', 
 })
 
   const refresh = () => {

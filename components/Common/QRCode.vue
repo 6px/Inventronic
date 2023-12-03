@@ -22,7 +22,7 @@
         </tspan>
       </text>
 
-      <rect x="0" :y="qrSize*mul" width="100%" :height="(height-12)*mul" fill="#ffffff" />
+      <rect x="0" :y="qrSize*mul" width="100%" :height="(height-qrSize)*mul" fill="#ffffff" />
       
       <text :x="0" :y="qrSize*mul" class="description">
         <tspan :x="0" :dy="descriptionSize*mul" v-for="line in descLines">

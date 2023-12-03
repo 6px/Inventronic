@@ -92,6 +92,7 @@
     <div class="text-right" v-if="newParts">
       <UButton @click="addAll">Add all</UButton>
     </div>
+    {{ partModal }} {{ selectedPart.id }}
     <PartsQRCodeModal v-if="selectedPart" :open="qrModal" :part="qrPart" @close="qrModal=false" />
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
   </UCard>

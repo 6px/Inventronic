@@ -1,8 +1,11 @@
 <template>
-  <UModal v-model="open" :ui="{base: 'overflow-visible relative text-left rtl:text-right w-full flex flex-col'}">
+  <UModal v-model="open" :ui="{base: 'overflow-visible relative text-left rtl:text-right w-full flex flex-col'}" @close="emit('close')">
     <UCard :ui="{ base:'', ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
-        <h2>Move part to {{ location.name }}</h2>
+        <div class="flex items-center justify-between">
+          <h2>Move part to {{ location.name }}</h2>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
+        </div>
       </template>
       <!-- <UForm class="space-y-8" @submit="save" :validate="validate" :state="selectedPart">
         <UFormGroup label="Part" name="part"> -->

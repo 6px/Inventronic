@@ -1,8 +1,11 @@
 <template>
-  <UModal v-model="open">
+  <UModal v-model="open" @close="emit('close')">
     <UCard :ui="{ body: {background: 'bg-slate-200 dark:bg-slate-800'}, divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
-        <h2>Label for {{ part.part === part.value ? part.part : part.part + ' ' + part.value }} </h2>
+        <div class="flex items-center justify-between">
+          <h2>Label for {{ part.part === part.value ? part.part : part.part + ' ' + part.value }} </h2>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
+        </div>
       </template>
 
       <CommonQrCode

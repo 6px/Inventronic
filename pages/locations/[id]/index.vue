@@ -91,6 +91,12 @@
     return data[0]
   })
 
+  if (!location.value) {
+    showError({
+      statusCode: 404,
+      statusMessage: 'Page Not Found'
+    })
+  }
 
 useHead({
   title: location.value.name,

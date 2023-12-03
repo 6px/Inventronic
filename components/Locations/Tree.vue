@@ -3,11 +3,13 @@
     <li v-for="location in locations" class="">
       <div class="px-3 py-2 flex flex-row justify-between content-center items-center border-0 border-b border-r border-l border-t-2" style="margin-top: -1px;">
         <div :class="`grow leading-8 ${location.locations && location.locations.length > 0 ? 'cursor-pointer' : ''}`" @click="open(location)">
-          <strong>{{ location.name }}</strong>
-          <UBadge color="teal" class="ml-3">{{ location.locations ? location.locations.length : '0' }} <span class="hidden md:inline ml-1"> location{{ location.locations && location.locations.length > 1 ? 's' : '' }}</span></UBadge>
-          <UBadge color="yellow" class="ml-3">
-            {{ partsCount(location) }}<span class="hidden md:inline ml-1"> part{{ partsCount(location) > 1 ? 's' : '' }} </span>
-          </UBadge>
+          <UButton :to="`/locations/${location.id}`" variant="ghost">
+            <strong class="text-lg">{{ location.name }}</strong>
+            <UBadge color="teal" class="ml-3">{{ location.locations ? location.locations.length : '0' }} <span class="hidden md:inline ml-1"> location{{ location.locations && location.locations.length > 1 ? 's' : '' }}</span></UBadge>
+            <UBadge color="yellow" class="ml-3">
+              {{ partsCount(location) }}<span class="hidden md:inline ml-1"> part{{ partsCount(location) > 1 ? 's' : '' }} </span>
+            </UBadge>
+          </UButton>
         </div>
         <div class="shrink flex items-center content-center">
           <UPopover class="block md:hidden">

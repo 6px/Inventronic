@@ -6,13 +6,20 @@
     <UContainer
       body-class="overflow-hidden"
     >
-      <UTable :rows="projects" :columns="columns" @select="(row) => router.push(`/projects/${row.id}`)">
+      <UTable :rows="projects" :columns="columns">
         <template #id-data="{row}">
           <UButton :to="`/projects/${row.id}`" icon="i-heroicons-outline-eye"></UButton>
+          <UButton class="ml-2" icon="i-heroicons-outline-qr-code" @click="printLabel(row)"></UButton>
           <UButton class="ml-2" color="red" icon="i-heroicons-outline-trash" @click="deleteProject(row)"></UButton>
         </template>
         <template #created_at-data="{row}">
           {{ (new Date(row.created_at)).toLocaleString() }}
+        </template>
+        <template #name-data="{row}">
+          <UButton :to="`/projects/${row.id}`" variant="link">
+            {{ row.name }}
+          </UButton>
+          
         </template>
         <template #buildable-data="{row}">
           <UBadge color="white">{{ nparts(row) }} PCBs</UBadge>
@@ -22,9 +29,11 @@
           <UBadge color="white">{{ row.project_parts.length }}</UBadge>
         </template>
       </UTable>
-      <ProjectsNew :open="newModal" @close="newModal=false && refresh()" />
+      <ProjectsNew :open="newModal" @close="closedNew" />
       <UButton label="New project" @click="newModal=true" />
     </UContainer>
+    <ProjectsQRCodeModal :open="qrModal" :project="qrProject" @close="qrModal=false" />
+
   </div>
 </template>
 
@@ -33,6 +42,10 @@ const router = useRouter()
 const client = useSupabaseClient()
 
 const newModal = ref(false)
+
+const qrModal=ref(false)
+
+const qrProject=ref({})
 
 useHead({
   title: 'Projects', 
@@ -54,6 +67,15 @@ const {data: projects, refresh} = await useAsyncData(`projects`, async () => {
 
   return data
 })
+
+const printLabel = (row) => {
+  qrProject.value = row
+  qrModal.value = true
+}
+const closedNew = () => {
+  newModal.value=false
+  refresh()
+}
 
 const deleteProject = async (row) => {
   await client.from('projects').delete().eq('id', row.id)

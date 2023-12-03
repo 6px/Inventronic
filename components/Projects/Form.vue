@@ -1,8 +1,11 @@
 <template>
   <UCard class="mr-2">
     <template #header>
-      <h2 class="text-xl font-bold u-text-white" v-if="project.id">Edit project</h2>
-      <h2 class="text-xl font-bold u-text-white" v-else>Create project</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold u-text-white" v-if="project.id">Edit project</h2>
+        <h2 class="text-xl font-bold u-text-white" v-else>Create project</h2>
+        <UButton v-if="modal" color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
+      </div>
     </template>
     <UForm :validate="validate" :state="state" @submit="save" class="space-y-4">
       <UFormGroup label="Project name">

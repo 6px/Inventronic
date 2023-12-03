@@ -1,8 +1,11 @@
 <template>
   <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
     <template #header>
-      <h2 v-if="selectedPart.id">Editing <strong>{{ selectedPart.part }} {{ selectedPart.value }}</strong></h2>
-      <h2 v-else>Create new part</h2>
+      <div class="flex items-center justify-between">
+        <h2 v-if="selectedPart.id">Editing <strong>{{ selectedPart.part }} {{ selectedPart.value }}</strong></h2>
+        <h2 v-else>Create new part</h2>
+        <UButton v-if="modal" color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
+      </div>
     </template>
 
     <UForm class="space-y-4" @submit="emit('save')" :validate="validate" :state="selectedPart">

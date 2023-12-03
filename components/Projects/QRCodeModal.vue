@@ -3,18 +3,20 @@
     <UCard :ui="{ body: {background: 'bg-slate-200 dark:bg-slate-800'}, divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
         <div class="flex items-center justify-between">
-          <h2>Label for {{ location.name }}</h2>
+          <h2>Label for {{ project.name }} </h2>
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
         </div>
       </template>
 
       <CommonQrCode
-        :subtitle="location.parts.map(p => p.part).join(', ')"
-        :description="location.description"
-        :url="`${req.public.baseUrl}/locations/${props.location.id}`"
+        :subtitle="project.description"
+        :description="`${req.public.baseUrl}/projects/${project.id}`"
+        :description-size="2"
+        :subtitle-size="2.5"
+        :url="`${req.public.baseUrl}/projects/${project.id}`"
       >
         <template #title>
-          {{ location.name }}
+          {{ project.name }}
         </template>
       </CommonQrCode>
       <template #footer>
@@ -38,7 +40,7 @@ import type { CommonQrCode } from '#build/components';
 
 
 const req = useRuntimeConfig()
-const emit = defineEmits(['close'])
+const emit = defineEmits()
 
 
 
@@ -47,19 +49,16 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  location: {
-    type: Object as Location,
+  project: {
+    type: Object as Project,
     required: true,
   },
 });
 
 const open = ref(false)
 
-
-
-
 const print = () => {
-  const mywindow = window.open(`${req.public.baseUrl}/locations/${props.location.id}`, 'PRINT', 'height=400,width=600');
+  const mywindow = window.open(`${req.public.baseUrl}/projects/${props.project.id}`, 'PRINT', 'height=400,width=600');
   const html = document.getElementById('image').innerHTML
   mywindow.onload = () => {
     mywindow.document.head.innerHTML = ''
