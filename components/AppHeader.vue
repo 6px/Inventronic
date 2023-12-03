@@ -25,7 +25,7 @@
             </NuxtLink>
         </div>
         <div class="hidden sm:ml-6 sm:block">
-          <NavMenu :mobile="false" />
+          <NavMenu :mobile="false" v-if="user" />
         </div>
       </div>
       <div class="absolute inset-y-0 right-0 flex items-center pr-0 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -65,7 +65,7 @@
 
   <!-- Mobile menu, show/hide based on menu state. -->
   <div v-if="showNav" class="sm:hidden" id="mobile-menu">
-    <NavMenu :mobile="true" />
+    <NavMenu :mobile="true" v-if="user" />
   </div>
 </nav>
 <!-- <div>
