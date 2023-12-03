@@ -36,7 +36,7 @@
       </template>
       <template #id-data="{ row }">
         <div class="whitespace-nowrap">
-          <UButton v-if="row.locations" class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
+          <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
           <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
           <UButton class="ml-2" label="" icon="i-heroicons-outline-trash" color="red" @click="deletePart(row)" />
         </div>
@@ -58,7 +58,7 @@
   </div>
   <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal=false" @refresh="emit('refresh')" />
   <PartsPartModal v-if="selectedPart" :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
-  <PartsQRCodeModal v-if="selectedPart" :partModal="qrModal" :selectedPart="qrPart" @close="qrModal=false" />
+  <PartsQRCodeModal v-if="selectedPart" :open="qrModal" :part="qrPart" @close="qrModal=false" />
 
 </template>
 

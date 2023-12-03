@@ -12,14 +12,12 @@
       </svg:style>
       <rect width="100%" height="100%" fill="white" />
 
-      <g v-html="qrSvg"></g>
-
       <text :x="width*mul" :y="3*mul" class="name">
         <slot name="title"></slot>
       </text>
       
-      <text :x="width*mul" :y="3*mul" class="parts">
-        <tspan :x="width*mul" :dy="2*mul" v-for="line in partLines">
+      <text :x="maxLineLen > 68/subtitleSize ? 12*mul : width*mul" :y="3.25*mul" class="parts" :style="maxLineLen > 68/subtitleSize ? 'text-anchor:start;' : ''">
+        <tspan :x="maxLineLen > 68/subtitleSize ? 12*mul : width*mul" :dy="subtitleSize*mul" v-for="line in partLines">
           {{ line }}
         </tspan>
       </text>
@@ -27,11 +25,12 @@
       <rect x="0" :y="12*mul" width="100%" :height="(height-12)*mul" fill="white" />
       
       <text :x="0" :y="(height-5)*mul" class="description">
-        <tspan :x="0" :dy="2*mul" v-for="line in descLines">
+        <tspan :x="0" :dy="descriptionSize*mul" v-for="line in descLines">
           {{ line }}
         </tspan>
       </text>
 
+      <g v-html="qrSvg"></g>
     </svg>
   </div>
 </template>
@@ -45,9 +44,19 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  subtitleSize: {
+    type: Number,
+    required: false,
+    default: 1.75
+  },
   description: {
     type: String,
     required: false,
+  },
+  descriptionSize: {
+    type: Number,
+    required: false,
+    default: 2.25
   },
   url: {
     type: String,
@@ -75,28 +84,43 @@ const svgStyle = `
 
 
 .name {
-  font: ${4*mul}px monaspaceBold;
+  font: ${3.75*mul}px monaspaceBold;
   fill: black;
   text-anchor:end;
 }
 .parts {
-  font: ${1.75*mul}px monaspace;
+  font: ${props.subtitleSize*mul}px monaspace;
   fill: black;
   text-anchor:end;
 }
 
 .description {
-  font: ${2.25*mul}px monaspace;
+  font: ${props.descriptionSize*mul}px monaspace;
   fill: black;
 }
 `
 
 const qrSvg = ref('')
 
-onUpdated(async () => {
+onMounted(async () => {
   generateLabel()
-  partLines.value = await getLines(props.subtitle, (width - 12)*mul)
+  const ln = await Promise.all(
+    props.subtitle.split('\n')
+    .map(
+      async(l) => {
+        console.log('l', l)
+        return await getLines(l, (width - 12)*mul)
+      }
+    )
+  )
+  console.log('split', ln.flat())
+  partLines.value = (await Promise.all(props.subtitle.split('\n').map(async(l) => await getLines(l, (width - 12)*mul)))).flat()
   descLines.value = await getLines(props.description, width*mul, 'description')
+})
+
+const maxLineLen = computed(() => {
+  const ls = partLines.value.map(l => l.length)
+  return Math.max(...ls)
 })
 
 const generateLabel = () => {
@@ -153,7 +177,7 @@ const getLines = async (text, maxWidth, cls='parts') => {
           }
         }
         lines.push(currentLine);
-          document.body.removeChild(label)
+        document.body.removeChild(label)
 
         resolve(lines)
       }, 100)
