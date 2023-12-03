@@ -17,4 +17,7 @@ Electronic components management
 
 # Run with Docker
 A docker image is available on docker hub
-Run it like this: `docker run -p 3000:3000 -e SUPABASE_URL=https://yourproject.supabase.co -e SUPABASE_KEY=a_very_long_key_here jonathanfoucher/inventronic:latest`
+Run it like this: `docker run -p 3000:3000 -e SUPABASE_URL=https://yourproject.supabase.co -e SUPABASE_KEY=a_very_long_key_here -e BASE_URL=https://localhost:3000 jonathanfoucher/inventronic:latest`
+
+Or create a `.env` file and use this command:
+`docker run -p 3000:3000 --env-file=.env jonathanfoucher/inventronic:latest`
