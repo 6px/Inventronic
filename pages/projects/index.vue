@@ -59,7 +59,7 @@ const {data: parts} = await useAsyncData('parts', async () => {
   return data
 })
 
-const projectFields = `id, name, description, url, created_at, project_parts(id, parts(id, part, value), quantity)`
+const projectFields = `id, name, description, url, created_at, project_parts(id, parts(id, part, value), quantity, references)`
 
 
 const {data: projects, refresh} = await useAsyncData(`projects`, async () => {

@@ -5,4 +5,5 @@ declare interface ProjectPart {
     project_id: number
     projects: Project
     quantity: number
+    references: string
   }

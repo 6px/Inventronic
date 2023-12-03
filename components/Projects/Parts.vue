@@ -5,7 +5,7 @@
         <h2 class="text-xl font-bold u-text-white">{{ project.project_parts.length}} project parts</h2>
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
           <UButton color="white" label="Add parts" trailing-icon="i-heroicons-chevron-down-20-solid" />
-          <ProjectsUploadModal @change="changed($event)" :open="uploadModal" @close="uploadModal = false" />
+          <ProjectsUploadModal @change="kicadCSV($event)" :open="uploadModal" @close="uploadModal = false" />
         </UDropdown>
       </div>
     </template>
@@ -47,9 +47,13 @@
       </template>
       
       <template #parts.value-data="{ row }">
-        <UButton class="p-0"  v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
-          {{ row.parts.value }}
-        </UButton>
+        <UTooltip :text="row.parts.value">
+          <UButton class="p-0 "  v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
+            <div class="max-w-[100px] truncate overflow-hidden">
+              {{ row.parts.value }}
+            </div>
+          </UButton>
+        </UTooltip>
       </template>
 
       <template #parts.footprint-data="{ row }">
@@ -96,14 +100,14 @@
     <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
       <UPagination v-model="page" :page-count="pageCount" :total="project.project_parts.length" />
     </div>
-    <PartsQRCodeModal v-if="selectedPart" :open="qrModal" :part="qrPart" @close="qrModal=false" />
+    <ProjectsPartQRCodeModal :open="qrModal" :projectPart="qrPart" @close="qrModal=false" />
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
   </UCard>
 </template>
 
 <script lang="ts" setup>
 import type { UButton, UTooltip } from '#ui-colors/components';
-import Papa from 'papaparse';
+
 
 const props = defineProps({
   project: {
@@ -164,8 +168,7 @@ watch(
   )
 
 const printTag = (row: ProjectPart) => {
-  console.log(row.parts)
-  qrPart.value = row.parts
+  qrPart.value = row
   qrModal.value = true
 }
 
@@ -250,6 +253,7 @@ const addPart = async (row) => {
       project_id: props.project.id,
       part_id: row.parts.id,
       quantity: row.quantity,
+      references: row.references,
     }).select('id, parts(id, part, value, footprint, description, quantity, locations(id, name)), quantity')
 
   if (r2.error) {
@@ -280,6 +284,7 @@ const createPart = async (row: ProjectPart) => {
       project_id: props.project.id,
       part_id: newPart.id,
       quantity: row.quantity,
+      references: row.references,
     }).select()
 
     if (r2.error) {
@@ -353,96 +358,20 @@ const columns = [
     sortable: true,
   },
   {
+    key: "references",
+    label: "References",
+    sortable: true,
+  },
+  {
     key: "id",
     label: "Tools"
   },
 ]
 
-const changed = (files: Array<File>) => {
-  console.log('files changed', files)
-  if (files.length && files[0].type === 'text/csv') {
-    const file = files[0]
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const lines = (e.target.result as String)
-      console.log(lines)
-      const csv = Papa.parse(lines)
-      if (csv.errors.length > 0) {
-        alert('could not parse CSV file')
-        return;
-      }
-      const data = csv.data
-      console.log(data)
-      // parse header line
-      let partCol = 0
-      let valCol = 0
-      let descCol = 0
-      let qtyCol = 0
-      let fpCol = 0
-      data[0].forEach((el: String, i) => {
-        if (el.toLowerCase() === 'part') {
-          partCol = i
-        } else if (el.toLowerCase() === 'description') {
-          descCol = i
-        } else if (el.toLowerCase() === 'value') {
-          valCol = i
-        } else if (el.toLowerCase() === 'quantity per pcb') {
-          qtyCol = i
-        } else if (el.toLowerCase() === 'footprint') {
-          fpCol = i
-        }
-      }) 
+const kicadCSV = async (files: Array<File>) => {
+  const projectParts = await kicadImporter(files, props.parts, props.project)
 
-      let i = 1;
-      for (i=1; i < data.length;i++) {
-        const line = data[i]
-        const row = parseInt(line[0], 10)
-        if (!Number.isNaN(row)) {
-          const existingPart = props.parts.find(p => p.part === line[partCol] && p.value === line[valCol] && p.footprint === line[fpCol])
-          if (existingPart){
-            if (!props.project.project_parts.find((pp: ProjectPart) => pp.parts.id === existingPart.id)) {
-              const pp: ProjectPart = {
-                part_id: existingPart.id,
-                parts: existingPart,
-                project_id: props.project.id,
-                quantity: line[qtyCol],
-              } 
-              props.project.project_parts.push(pp)
-            }
-
-          } else {
-            const part: Part = {
-              id: null,
-              part: line[partCol],
-              description: line[descCol],
-              value: line[valCol],
-              footprint: line[fpCol],
-              quantity: 0,
-              location_id: null,
-            }
-
-            const pp: ProjectPart = {
-              parts: part,
-              project_id: props.project.id,
-              part_id: null,
-              quantity: line[qtyCol],
-            } 
-
-            props.project.project_parts.push(pp)
-          }
-          
-        }
-      }
-
-      //emit('setParts', projectParts.value)
-
-    };
-    reader.readAsText(file);
-
-
-  } else {
-    alert('Please upload BOM in CSV format')
-  }
+  props.project.project_parts = projectParts
 }
 
 </script>

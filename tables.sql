@@ -39,6 +39,7 @@ CREATE TABLE public.project_parts (
     project_id uuid,
     part_id uuid,
     quantity bigint,
+    references text,
     owner_id uuid DEFAULT auth.uid()
 );
 
