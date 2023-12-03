@@ -10,21 +10,21 @@
       <svg:style>
         {{ svgStyle }}
       </svg:style>
-      <rect width="100%" height="100%" fill="white" />
+      <!-- <rect width="100%" height="100%" fill="#ffffff" /> -->
 
       <text :x="width*mul" :y="3*mul" class="name">
         <slot name="title"></slot>
       </text>
       
-      <text :x="maxLineLen > 68/subtitleSize ? 12*mul : width*mul" :y="3.25*mul" class="parts" :style="maxLineLen > 68/subtitleSize ? 'text-anchor:start;' : ''">
-        <tspan :x="maxLineLen > 68/subtitleSize ? 12*mul : width*mul" :dy="subtitleSize*mul" v-for="line in partLines">
+      <text :x="maxLineLen > 68/subtitleSize ? qrSize*mul : width*mul" :y="3.25*mul" class="parts" :style="maxLineLen > 68/subtitleSize ? 'text-anchor:start;' : ''">
+        <tspan :x="maxLineLen > 68/subtitleSize ? qrSize*mul : width*mul" :dy="subtitleSize*mul" v-for="line in partLines">
           {{ line }}
         </tspan>
       </text>
 
-      <rect x="0" :y="12*mul" width="100%" :height="(height-12)*mul" fill="white" />
+      <rect x="0" :y="qrSize*mul" width="100%" :height="(height-12)*mul" fill="#ffffff" />
       
-      <text :x="0" :y="(height-5)*mul" class="description">
+      <text :x="0" :y="qrSize*mul" class="description">
         <tspan :x="0" :dy="descriptionSize*mul" v-for="line in descLines">
           {{ line }}
         </tspan>
@@ -68,8 +68,9 @@ const partLines = ref([props.subtitle])
 const descLines = ref([props.description])
 
 const mul = 4
-const height=17
-const width=54
+const height=13
+const width=48
+const qrSize=10
 
 const svgStyle = `
 @font-face {
@@ -82,6 +83,12 @@ const svgStyle = `
   src: url(/fonts/MonaspaceKrypton-Light.otf);
 }
 
+@media print {
+  svg {
+     width: ${width}mm; 
+     height: ${height}mm; 
+  }
+}
 
 .name {
   font: ${3.75*mul}px monaspaceBold;
@@ -125,7 +132,7 @@ const maxLineLen = computed(() => {
 
 const generateLabel = () => {
   return new Promise((resolve, reject) => {
-    QRCode.toString(props.url, {margin:0, type: 'svg', width:12*mul})
+    QRCode.toString(props.url, {margin:0, type: 'svg', width:qrSize*mul})
     .then(svg => {
       qrSvg.value = svg
       resolve(svg)

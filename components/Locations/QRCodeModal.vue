@@ -62,6 +62,23 @@ const print = () => {
     mywindow.document.head.innerHTML = ''
     mywindow.document.body.innerHTML = ''
     const style = mywindow.document.createElement('style')
+    const css = mywindow.document.createTextNode(`
+    @media print {
+      svg {
+        width: 50mm !important;
+        padding:0;
+        margin:0;
+      }
+      body{
+        width: 50mm !important; 
+        height: 17mm !important; 
+        color-adjust: exact;
+        padding:0;
+        margin:0;
+      }
+    }
+    `)
+    style.appendChild(css)
     mywindow.document.head.innerHTML = ''
     mywindow.document.head.appendChild(style)
     mywindow.document.body.innerHTML = `

@@ -380,7 +380,7 @@ const changed = (files: Array<File>) => {
         const line = data[i]
         const row = parseInt(line[0], 10)
         if (!Number.isNaN(row)) {
-          const existingPart = props.parts.find(p => p.part === line[partCol] && p.value === line[valCol])
+          const existingPart = props.parts.find(p => p.part === line[partCol] && p.value === line[valCol] && p.footprint === line[fpCol])
           if (existingPart){
             if (!props.project.project_parts.find((pp: ProjectPart) => pp.parts.id === existingPart.id)) {
               const pp: ProjectPart = {
