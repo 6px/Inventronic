@@ -13,7 +13,7 @@
         @click="auth.signInWithOAuth({ provider: 'github', options: { redirectTo } })"
       />
 
-      <hr class="mt-8 border-slate-300 dark:border-slate-700" />
+      <UDivider class="mt-8">OR</UDivider>
       
       <div v-if="emailSignInOk===false" class="mt-8">
         <UForm @submit="onSubmit" :validate="validate" :state="state">
