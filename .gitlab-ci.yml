@@ -11,9 +11,7 @@ build:
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG $CI_REGISTRY_IMAGE:latest
     - docker push $IMAGE_TAG
     - docker push $CI_REGISTRY_IMAGE:latest
-    - docker login --help
-    - echo "user $DOCKER_HUB_USER"
-    - docker login --user $DOCKER_HUB_USER --password $DOCKER_HUB_PASSWORD
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD 
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG jonathanfoucher/inventronic:latest
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG jonathanfoucher/inventronic:$CI_COMMIT_REF_SLUG
     - docker push jonathanfoucher/inventronic:latest
