@@ -15,6 +15,7 @@
         <PageContainer>
             <NuxtPage />
         </PageContainer>
+        <AppFooter />
     </AppContainer>
 </template>
 <script lang="ts" setup>

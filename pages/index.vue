@@ -20,7 +20,10 @@
         <div class="opacity-70 text-sm text-center md:max-w-xl lg:max-w-2xl m-auto mt-2">
           It's free and only takes a few seconds. You'l be uploading your bills of materials in no time.
         </div>
-        
+        <div class="md:max-w-xl lg:max-w-2xl m-auto mt-8">
+          <strong class="text-monaspace uppercase text-primary-600">Inventronic</strong> 
+          lets you keep track of what parts you have in stock, so that you neither run out, nor buy some parts that you already have... somewhere... 
+        </div>
       </UContainer>
     </div>
   </div>
