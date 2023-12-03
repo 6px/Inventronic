@@ -1,7 +1,7 @@
 <template>
 <div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8 mx-auto">
     <h2 class="my-6 text-center text-3xl font-extrabold u-text-white">
-      Sign in to your account
+      Sign in or create your account
     </h2>
     <AuthLogin>
       <UButton

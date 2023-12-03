@@ -12,12 +12,13 @@ export default defineNuxtConfig({
       baseUrl: process.env.BASE_URL || 'http://localhost:3000'
     },
   },
-  ssr: false,
+  css: ['~/assets/css/main.css'],
+  ssr: true,
   supabase: {
     redirectOptions: {
-      login: '/login',
+      login: '/',
       callback: '/confirm',
-      exclude: []
+      exclude: ['/login']
     },
   },
   colorMode: {
@@ -26,7 +27,7 @@ export default defineNuxtConfig({
   },
   ui: {
     colors: {
-      primary: 'green'
+      primary: 'blue'
     },
     icons: ['mdi', 'heroicons', 'heroicons-outline']
   },

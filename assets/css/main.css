@@ -1,0 +1,15 @@
+@font-face {
+    font-family: monaspace;
+    font-weight: bold;
+    src: url(/fonts/MonaspaceKrypton-ExtraBold.otf);
+}
+
+@font-face {
+    font-weight: normal;
+    font-family: monaspace;
+    src: url(/fonts/MonaspaceKrypton-Light.otf);
+}
+
+.text-monaspace {
+    font-family: monaspace, 'Courier New', Courier, monospace
+}

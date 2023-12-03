@@ -24,7 +24,9 @@
             <template #option="{ option: part, selected: sel }">
               <div class="flex flex-row justify-between px-1">
                 <div class="truncate grow">{{ part.part }} {{ part.value }}</div>
-                <div class="truncate shrink text-slate-600 dark:text-slate-200">{{ part.locations.name }}</div>
+                <div v-if="part.locations" class="truncate shrink text-slate-600 dark:text-slate-200">{{ part.locations.name }}</div>
+                <div v-else class="truncate shrink text-slate-600 dark:text-slate-200">None</div>
+
                 <div class="w-5 pe-2" v-if="!sel"></div>
               </div>
             </template>
@@ -80,7 +82,7 @@ watch(
 const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
 
 const {data: parts} = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields).neq('location_id', props.location.id).order('created_at')
+  const { data } = await client.from('parts').select(partFields).order('created_at')
 
   return data
 })

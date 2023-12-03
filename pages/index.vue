@@ -1,30 +1,36 @@
 <template>
-  <div class="w-full my-2">
-    <h1 class="mb-6 text-4xl font-bold u-text-white text-center">
-      Parts
-    </h1>
-    <UContainer
-      body-class="overflow-hidden"
-    >
-      <PartsTable :parts="parts" @refresh="refresh" />
-    </UContainer>
+  <div>
+    <PartsList v-if="user" />
+    <div v-else>
+      <UContainer>
+        <div class="text-bold text-xl md:text-4xl lg:text-6xl text-center md:max-w-xl lg:max-w-2xl m-auto mt-8">
+          Too many parts cluttering your workbench?
+        </div>
+        <div class="opacity-50 text-sm md:text-lg lg:text-xl text-center md:max-w-xl lg:max-w-2xl m-auto mt-4">
+          But still not what you need to build your latest project?
+        </div>
+        <div class="text-bold text-md md:text-xl lg:text-2xl text-center md:max-w-xl lg:max-w-2xl m-auto mt-8">
+          Get organized!
+        </div>
+        <div class="text-bold text-md md:text-xl lg:text-2xl text-center md:max-w-xl lg:max-w-2xl m-auto mt-8">
+          <UButton color="primary" size="xl" block to="/login">
+            Create an account
+          </UButton>
+        </div>
+        <div class="opacity-70 text-sm text-center md:max-w-xl lg:max-w-2xl m-auto mt-2">
+          It's free and only takes a few seconds. You'l be uploading your bills of materials in no time.
+        </div>
+        
+      </UContainer>
+    </div>
   </div>
+  
 
 </template>
 
 <script lang="ts" setup>
 
-const client = useSupabaseClient()
-
-
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
-
-const {data: parts, refresh} = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields).order('created_at')
-  
-  return data
-})
-
+const user = useSupabaseUser()
 
 
 </script>

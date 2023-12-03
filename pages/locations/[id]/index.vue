@@ -3,63 +3,67 @@
     <h1 class="mb-1 text-4xl font-bold u-text-white text-center">
       {{ location.name }} 
         <UButton
-          class="ml-3 sm"
-          label="Print label"
+          class="ml-4"
           icon="i-heroicons-outline-qr-code"
           @click="qrcode=true"
         />
     </h1>
-    <div class="mb-6 text-sm text-slate-500">{{ location.description }}</div>
+    <div class="mb-6 text-sm text-slate-500 text-center">{{ location.description }}</div>
     
-    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-      <template #header>
-        <h2>Parts in <strong>{{ location.name }}</strong></h2>
-      </template>
-      <PartsTable :parts="parts" :location="location" @refresh="refreshParts" />
-    </UCard>
-    <div class="lg:flex lg:flex-row mt-4">
-      <UCard class="w-full lg:w-1/2 mr-2" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-        <template #header>
-          <h2>Locations in <strong>{{ location.name }}</strong></h2>
-        </template>
-        <LocationsTree v-if="location.locations && location.locations.length > 0" :locations="location.locations" :depth="0" @refresh="refresh" />
-        <div v-else class="text-center text-slate-500 text-lg my-6">
-          No locations here
-        </div>
-        <UButton
-          class="mt-6"
-          icon="i-heroicons-outline-plus"
-          label="Create location here"
-          @click="create=true"
-        />
-      </UCard>
-    
-      <UCard class="w-full lg:w-1/2 ml-2" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-        <template #header>
-          <h2>Modify location <strong>{{ location.name }}</strong></h2>
-        </template>
-        <UForm class="space-y-4" @submit="save" :validate="validate" :state="location">
-          <UFormGroup label="Name" name="name">
-            <UInput v-model=location.name color="white" variant="outline" placeholder="Location name" />
-          </UFormGroup>
-          <UFormGroup label="Description" name="description">
-            <UInput v-model=location.description color="white" variant="outline" placeholder="Description" />
-          </UFormGroup>
-        </UForm>
-        <template #footer>
+    <UContainer>
+      <div class="md:grid md:grid-cols-2 md:gap-x-2">
+
+        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+          <template #header>
+            <h2>Modify location <strong>{{ location.name }}</strong></h2>
+          </template>
+          <UForm class="space-y-4" @submit="save" :validate="validate" :state="location">
+            <UFormGroup label="Name" name="name">
+              <UInput v-model=location.name color="white" variant="outline" placeholder="Location name" />
+            </UFormGroup>
+            <UFormGroup label="Description" name="description">
+              <UInput v-model=location.description color="white" variant="outline" placeholder="Description" />
+            </UFormGroup>
+          </UForm>
+          <template #footer>
+            <UButton
+              class="mr-4"
+              @click="save"
+              :loading="saving"
+            >
+              <div v-if="saving">
+                Saving...
+              </div>
+              <span v-else>Save</span>
+            </UButton>
+          </template>
+        </UCard>
+
+        <UCard class="mt-2 md:mt-0" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+          <template #header>
+            <h2>Locations in <strong>{{ location.name }}</strong></h2>
+          </template>
+          <LocationsTree v-if="location.locations && location.locations.length > 0" :locations="location.locations" :depth="0" @refresh="refresh" />
+          <div v-else class="text-center text-slate-500 text-lg my-6">
+            No locations here
+          </div>
           <UButton
-            class="mr-4"
-            @click="save"
-            :loading="saving"
-          >
-            <div v-if="saving">
-              Saving...
-            </div>
-            <span v-else>Save</span>
-          </UButton>
+            class="mt-6"
+            icon="i-heroicons-outline-plus"
+            label="Create location here"
+            @click="create=true"
+          />
+        </UCard>
+      
+      </div>
+
+      <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+        <template #header>
+          <h2>Parts in <strong>{{ location.name }}</strong></h2>
         </template>
+        <PartsTable :parts="parts" :location="location" @refresh="refreshParts" />
       </UCard>
-    </div>
+    </UContainer>
 
     <LocationsCreate :open="create" :parent="location" @close="create=false" @refresh="refresh" />
     <LocationsQrCodeModal :open="qrcode" :location="location" @close="qrcode=false" />
