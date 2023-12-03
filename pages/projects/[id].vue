@@ -1,19 +1,20 @@
 <template>
   <div class="w-full my-2">
     <h1 class="mb-8 text-4xl font-bold u-text-white text-center">
-      {{ project.name }}
+      {{ project.name }} 
+      <UButton class="ml-4" icon="i-heroicons-outline-qr-code" @click="qrModal=true"/>
     </h1>
     <UContainer>
-      <div class="grid grid-cols-2 gap-x-2">
+      <div class="md:grid md:grid-cols-2 md:gap-x-2">
         <ProjectsForm :project="project" @refresh="refresh" />
-        <ProjectsDetails :project="project" :parts="parts" @editPart="editPart($event)" @refresh="refresh" />
+        <ProjectsDetails class="mt-2 md:mt-0" :project="project" :parts="parts" @editPart="editPart($event)" @refresh="refresh" />
       </div>
       
       <ProjectsParts class="mt-8" :project="project" :parts="parts" @refresh="refresh" />
 
     </UContainer>
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
-
+    <ProjectsQrCodeModal :project="project" :open="qrModal"  @close="qrModal=false" />
   </div>
 </template>
 
@@ -27,6 +28,8 @@
   const selectedPart = ref({})
   const saving = ref(false)
   const partModal = ref(false)
+
+  const qrModal = ref(false)
 
   const projectFields = `id, name, created_at, description, url, project_parts(id, parts(id, part, value, footprint, description, quantity, price, ordering_url, locations(id, name)), quantity, references)`
 

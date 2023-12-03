@@ -1,6 +1,6 @@
 <template>
   <div class="w-full my-2">
-    <h1 class="mb-6 text-4xl font-bold u-text-white">
+    <h1 class="mb-6 text-4xl font-bold u-text-white text-center">
       Locations
     </h1>
     <UContainer
