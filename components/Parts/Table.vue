@@ -38,7 +38,7 @@
         <div class="whitespace-nowrap">
           <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
           <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
-          <UButton class="ml-2" label="" :loading="deleting.value = row.id" :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" color="red" @click="deletePart(row)" />
+          <UButton class="ml-2" label="" :loading="deleting === row.id" :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" color="red" @click="deletePart(row)" />
         </div>
       </template>
     </UTable>
