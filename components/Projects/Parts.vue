@@ -16,7 +16,7 @@
             <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
           </UTooltip>
           <UTooltip v-if="row.id" text="Remove part from this project">
-            <UButton class="mr-2" label="" color="red" icon="i-heroicons-outline-trash" @click="removeProjectPart(row)" />
+            <UButton class="mr-2" :loading="deleting===row.id" label="" color="red" :icon="deleting===row.id ? '' : 'i-heroicons-outline-trash'" @click="removeProjectPart(row)" />
           </UTooltip>
           
           <UTooltip v-else-if="row.parts.id" text="Add to this project">
@@ -135,6 +135,7 @@ const adding=ref({})
 const saveQty = ref({})
 const projectParts = ref(props.project.project_parts)
 const uploadModal = ref(false)
+const deleting = ref(0)
 
 const newParts = computed(() => {
   return projectParts.value.find(pp => !pp.id)
@@ -190,9 +191,11 @@ const editPart = (part: Part) => {
 }
 
 const removeProjectPart = async (row) => {
+  deleting.value = row.id
   await client.from('project_parts').delete().eq('id', row.id)
   projectParts.value = projectParts.value.filter((pp: ProjectPart) => pp.id !== row.id)
   refresh()
+  deleting.value = 0
 }
 
 const addAll = () => {

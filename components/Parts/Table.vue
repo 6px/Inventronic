@@ -38,7 +38,7 @@
         <div class="whitespace-nowrap">
           <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
           <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
-          <UButton class="ml-2" label="" icon="i-heroicons-outline-trash" color="red" @click="deletePart(row)" />
+          <UButton class="ml-2" label="" :loading="deleting.value = row.id" :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" color="red" @click="deletePart(row)" />
         </div>
       </template>
     </UTable>
@@ -142,6 +142,7 @@ const qrModal = ref(false)
 const moveModal = ref(false)
 const qrPart = ref({})
 const saving = ref(false)
+const deleting = ref(0)
 const emit = defineEmits(['refresh'])
 
 const {data: locations} = await useAsyncData('locations', async () => {
@@ -182,8 +183,10 @@ const editPart = (row: Part) => {
 }
 
 const deletePart = async (row: Part) => {
+  deleting.value = row.id
   await client.from('parts').delete().eq('id', row.id)
   emit('refresh')
+  deleting.value = 0
 }
 
 const printTag = (row: Part) => {
