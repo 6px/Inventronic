@@ -1,9 +1,10 @@
 <template>
-  <nav class="dark:bg-slate-300 bg-slate-800 px-0 py-4 md:px-4 mt-8">
+  <nav class="dark:bg-slate-300 bg-slate-800 px-0 py-4 md:px-4 mt-24">
     <UContainer>
       <div class="flex justify-between items-center">
         <div class="text-slate-200 dark:text-slate-700 text-sm">
-          Created by<br class="block md:hidden"> <a target="_blank" href="https://6px.fr">Six Pixels</a>
+          Created by <br class="block md:hidden"> 
+          <a target="_blank" href="https://6px.eu">Six Pixels</a>
         </div>
         <div class="text-slate-200 dark:text-slate-700 text-sm">
           <a target="_blank" href="__VERSION_LINK__">__VERSION__</a>

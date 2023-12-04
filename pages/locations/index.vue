@@ -3,20 +3,11 @@
     <h1 class="mb-6 text-4xl font-bold u-text-white text-center">
       Locations
     </h1>
-    <UContainer
-      v-if="locations?.length > 0"
-      body-class="overflow-hidden"
-      class="px-2 md:px-4 lg:px-6"
-    >
-
-      <LocationsTree :locations="locations" :depth="0" @refresh="refresh" />
-      <UButton
-        class="mt-6"
-        label="Create location"
-        @click="create"
-      />
+    <UContainer body-class="overflow-hidden" class="px-2 md:px-4 lg:px-6">
+      <LocationsTree v-if="locations?.length > 0" :locations="locations" :depth="0" @refresh="refresh" />
+      <UButton class="mt-6" label="Create location" @click="create" />
     </UContainer>
-    <LocationsCreate :open="locationModal" @refresh="refresh" @close="locationModal=false"/>
+    <LocationsCreate :open="locationModal" @refresh="refresh" @close="locationModal = false" />
   </div>
 </template>
 
@@ -32,7 +23,7 @@ useHead({
 
 const locationFields = `id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value)))))))`
 
-const {data: locations, refresh} = await useAsyncData('locations', async () => {
+const { data: locations, refresh } = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select(locationFields).is('parent_id', null).order('created_at')
 
   return data
@@ -48,7 +39,5 @@ const create = () => {
 
 </script>
 
-<style>
-
-</style>
+<style></style>
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="u-text-black">
+    <p class="u-text-black text-center mt-16">
       Redirecting...
     </p>
   </div>
