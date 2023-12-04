@@ -9,6 +9,7 @@
         <meta name="msapplication-TileColor" content="#da532c">
         <meta name="msapplication-config" content="/icons/browserconfig.xml">
         <meta name="theme-color" content="#ffffff">
+        <meta name="description" content="Easily manage your electronic parts for your projects.">
     </Head>
     <AppContainer>
         <AppHeader />
