@@ -19,5 +19,5 @@ build:
     - docker push jonathanfoucher/inventronic:latest
     - docker push jonathanfoucher/inventronic:$CI_COMMIT_REF_SLUG
   only:
-    - tags
+    - main
 
