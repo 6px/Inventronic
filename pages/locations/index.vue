@@ -10,13 +10,12 @@
     >
 
       <LocationsTree :locations="locations" :depth="0" @refresh="refresh" />
-
+      <UButton
+        class="mt-6"
+        label="Create location"
+        @click="create"
+      />
     </UContainer>
-    <UButton
-      class="mt-6"
-      label="Create location"
-      @click="create"
-    />
     <LocationsCreate :open="locationModal" @refresh="refresh" @close="locationModal=false"/>
   </div>
 </template>
@@ -25,14 +24,6 @@
 
 const client = useSupabaseClient()
 const locationModal = ref(false)
-
-let selectedLocation: Location = reactive({
-  name: '',
-  description: '',
-  parent_id: null,
-  id:null,
-  owner_id: null,
-})
 
 useHead({
   title: 'Locations',

@@ -40,7 +40,9 @@
         
       </div>
       <div v-else class="mt-8">
-        Please check your inbox for a login link, or input the OTP you received below
+        <div class="mb-2">
+          Please check your inbox for a login link, or input the OTP you received below
+        </div>
         <UFormGroup>
             <UInput
               v-model="otp"
