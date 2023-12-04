@@ -1,5 +1,9 @@
 {
   "name": "inventronic",
+  "author": {
+    "name": "Jonathan Foucher",
+    "email": "jfoucher@6px.eu"
+  },
   "private": true,
   "type": "module",
   "scripts": {

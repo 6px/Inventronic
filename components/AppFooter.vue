@@ -3,10 +3,10 @@
     <UContainer>
       <div class="flex justify-between items-center">
         <div class="text-slate-200 dark:text-slate-700">
-          Created by <a href="https://6px.fr">Six Pixels</a>
+          Created by <a target="_blank" href="https://6px.fr">Six Pixels</a>
         </div>
         <div class="text-slate-200 dark:text-slate-700">
-          <a href="__VERSION_LINK__">__VERSION__</a>
+          <a target="_blank" href="__VERSION_LINK__">__VERSION__</a>
         </div>
         <div class="flex justify-end">
           <UButton target="_blank" class="rounded-full p-0 border-0 mx-4" variant="link" color="white" to="https://github.com/6px/Inventronic">
