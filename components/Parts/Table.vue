@@ -1,13 +1,31 @@
 <template>
   <div>
-    <UTable :rows="rows" :columns="columns" :ui="{td: {base:''}}">
+    <div :class="selected.length ? '' : 'h-8'">
+      <UButtonGroup size="sm" orientation="horizontal"  v-if="selected.length">
+        <UButton icon="i-heroicons-outline-qr-code" label="Print labels" color="white" @click="printTags" />
+        <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete" @click="deleteParts" />
+      </UButtonGroup>
+    </div>
+    <UTable :rows="rows" :columns="columns" :ui="{ td: { base: '' } }" v-model="selected">
+      <template #part-data="{ row }">
+        <strong>{{ row.part }}</strong>
+      </template>
+
+      <template #value-data="{ row }">
+        <UTooltip :text="row.value">
+          <div class="max-w-[200px] truncate overflow-hidden">
+
+            {{ row.value }}
+
+          </div>
+        </UTooltip>
+      </template>
+
       <template #quantity-data="{ row }">
-        <UBadge
-          :color="row.quantity <= row.min_quantity ? 'red': 'primary'"
-          :variant="row.quantity <= row.min_quantity ? 'solid': 'outline'"
-        >
-        {{ row.quantity }}
-      </UBadge>
+        <UBadge :color="row.quantity <= row.min_quantity ? 'red' : 'primary'"
+          :variant="row.quantity <= row.min_quantity ? 'solid' : 'outline'">
+          {{ row.quantity }}
+        </UBadge>
 
       </template>
 
@@ -16,7 +34,8 @@
           {{ row.locations.name }}
         </UButton>
         <div v-else>
-          <USelect :options="locations" option-attribute="name" value-attribute="id" v-model="row.location_id" @change="changeLocation(row)" />
+          <USelect :options="locations" option-attribute="name" value-attribute="id" v-model="row.location_id"
+            @change="changeLocation(row)" />
         </div>
       </template>
 
@@ -24,49 +43,41 @@
       <template #footprint-data="{ row }">
         <UTooltip :text="row.footprint">
           <div class="max-w-[200px] truncate overflow-hidden">
-          
+
             {{ row.footprint }}
-            
+
           </div>
         </UTooltip>
       </template>
 
-      <template #part-data="{ row }">
-        <strong>{{ row.part }}</strong>
-      </template>
+
       <template #id-data="{ row }">
         <div class="whitespace-nowrap">
           <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
           <UButton label="" icon="i-heroicons-outline-pencil" @click="editPart(row)" />
-          <UButton class="ml-2" label="" :loading="deleting === row.id" :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" color="red" @click="deletePart(row)" />
+          <UButton class="ml-2" label="" :loading="deleting === row.id"
+            :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" color="red" @click="deletePart(row)" />
         </div>
       </template>
     </UTable>
 
-    <div v-if="parts.length > pageCount" class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+    <div v-if="parts.length > pageCount"
+      class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
       <UPagination v-model="page" :page-count="pageCount" :total="parts.length" />
     </div>
 
-    <UButton
-      icon="i-heroicons-outline-plus"
-      class="mt-6"
-      :label="`Create part ${location ? 'here' : ''}`"
-      @click="createPart"
-    />
-    <UButton
-      v-if="location"
-      icon="i-heroicons-outline-arrow-top-right-on-square"
-      class="mt-6 ml-2"
-      label="Move part here"
-      @click="moveModal=true"
-    />
-    <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal=false" @refresh="emit('refresh')" />
-    
-    <PartsPartModal :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal=false" @save="savePart" />
-    <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal=false" />
+    <UButton icon="i-heroicons-outline-plus" class="mt-6" :label="`Create part ${location ? 'here' : ''}`"
+      @click="createPart" />
+    <UButton v-if="location" icon="i-heroicons-outline-arrow-top-right-on-square" class="mt-6 ml-2" label="Move part here"
+      @click="moveModal = true" />
+    <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal = false"
+      @refresh="emit('refresh')" />
+
+    <PartsPartModal :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false"
+      @save="savePart" />
+    <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
 
   </div>
-
 </template>
 
 <script lang="ts" setup>
@@ -74,6 +85,10 @@ import type { UButton } from '#ui-colors/components';
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
+
+const router = useRouter()
+
+const config = useRuntimeConfig()
 
 const props = defineProps({
   parts: {
@@ -86,8 +101,12 @@ const props = defineProps({
   },
 })
 
+// TODO Allow printing many labels at once on single piece of paper
+
 const page = ref(1)
 const pageCount = 20
+
+const selected = ref([])
 
 const rows = computed(() => {
   return props.parts.slice((page.value - 1) * pageCount, (page.value) * pageCount)
@@ -143,9 +162,10 @@ const moveModal = ref(false)
 const qrPart = ref({})
 const saving = ref(false)
 const deleting = ref(0)
+const deletingAll = ref(false)
 const emit = defineEmits(['refresh'])
 
-const {data: locations} = await useAsyncData('locations', async () => {
+const { data: locations } = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
 
   return data
@@ -162,14 +182,14 @@ let selectedPart: Part = reactive({
   price: 0,
   ordering_url: '',
   location_id: props.location ? props.location.id : null,
-  id:null,
+  id: null,
   owner_id: null,
-  locations: {...props.location}
+  locations: { ...props.location }
 })
 
 const changeLocation = async (row) => {
   console.log(row.location_id)
-  await client.from('parts').update({'location_id': row.location_id}).eq('id', row.id)
+  await client.from('parts').update({ 'location_id': row.location_id }).eq('id', row.id)
   emit('refresh')
 }
 
@@ -189,9 +209,21 @@ const deletePart = async (row: Part) => {
   deleting.value = 0
 }
 
+const deleteParts = async () => {
+  deletingAll.value = true
+  await client.from('parts').delete().in('id', selected.value.map(p => p.id))
+  emit('refresh')
+  deletingAll.value = false
+}
+
 const printTag = (row: Part) => {
   qrPart.value = row
   qrModal.value = true
+}
+
+const printTags = () => {
+  const routeData = router.resolve({path: '/parts/print', query: {ids: selected.value.map(p => p.id)}});
+  window.open(routeData.href, '_blank');
 }
 
 const savePart = async () => {
@@ -203,7 +235,7 @@ const savePart = async () => {
   if (p.id) {
     p.owner_id = user.value.id
     const r = await client.from('parts').update({ ...p }).select(partFields)
-    .eq('id', p.id)
+      .eq('id', p.id)
     if (r.error) {
       alert(r.error.message)
     } else {
@@ -233,7 +265,5 @@ const savePart = async () => {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
 

@@ -30,7 +30,7 @@
 
 </script>
 
-<style>
+<style scoped>
 svg {
   fill: rgb(203, 213, 225);
 }

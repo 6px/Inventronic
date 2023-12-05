@@ -13,3 +13,36 @@
 .text-monaspace {
     font-family: monaspace, 'Courier New', Courier, monospace
 }
+
+@font-face {
+    font-family: monaspaceBold;
+    src: url(/fonts/MonaspaceKrypton-ExtraBold.otf);
+  }
+  
+  @font-face {
+    font-family: monaspace;
+    src: url(/fonts/MonaspaceKrypton-Light.otf);
+  }
+  
+  @media print {
+    svg {
+       width: 48mm; 
+       height: 13mm; 
+    }
+  }
+  
+  svg .name {
+    font: 15px monaspaceBold;
+    fill: black;
+    text-anchor:end;
+  }
+  svg .parts {
+    font: 10px monaspace;
+    fill: black;
+    text-anchor:end;
+  }
+  
+  svg .description {
+    font: 8px monaspace;
+    fill: black;
+  }

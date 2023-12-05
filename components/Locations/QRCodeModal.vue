@@ -7,16 +7,17 @@
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
         </div>
       </template>
-
-      <CommonQrCode
-        :subtitle="location.parts.map(p => p.part).join(', ')"
-        :description="location.description"
-        :url="`${req.public.baseUrl}/locations/${props.location.id}`"
-      >
-        <template #title>
-          {{ location.name }}
-        </template>
-      </CommonQrCode>
+      <div id="image">
+        <CommonQrCode
+          :subtitle="location.parts.map(p => p.part).join(', ')"
+          :description="location.description"
+          :url="`${req.public.baseUrl}/locations/${props.location.id}`"
+        >
+          <template #title>
+            {{ location.name }}
+          </template>
+        </CommonQrCode>
+      </div>
       <template #footer>
         <UButton
           class="mx-4"

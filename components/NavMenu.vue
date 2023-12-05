@@ -9,7 +9,7 @@
       <span class="pl-1">Parts</span>
     </NuxtLink>
     <NuxtLink
-      to="/locations"
+      to="/locations/"
       active-class="font-bold text-primary-600"
       class="hover:text-primary-600 px-3 py-2 flex items-center"
     >
@@ -17,7 +17,7 @@
       <span class="pl-1">Locations</span>
     </NuxtLink>
     <NuxtLink
-      to="/projects"
+      to="/projects/"
       active-class="font-bold text-primary-600"
       class="hover:text-primary-600 px-3 py-2 flex items-center"
     >

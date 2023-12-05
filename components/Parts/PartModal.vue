@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model="open" @close="emit('close')">
+  <UModal v-model="open" @close="emit('close')" :ui="{width: 'w-full sm:max-w-2xl'}">
     <PartsForm :modal="true" :selectedPart="selectedPart" @close="emit('close')" :saving="saving" @save="emit('save')" />
   </UModal>
 </template>

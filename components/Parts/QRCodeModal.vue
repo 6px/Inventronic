@@ -7,18 +7,19 @@
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
         </div>
       </template>
-
-      <CommonQrCode
-        :subtitle="part.footprint + '\n' + (part.locations ? part.locations.name : '')"
-        :description="part.description"
-        :description-size="2"
-        :subtitle-size="2.5"
-        :url="`${req.public.baseUrl}/parts/${part.id}`"
-      >
-        <template #title>
-          {{ part.part === part.value ? part.part : part.part + ' ' + part.value }} 
-        </template>
-      </CommonQrCode>
+      <div id="image">
+        <CommonQrCode
+          :subtitle="part.footprint + '\n' + (part.locations ? part.locations.name : '')"
+          :description="part.description"
+          :description-size="2"
+          :subtitle-size="2.5"
+          :url="`${req.public.baseUrl}/parts/${part.id}`"
+        >
+          <template #title>
+            {{ part.part === part.value ? part.part : part.part + ' ' + part.value }} 
+          </template>
+        </CommonQrCode>
+      </div>
       <template #footer>
         <UButton
           class="mx-4"
