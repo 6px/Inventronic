@@ -9,13 +9,11 @@
       </template>
       <div id="image">
         <CommonQrCode
+          :title="location.name"
           :subtitle="location.parts.map(p => p.part).join(', ')"
           :description="location.description"
           :url="`${req.public.baseUrl}/locations/${props.location.id}`"
         >
-          <template #title>
-            {{ location.name }}
-          </template>
         </CommonQrCode>
       </div>
       <template #footer>

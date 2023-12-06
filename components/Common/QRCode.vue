@@ -6,8 +6,8 @@
     </svg:style>
     <!-- <rect width="100%" height="100%" fill="white" /> -->
 
-    <text :x="width * mul" :y="3 * mul" class="name">
-      <slot name="title"></slot>
+    <text :x="title.length > 16 ? qrSize*mul : width * mul" :y="3 * mul" class="name" :style="title.length > 16 ? 'text-anchor: start;' : ''">
+      {{ title }}
     </text>
 
     <text :x="maxLineLen > 68 / subtitleSize ? qrSize * mul : width * mul" :y="3.25 * mul" class="parts"
@@ -36,6 +36,10 @@ import QRCode from 'qrcode'
 const emit = defineEmits(['ready'])
 
 const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
   subtitle: {
     type: String,
     required: true,

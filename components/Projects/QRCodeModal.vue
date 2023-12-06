@@ -9,16 +9,13 @@
       </template>
 
       <CommonQrCode
+        :title="project.name"
         :subtitle="project.description"
         :description="project.url"
         :description-size="1.75"
         :subtitle-size="2.5"
         :url="project.url"
-      >
-        <template #title>
-          {{ project.name }}
-        </template>
-      </CommonQrCode>
+      />
       <template #footer>
         <UButton
           class="mx-4"

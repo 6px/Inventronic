@@ -1,11 +1,21 @@
 <template>
   <div>
-    <div :class="selected.length ? '' : 'h-8'">
-      <UButtonGroup size="sm" orientation="horizontal"  v-if="selected.length">
-        <UButton icon="i-heroicons-outline-qr-code" label="Print labels" color="white" @click="printTags" />
-        <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete" @click="deleteParts" />
-      </UButtonGroup>
+    <div class="flex justify-between items-end">
+      
+      <div :class="selected.length ? '' : 'h-8'">
+        <UButtonGroup size="sm" orientation="horizontal"  v-if="selected.length">
+          
+          <UButton icon="i-heroicons-outline-qr-code" label="Print labels" color="white" @click="printTags" />
+          <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete" @click="deleteParts" />
+          
+        </UButtonGroup>
+      </div>
+
+      <UFormGroup label="Parts per page">
+        <USelect class="mr-4" :options="['10', '20', '50', '100', 'All']" v-model="pageCount" />
+      </UFormGroup>
     </div>
+    <UDivider class="mt-4 mb-0"/>
     <UTable :rows="rows" :columns="columns" :ui="{ td: { base: '' } }" v-model="selected">
       <template #part-data="{ row }">
         <strong>{{ row.part }}</strong>
@@ -61,10 +71,20 @@
       </template>
     </UTable>
 
-    <div v-if="parts.length > pageCount"
-      class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <UPagination v-model="page" :page-count="pageCount" :total="parts.length" />
-    </div>
+    <UDivider/>
+
+    <div
+      class="flex justify-between px-3 py-3.5">
+      <div :class="selected.length ? '' : 'h-8'">
+        <UButtonGroup size="sm" orientation="horizontal"  v-if="selected.length">
+          <UButton icon="i-heroicons-outline-qr-code" label="Print labels" color="white" @click="printTags" />
+          <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete" @click="deleteParts" />
+        </UButtonGroup>
+      </div>
+      <div>
+        <UPagination v-if="pageCount !== 'All' && parts.length > parseInt(pageCount, 10)" v-model="page" :page-count="parseInt(pageCount, 10)" :total="parts.length" />
+      </div>
+      </div>
 
     <UButton icon="i-heroicons-outline-plus" class="mt-6" :label="`Create part ${location ? 'here' : ''}`"
       @click="createPart" />
@@ -81,6 +101,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { UDivider } from '#build/components';
 import type { UButton } from '#ui-colors/components';
 
 const client = useSupabaseClient()
@@ -104,12 +125,18 @@ const props = defineProps({
 // TODO Allow printing many labels at once on single piece of paper
 
 const page = ref(1)
-const pageCount = 20
+const pageCount = ref('20')
 
 const selected = ref([])
 
 const rows = computed(() => {
-  return props.parts.slice((page.value - 1) * pageCount, (page.value) * pageCount)
+  if (pageCount.value === 'All') {
+    return props.parts
+  }
+
+  const pc = parseInt(pageCount.value, 10)
+  
+  return props.parts.slice((page.value - 1) * pc, (page.value) * pc)
 })
 
 const columns = [

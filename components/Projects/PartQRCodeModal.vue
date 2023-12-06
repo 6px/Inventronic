@@ -9,16 +9,13 @@
       </template>
       <div id="image">
         <CommonQrCode
+          :title="projectPart.parts.part === projectPart.parts.value ? projectPart.parts.part : projectPart.parts.part + ' ' + projectPart.parts.value"
           :subtitle="projectPart.references"
           :description="projectPart.parts.footprint"
           :description-size="2"
           :subtitle-size="2.5"
           :url="`${req.public.baseUrl}/parts/${projectPart.parts.id}`"
-        >
-          <template #title>
-            {{ projectPart.parts.part === projectPart.parts.value ? projectPart.parts.part : projectPart.parts.part + ' ' + projectPart.parts.value }} 
-          </template>
-        </CommonQrCode>
+        />
       </div>
       <template #footer>
         <UButton

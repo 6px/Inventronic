@@ -2,6 +2,7 @@
   <div>
     <CommonQrCode
         v-for="part in parts"
+        :title="part.part === part.value ? part.part : part.part + ' ' + part.value"
         :subtitle="part.footprint + '\n' + (part.locations ? part.locations.name : '')"
         :description="part.description"
         :description-size="2"
@@ -9,9 +10,6 @@
         :url="`${config.public.baseUrl}/parts/${part.id}`"
         @ready="ready"
       >
-        <template #title>
-          {{ part.part === part.value ? part.part : part.part + ' ' + part.value }} 
-        </template>
       </CommonQrCode>
   </div>
 </template>
