@@ -22,7 +22,7 @@
               </UButton>
             </div>
             <div class="opacity-70 text-xs md:text-sm text-center md:max-w-xl lg:max-w-2xl m-auto mt-2">
-              It's free and only takes a few seconds. You'l be uploading your bills of materials in no time.
+              It's free and only takes a few seconds. You'll be uploading your bills of materials in no time.
             </div>
 
           </UContainer>

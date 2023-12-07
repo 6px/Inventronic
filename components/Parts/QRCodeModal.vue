@@ -14,7 +14,7 @@
           :description="part.description"
           :description-size="2"
           :subtitle-size="2.5"
-          :url="`${req.public.baseUrl}/parts/${part.id}`"
+          :url="`${req.public.baseUrl}/parts/${uuidb64(part.id)}`"
         />
       </div>
       <template #footer>
@@ -68,12 +68,12 @@ const print = () => {
     const css = mywindow.document.createTextNode(`
     @media print {
       svg {
-        width: 50mm !important;
+        width: 54mm !important;
         padding:0;
         margin:0;
       }
       body{
-        width: 50mm !important; 
+        width: 54mm !important; 
         height: 17mm !important; 
         color-adjust: exact;
         padding:0;

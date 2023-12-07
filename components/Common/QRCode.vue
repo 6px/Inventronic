@@ -6,26 +6,26 @@
     </svg:style>
     <!-- <rect width="100%" height="100%" fill="white" /> -->
 
-    <text :x="title.length > 16 ? qrSize*mul : width * mul" :y="3 * mul" class="name" :style="title.length > 16 ? 'text-anchor: start;' : ''">
+    <text :x="title.length > 16 ? (marginX+qrSize)*mul : (width-marginX) * mul" :y="(3+marginY) * mul" class="name" :style="title.length > 16 ? 'text-anchor: start;' : ''">
       {{ title }}
     </text>
 
-    <text :x="maxLineLen > 68 / subtitleSize ? qrSize * mul : width * mul" :y="3.25 * mul" class="parts"
+    <text :x="maxLineLen > 68 / subtitleSize ? (marginX+qrSize) * mul : (width-marginX) * mul" :y="(3.25+marginY) * mul" class="parts"
       :style="maxLineLen > 68 / subtitleSize ? 'text-anchor:start;' : ''">
-      <tspan :x="maxLineLen > 68 / subtitleSize ? qrSize * mul : width * mul" :dy="subtitleSize * mul" v-for="line in partLines">
+      <tspan :x="maxLineLen > 68 / subtitleSize ? (marginX+qrSize) * mul : (width-marginX) * mul" :dy="subtitleSize * mul" v-for="line in partLines">
         {{ line }}
       </tspan>
     </text>
 
-    <!-- <rect x="0" :y="qrSize * mul" width="100%" :height="(height - qrSize) * mul" fill="#ffffff" /> -->
+    <!-- <rect x="0" :y="(marginX+qrSize) * mul" width="100%" :height="(height - qrSize) * mul" fill="#ffffff" /> -->
 
-    <text :x="0" :y="qrSize * mul" class="description">
-      <tspan :x="0" :dy="descriptionSize * mul" v-for="line in descLines">
+    <text :x="marginX*mul" :y="(marginY+qrSize) * mul" class="description">
+      <tspan :x="marginX*mul" :dy="descriptionSize * mul" v-for="line in descLines">
         {{ line }}
       </tspan>
     </text>
 
-    <g v-html="qrSvg"></g>
+    <g :style="`transform: translateX(${marginX*mul}px) translateY(${marginY * mul}px)`" v-html="qrSvg"></g>
   </svg>
 </template>
 
@@ -68,8 +68,10 @@ const partLines = ref([props.subtitle])
 const descLines = ref([props.description])
 
 const mul = 4
-const height = 13
-const width = 48
+const height = 17
+const width = 54
+const marginX = 3.1;
+const marginY = 2;
 const qrSize = 10
 
 const svgStyle = `
@@ -121,8 +123,8 @@ onMounted(async () => {
       )
   )
   console.log('split', ln.flat())
-  partLines.value = (await Promise.all(props.subtitle.split('\n').map(async (l) => await getLines(l, (width - 12) * mul)))).flat()
-  descLines.value = await getLines(props.description, width * mul, 'description')
+  partLines.value = (await Promise.all(props.subtitle.split('\n').map(async (l) => await getLines(l, (width - qrSize - marginX) * mul)))).flat()
+  descLines.value = (await getLines(props.description, (width-marginX*2) * mul, 'description')).slice(0, 1)
 
   emit('ready')
 })

@@ -4,6 +4,10 @@
     src: url(/fonts/MonaspaceKrypton-ExtraBold.otf);
 }
 
+#image {
+  background: white;;
+}
+
 @font-face {
     font-weight: normal;
     font-family: monaspace;

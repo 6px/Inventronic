@@ -88,7 +88,7 @@ watchEffect(() => {
   console.log('user',user.value)
   if (user.value && user.value.id) {
     //navigateTo('/')
-    window.location='/'
+    //window.location='/'
   }
 })
 

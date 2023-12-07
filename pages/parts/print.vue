@@ -7,7 +7,7 @@
         :description="part.description"
         :description-size="2"
         :subtitle-size="2.5"
-        :url="`${config.public.baseUrl}/parts/${part.id}`"
+        :url="`${config.public.baseUrl}/parts/${uuidb64(part.id)}`"
         @ready="ready"
       >
       </CommonQrCode>
@@ -38,6 +38,7 @@ const ready = () => {
   cnt.value += 1
   if (cnt.value >= parts.value.length) {
     window.print()
+    window.close()
   }
 }
 
@@ -46,11 +47,27 @@ const ready = () => {
 
 <style scoped>
   svg {
-    width: 48mm;
+    width: 54mm;
+    height: 17mm;
     display: inline;
-    margin: 2mm;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   body, html, div {
     background: white;
   }
+  @media print {
+      svg {
+        width: 54mm !important;
+        height: 17mm;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body{
+        color-adjust: exact;
+        print-color-adjust: exact;
+        padding:0;
+        margin:0;
+      }
+    }
 </style>

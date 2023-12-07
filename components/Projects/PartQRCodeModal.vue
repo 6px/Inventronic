@@ -14,7 +14,7 @@
           :description="projectPart.parts.footprint"
           :description-size="2"
           :subtitle-size="2.5"
-          :url="`${req.public.baseUrl}/parts/${projectPart.parts.id}`"
+          :url="`${req.public.baseUrl}/parts/${uuidb64(projectPart.parts.id)}`"
         />
       </div>
       <template #footer>
