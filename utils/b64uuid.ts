@@ -7,5 +7,5 @@ const b64decode = (x) => {
 };
 
 export default (b64: string) => {
-  return stringify(b64decode(b64+'=='));
+  return stringify(b64decode((b64.replaceAll('-', '+').replaceAll('_', '/'))+'=='));
 }
