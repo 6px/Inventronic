@@ -85,9 +85,8 @@ const otpLoading=ref(false)
 const redirectTo = `${useRuntimeConfig().public.baseUrl}/confirm`
 
 watchEffect(() => {
-  console.log('user',user.value)
   if (user.value && user.value.id) {
-    //navigateTo('/')
+    navigateTo('/')
     //window.location='/'
   }
 })

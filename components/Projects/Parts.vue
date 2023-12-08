@@ -81,7 +81,7 @@
       
 
       <template #parts.quantity-data="{ row }">
-        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > row.parts.quantity ? 'red' : 'green'" class="ml-2 shrink">{{ row.parts.quantity }}</UBadge>
+        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.parts.min_quantity > row.parts.quantity ? 'red' : 'green'" class="ml-2 shrink">{{ row.parts.quantity }}</UBadge>
       </template>
 
       <template #parts.locations-data="{ row }">

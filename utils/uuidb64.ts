@@ -11,5 +11,6 @@ const b64encode = (x) => {
 
 export default (uuid: string) => {
   const bytes = uuidParse(uuid);
-  return b64encode(bytes).substring(0, 22).replaceAll('+', '-').replaceAll('/', '_')
+  const st = b64encode(bytes).substring(0, 22).replaceAll('+', '-').replaceAll('/', '_')
+  return st
 }
