@@ -12,8 +12,16 @@
     <UTable :rows="rows" :columns="columns" :ui="{td:{base:''}}">
       <template #id-data="{ row }">
         <div class="flex flex-row">
-          <UTooltip v-if="row.id" text="Print part label">
+          <UTooltip v-if="row.id" text="Print project part label">
             <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
+          </UTooltip>
+          <UTooltip v-if="row.id" text="Edit project part">
+            <UButton
+            class="mr-2"
+            label=""
+            icon="i-heroicons-outline-pencil"
+            @click="editProjectPart(row)"
+          />
           </UTooltip>
           <UTooltip v-if="row.id" text="Remove part from this project">
             <UButton class="mr-2" :loading="deleting===row.id" label="" color="red" :icon="deleting===row.id ? '' : 'i-heroicons-outline-trash'" @click="removeProjectPart(row)" />
@@ -87,7 +95,7 @@
       
 
       <template #parts.quantity-data="{ row }">
-        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.parts.min_quantity > row.parts.quantity ? 'red' : 'green'" class="ml-2 shrink">{{ row.parts.quantity }}</UBadge>
+        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > row.parts.quantity ? 'red' : 'green'" class="ml-2 shrink">{{ row.parts.quantity }}</UBadge>
       </template>
 
       <template #parts.locations-data="{ row }">
@@ -107,6 +115,8 @@
       <UPagination v-model="page" :page-count="pageCount" :total="project.project_parts.length" />
     </div>
     <ProjectsPartQRCodeModal :open="qrModal" :projectPart="qrPart" @close="qrModal=false" />
+    <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal=false" />
+
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
   </UCard>
 </template>
@@ -142,6 +152,9 @@ const saveQty = ref({})
 const projectParts = ref(props.project.project_parts)
 const uploadModal = ref(false)
 const deleting = ref(0)
+
+const ppModal = ref(false)
+const ppPart = ref({})
 
 const newParts = computed(() => {
   return projectParts.value.find(pp => !pp.id)
@@ -194,6 +207,11 @@ const saveLocation = async (row: ProjectPart) => {
 const editPart = (part: Part) => {
   selectedPart.value = part
   partModal.value = true
+}
+
+const editProjectPart = (row) => {
+  ppPart.value = row
+  ppModal.value = true
 }
 
 const removeProjectPart = async (row) => {

@@ -31,7 +31,7 @@
 
   const qrModal = ref(false)
 
-  const projectFields = `id, name, created_at, description, url, project_parts(id, parts(id, part, value, footprint, description, quantity, price, ordering_url, locations(id, name)), quantity, references)`
+  const projectFields = `id, name, created_at, description, url, project_parts(id, part_id, parts(id, part, value, footprint, description, quantity, price, ordering_url, locations(id, name)), quantity, references)`
 
   const {data: project, refresh: refreshProject} = await useAsyncData(`project-${route.params.id}`, async () => {
     const { data } = await client.from('projects').select(projectFields).eq('id', route.params.id).order('created_at')
