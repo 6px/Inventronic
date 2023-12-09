@@ -10,9 +10,10 @@
       <div id="image">
         <CommonQrCode
           :title="location.name"
-          :subtitle="location.parts.map(p => p.part).join(', ')"
-          :description="location.description"
-          :url="`${req.public.baseUrl}/locations/${props.location.id}`"
+          :qrSize="12"
+          :subtitle="location.description + '\n' + location.location_parts.length + (location.location_parts.length === 1 ? ' part' : ' parts')"
+          :description="`${req.public.baseUrl}/locations/${uuidb64(props.location.id)}`"
+          :url="`${req.public.baseUrl}/locations/${uuidb64(props.location.id)}`"
         >
         </CommonQrCode>
       </div>

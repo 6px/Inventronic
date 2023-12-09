@@ -1,15 +1,11 @@
 <template>
   <div class="w-full my-2">
     <h1 class="mb-1 text-4xl font-bold u-text-white text-center">
-      {{ location.name }} 
-        <UButton
-          class="ml-4"
-          icon="i-heroicons-outline-qr-code"
-          @click="qrcode=true"
-        />
+      {{ location.name }}
+      <UButton class="ml-4" icon="i-heroicons-outline-qr-code" @click="qrcode = true" />
     </h1>
     <div class="mb-6 text-sm text-slate-500 text-center">{{ location.description }}</div>
-    
+
     <UContainer>
       <div class="md:grid md:grid-cols-2 md:gap-x-2">
 
@@ -26,11 +22,7 @@
             </UFormGroup>
           </UForm>
           <template #footer>
-            <UButton
-              class="mr-4"
-              @click="save"
-              :loading="saving"
-            >
+            <UButton class="mr-4" @click="save" :loading="saving">
               <div v-if="saving">
                 Saving...
               </div>
@@ -43,67 +35,64 @@
           <template #header>
             <h2>Locations in <strong>{{ location.name }}</strong></h2>
           </template>
-          <LocationsTree v-if="location.locations && location.locations.length > 0" :locations="location.locations" :depth="0" @refresh="refresh" />
+          <LocationsTree v-if="location.locations && location.locations.length > 0" :locations="location.locations"
+            :depth="0" @refresh="refresh" />
           <div v-else class="text-center text-slate-500 text-lg my-6">
             No locations here
           </div>
-          <UButton
-            class="mt-6"
-            icon="i-heroicons-outline-plus"
-            label="Create location here"
-            @click="create=true"
-          />
+          <UButton class="mt-6" icon="i-heroicons-outline-plus" label="Create location here" @click="create = true" />
         </UCard>
-      
+
       </div>
 
       <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
         <template #header>
           <h2>Parts in <strong>{{ location.name }}</strong></h2>
         </template>
-        <PartsTable :parts="parts" :location="location" @refresh="refreshParts" />
+        <PartsTable :parts="parts" :location="location" @refresh="refresh" />
       </UCard>
     </UContainer>
 
-    <LocationsCreate :open="create" :parent="location" @close="create=false" @refresh="refresh" />
-    <LocationsQrCodeModal :open="qrcode" :location="location" @close="qrcode=false" />
+    <LocationsCreate :open="create" :parent="location" @close="create = false" @refresh="refresh" />
+    <LocationsQrCodeModal :open="qrcode" :location="location" @close="qrcode = false" />
   </div>
 </template>
 
 <script lang="ts" setup>
-
-  const route = useRoute()
-  const client = useSupabaseClient()
-  const user = useSupabaseUser()
+import { loadRouteLocation } from 'vue-router';
+import Locations from '~/pages/locations.vue';
 
 
-  const create = ref(false)
-  const qrcode = ref(false)
-  const saving = ref(false)
-  const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
-  const locationFields = `id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value) ))))))`
+const route = useRoute()
+const client = useSupabaseClient()
+const user = useSupabaseUser()
 
-  const {data: parts, refresh: refreshParts} = await useAsyncData(`location-${route.params.id}-parts`, async () => {
-    const { data } = await client.from('parts').select(partFields).eq('location_id', route.params.id).order('created_at')
 
-    return data
+const create = ref(false)
+const qrcode = ref(false)
+const saving = ref(false)
+const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, project_parts(id, projects(id, name, description))`
+const locationFields = `id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields}))))))))`
+
+const { data: location, refresh } = await useAsyncData(`location-${route.params.id}`, async () => {
+  const { data } = await client.from('locations').select(locationFields).eq('id', b64uuid(route.params.id)).order('created_at')
+
+  return data[0]
+})
+
+if (!location.value) {
+  showError({
+    statusCode: 404,
+    statusMessage: 'Page Not Found'
   })
+}
 
-  const {data: location, refresh} = await useAsyncData(`location-${route.params.id}`, async () => {
-    const { data } = await client.from('locations').select(locationFields).eq('id', route.params.id).order('created_at')
-
-    return data[0]
-  })
-
-  if (!location.value) {
-    showError({
-      statusCode: 404,
-      statusMessage: 'Page Not Found'
-    })
-  }
+const parts = computed(() => {
+  return location.value.location_parts.map((lp: LocationPart) => lp.parts)
+})
 
 useHead({
-  title: location.value.name,
+  title: location.value ? location.value.name : 'Not found',
 })
 
 
@@ -129,17 +118,15 @@ const save = async () => {
   }
 }
 
-  const validate = (state: any): FormError[] => {
-    const errors = []
-    if (!state.name) errors.push({ path: 'name', message: 'Required' })
-    if (!state.quantity) errors.push({ path: 'quantity', message: 'Required' })
-    return errors
-  }
+const validate = (state: any): FormError[] => {
+  const errors = []
+  if (!state.name) errors.push({ path: 'name', message: 'Required' })
+  if (!state.quantity) errors.push({ path: 'quantity', message: 'Required' })
+  return errors
+}
 
 
 </script>
 
-<style>
-
-</style>
+<style></style>
 

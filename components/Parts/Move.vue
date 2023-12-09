@@ -24,7 +24,7 @@
             <template #option="{ option: part, selected: sel }">
               <div class="flex flex-row justify-between px-1">
                 <div class="truncate grow">{{ part.part }} {{ part.value }}</div>
-                <div v-if="part.locations" class="truncate shrink text-slate-600 dark:text-slate-200">{{ part.locations.name }}</div>
+                <div v-if="part.location_parts && part.location_parts.length > 0" class="truncate shrink text-slate-600 dark:text-slate-200">{{ part.location_parts.map((lp: LocationPart) => lp.locations.name).join(', ') }}</div>
                 <div v-else class="truncate shrink text-slate-600 dark:text-slate-200">None</div>
 
                 <div class="w-5 pe-2" v-if="!sel"></div>
@@ -79,7 +79,7 @@ watch(
   () => {open.value = props.open}
 )
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
+const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, locations(id, name), quantity)`
 
 const {data: parts} = await useAsyncData('parts', async () => {
   const { data } = await client.from('parts').select(partFields).order('created_at')
@@ -90,17 +90,8 @@ const {data: parts} = await useAsyncData('parts', async () => {
 const save = async () => {
   saving.value = true
   for await (const part of selected.value) {
-    part.location_id = props.location.id
-    delete part.locations
-    console.log(part)
-    const r = await client.from('parts')
-      .update({ ...part })
-      .eq('id', part.id)
-      .select(partFields)
-    
-    if (r.error) {
-      alert(r.error.message)
-    }
+    const r = await client.from('location_parts')
+      .insert({ part_id: part.id, location_id: props.location.id})
   }
   saving.value = false
 

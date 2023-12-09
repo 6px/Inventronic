@@ -2,49 +2,48 @@
   <UCard>
     <template #header>
       <div class="flex flex-row justify-between">
-        <h2 class="text-xl font-bold u-text-white">{{ project.project_parts.length}} project parts</h2>
+        <h2 class="text-xl font-bold u-text-white">{{ project.project_parts.length }} project parts</h2>
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
           <UButton color="white" label="Add parts" trailing-icon="i-heroicons-chevron-down-20-solid" />
           <ProjectsUploadModal @change="kicadCSV($event)" :open="uploadModal" @close="uploadModal = false" />
         </UDropdown>
       </div>
     </template>
-    <UTable :rows="rows" :columns="columns" :ui="{td:{base:''}}">
+    <UTable :rows="rows" :columns="columns" :ui="{ td: { base: '' } }">
       <template #id-data="{ row }">
         <div class="flex flex-row">
-          <UTooltip v-if="row.id" text="Print project part label">
-            <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
-          </UTooltip>
-          <UTooltip v-if="row.id" text="Edit project part">
-            <UButton
-            class="mr-2"
-            label=""
-            icon="i-heroicons-outline-pencil"
-            @click="editProjectPart(row)"
-          />
-          </UTooltip>
-          <UTooltip v-if="row.id" text="Remove part from this project">
-            <UButton class="mr-2" :loading="deleting===row.id" label="" color="red" :icon="deleting===row.id ? '' : 'i-heroicons-outline-trash'" @click="removeProjectPart(row)" />
-          </UTooltip>
-          
-          <UTooltip v-else-if="row.parts.id" text="Add to this project">
-            <UButton
-            class="mr-2"
-            label=""
-            :icon="adding[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
-            :loading="adding[row.parts.part + row.parts.value]"
-            @click="addPart(row)"
-          />
-          </UTooltip>
-          <UTooltip v-else text="Create this part and add it to this project">
-            <UButton
-              class="mr-2"
-              label=""
-              :icon="creating[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
-              @click="createPart(row)"
-              :loading="creating[row.parts.part + row.parts.value]"
-            />
-          </UTooltip>
+          <div v-if="row.id">
+            <UTooltip text="Print project part label">
+              <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
+            </UTooltip>
+          </div>
+          <div v-if="row.id">
+            <UTooltip text="Edit project part">
+              <UButton class="mr-2" label="" icon="i-heroicons-outline-pencil" @click="editProjectPart(row)" />
+            </UTooltip>
+          </div>
+          <div v-if="row.id">
+            <UTooltip text="Remove part from this project">
+              <UButton class="mr-2" :loading="deleting === row.id" label="" color="red"
+                :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" @click="removeProjectPart(row)" />
+            </UTooltip>
+          </div>
+
+          <div v-else-if="row.parts.id">
+            <UTooltip text="Add to this project">
+              <UButton class="mr-2" label=""
+                :icon="adding[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
+                :loading="adding[row.parts.part + row.parts.value]" @click="addPart(row)" />
+            </UTooltip>
+          </div>
+          <div v-else>
+
+            <UTooltip text="Create this part and add it to this project">
+              <UButton class="mr-2" label=""
+                :icon="creating[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
+                @click="createPart(row)" :loading="creating[row.parts.part + row.parts.value]" />
+            </UTooltip>
+          </div>
         </div>
       </template>
 
@@ -56,54 +55,60 @@
           {{ row.parts.part }}
         </div>
       </template>
-      
+
       <template #parts.value-data="{ row }">
         <UTooltip :text="row.parts.value">
-          <UButton class="p-0 "  v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
+          <UButton class="p-0 " v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
             <div class="max-w-[100px] truncate overflow-hidden">
               {{ row.parts.value }}
             </div>
           </UButton>
           <div v-else class="max-w-[100px] truncate overflow-hidden">
-              {{ row.parts.value }}
-            </div>
+            {{ row.parts.value }}
+          </div>
         </UTooltip>
       </template>
 
       <template #parts.footprint-data="{ row }">
         <UTooltip :text="row.parts.footprint">
           <div class="max-w-[100px] truncate overflow-hidden">
-          
+
             {{ row.parts.footprint }}
-            
+
           </div>
         </UTooltip>
       </template>
 
       <template #quantity-data="{ row }">
-          <div class="shrink flex flex-row space-between form-input relative w-18 disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-sm p-0 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400">
-            <UInput v-model="row.quantity" variant="none" class="w-20" />
-            <UButton
-              class="rounded-s-none m-0"
-              @click="saveQuantity(row)"
-              :icon="saveQty[row.id] ? '' : 'i-heroicons-outline-arrow-down-on-square'"
-              :loading="saveQty[row.id]"
-            />
-          </div>
+        <div
+          class="shrink flex flex-row space-between form-input relative w-18 disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-sm p-0 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400">
+          <UInput v-model="row.quantity" variant="none" class="w-20" />
+          <UButton class="rounded-s-none m-0" @click="saveQuantity(row)"
+            :icon="saveQty[row.id] ? '' : 'i-heroicons-outline-arrow-down-on-square'" :loading="saveQty[row.id]" />
+        </div>
       </template>
 
-      
+
 
       <template #parts.quantity-data="{ row }">
-        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > row.parts.quantity ? 'red' : 'green'" class="ml-2 shrink">{{ row.parts.quantity }}</UBadge>
+        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) ? 'red' : 'green'"
+          class="ml-2 shrink">{{ row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) }}</UBadge>
       </template>
 
-      <template #parts.locations-data="{ row }">
-        <UButton v-if="row.parts.locations && row.parts.locations.name" variant="link" :to="`/locations/${row.parts.locations.id}`">
-          {{ row.parts.locations.name }}
-        </UButton>
+      <template #locations-data="{ row }">
+        <div v-if="row.parts.location_parts && row.parts.location_parts.length">
+          <div class="max-w-[150px] truncate overflow-hidden">
+            <UTooltip v-for="lp in row.parts.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
+
+              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                {{ lp.locations.name }}
+              </UButton>
+
+            </UTooltip>
+          </div>
+        </div>
         <div v-else>
-          <USelect @change="saveLocation(row)" :options="locations" option-attribute="name" value-attribute="id" v-model="row.parts.location_id" />
+          None
         </div>
       </template>
     </UTable>
@@ -114,10 +119,11 @@
     <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
       <UPagination v-model="page" :page-count="pageCount" :total="project.project_parts.length" />
     </div>
-    <ProjectsPartQRCodeModal :open="qrModal" :projectPart="qrPart" @close="qrModal=false" />
-    <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal=false" />
+    <ProjectsPartQRCodeModal :open="qrModal" :projectPart="qrPart" @close="qrModal = false" />
+    <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal = false" />
 
-    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
+    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal = false"
+      @save="savePart" />
   </UCard>
 </template>
 
@@ -140,14 +146,14 @@ const client = useSupabaseClient()
 const user = useSupabaseUser()
 const emit = defineEmits(['refresh', 'setParts'])
 
-const creating=ref({})
+const creating = ref({})
 const qrModal = ref(false)
 const selectedPart = ref({})
 const saving = ref(false)
 const partModal = ref(false)
 
 const qrPart = ref({})
-const adding=ref({})
+const adding = ref({})
 const saveQty = ref({})
 const projectParts = ref(props.project.project_parts)
 const uploadModal = ref(false)
@@ -167,13 +173,13 @@ const rows = computed(() => {
   return props.project.project_parts.slice((page.value - 1) * pageCount, (page.value) * pageCount)
 })
 
-const {data: locations} = await useAsyncData('locations', async () => {
+const { data: locations } = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
 
   return data
 })
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
+const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, parts(id, name), quantity), project_parts(id, projects(id, name, description))`
 
 
 const refresh = () => {
@@ -181,11 +187,11 @@ const refresh = () => {
 }
 
 watch(
-    () => props.project,
-    () => {
-      projectParts.value = props.project.project_parts;
-    }
-  )
+  () => props.project,
+  () => {
+    projectParts.value = props.project.project_parts;
+  }
+)
 
 const printTag = (row: ProjectPart) => {
   qrPart.value = row
@@ -194,13 +200,13 @@ const printTag = (row: ProjectPart) => {
 
 const saveQuantity = async (row: ProjectPart) => {
   saveQty.value[row.id] = true
-  await client.from('project_parts').update({quantity: row.quantity}).eq('id', row.id)
+  await client.from('project_parts').update({ quantity: row.quantity }).eq('id', row.id)
   saveQty.value[row.id] = false
 }
 
 const saveLocation = async (row: ProjectPart) => {
   // TODO update part location in table
-  await client.from('parts').update({location_id: row.parts.location_id}).eq('id', row.id)
+  await client.from('parts').update({ location_id: row.parts.location_id }).eq('id', row.id)
   refresh()
 }
 
@@ -241,7 +247,7 @@ const savePart = async () => {
   if (p.id) {
     p.owner_id = user.value.id
     const r = await client.from('parts').update({ ...p }).eq('id', p.id).select(partFields)
-    .eq('id', p.id)
+      .eq('id', p.id)
     if (r.error) {
       alert(r.error.message)
     } else {
@@ -264,10 +270,10 @@ const savePart = async () => {
         parts: part,
         project_id: props.project.id,
         quantity: 0,
-      } 
+      }
       const np = await addPart(pp)
       props.project.project_parts.push(np)
-      
+
       refresh()
     }
   }
@@ -277,11 +283,11 @@ const savePart = async () => {
 const addPart = async (row) => {
   adding.value[row.parts.part + row.parts.value] = true
   const r2 = await client.from('project_parts').insert({
-      project_id: props.project.id,
-      part_id: row.parts.id,
-      quantity: row.quantity,
-      references: row.references,
-    }).select('id, parts(id, part, value, footprint, description, quantity, locations(id, name)), quantity')
+    project_id: props.project.id,
+    part_id: row.parts.id,
+    quantity: row.quantity,
+    references: row.references,
+  }).select('id, parts(id, part, value, footprint, description, quantity, locations(id, name)), quantity')
 
   if (r2.error) {
     alert(r2.error.message)
@@ -296,7 +302,7 @@ const addPart = async (row) => {
 const createPart = async (row: ProjectPart) => {
   creating.value[row.parts.part + row.parts.value] = true
 
-  const p = {...row.parts}
+  const p = { ...row.parts }
   p.location_id = parseInt(p.location_id, 10)
   p.owner_id = user.value.id
   delete p.id
@@ -320,7 +326,7 @@ const createPart = async (row: ProjectPart) => {
       row.id = r2.data[0].id
       //refresh()
     }
-    
+
   }
   creating.value[row.parts.part + row.parts.value] = false
 }
@@ -370,8 +376,8 @@ const columns = [
     sortable: true,
   },
   {
-    key: "parts.locations",
-    label: "Location",
+    key: "locations",
+    label: "Locations",
     sortable: true,
   },
   {
@@ -403,6 +409,4 @@ const kicadCSV = async (files: Array<File>) => {
 
 </script>
 
-<style>
-
-</style>
+<style></style>

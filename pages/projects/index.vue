@@ -51,7 +51,7 @@ useHead({
   title: 'Projects', 
 })
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, locations(id, name), location_id`
+const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, locations(id, name), quantity)`
 
 const {data: parts} = await useAsyncData('parts', async () => {
   const { data } = await client.from('parts').select(partFields).order('created_at')
@@ -86,7 +86,6 @@ const nparts = (row) => {
   // For each project parts, get current inventory, 
   // and divide by the quantity required by the project
   let nparts = Infinity;
-  console.log(row.project_parts)
   row.project_parts.forEach((pp: ProjectPart) => {
     const part = parts.value.find(p => p.id === pp.parts.id)
     if (!part) {

@@ -21,7 +21,7 @@ useHead({
 })
 
 
-const locationFields = `id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value), locations(id, name, description, parts(id, part, value)))))))`
+const locationFields = `id, name, description, location_parts(parts(id, part, value)), locations(id, name, description, location_parts(parts(id, part, value)), locations(id, name, description, location_parts(parts(id, part, value)), locations(id, name, description, location_parts(parts(id, part, value)), locations(id, name, description, location_parts(parts(id, part, value)), locations(id, name, description, location_parts(parts(id, part, value)), locations(id, name, description, location_parts(parts(id, part, value))))))))`
 
 const { data: locations, refresh } = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select(locationFields).is('parent_id', null).order('created_at')

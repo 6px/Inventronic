@@ -10,6 +10,5 @@ declare interface Part {
     created_at?: string
     ordering_url?: string
     price?: number
-    locations: Location
-    location_id: number
+    location_parts: Array<LocationPart>
   }

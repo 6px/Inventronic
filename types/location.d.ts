@@ -5,5 +5,5 @@ declare interface Location {
     owner_id?: string
     created_at?: string
     locations?: Array
-    parts?: Array
+    location_parts?: Array
   }

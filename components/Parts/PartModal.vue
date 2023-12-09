@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="open" @close="emit('close')" :ui="{width: 'w-full sm:max-w-2xl'}">
-    <PartsForm :modal="true" :selectedPart="selectedPart" @close="emit('close')" :saving="saving" @save="emit('save')" />
+    <PartsForm :modal="true" :selectedPart="selectedPart" @close="emit('close')" />
   </UModal>
 </template>
 
@@ -12,10 +12,6 @@ const emit = defineEmits(['close', 'save'])
 
 const props = defineProps({
   partModal: {
-    type: Boolean,
-    required: true,
-  },
-  saving: {
     type: Boolean,
     required: true,
   },

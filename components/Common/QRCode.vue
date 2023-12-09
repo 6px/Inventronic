@@ -62,6 +62,11 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  qrSize: {
+    type: Number,
+    required: false,
+    default: 12,
+  },
 });
 
 const partLines = ref([props.subtitle])
@@ -70,9 +75,8 @@ const descLines = ref([props.description])
 const mul = 4
 const height = 17
 const width = 54
-const marginX = 3.1;
-const marginY = 2;
-const qrSize = 10
+const marginX = 3.1
+const marginY = 2
 
 const svgStyle = `
 @font-face {
@@ -123,7 +127,7 @@ onMounted(async () => {
       )
   )
   console.log('split', ln.flat())
-  partLines.value = (await Promise.all(props.subtitle.split('\n').map(async (l) => await getLines(l, (width - qrSize - marginX) * mul)))).flat()
+  partLines.value = (await Promise.all(props.subtitle.split('\n').map(async (l) => await getLines(l, (width - props.qrSize - marginX) * mul)))).flat()
   descLines.value = (await getLines(props.description, (width-marginX*2) * mul, 'description')).slice(0, 1)
 
   emit('ready')
@@ -136,7 +140,7 @@ const maxLineLen = computed(() => {
 
 const generateLabel = () => {
   return new Promise((resolve, reject) => {
-    QRCode.toString(props.url, { margin: 0, type: 'svg', width: qrSize * mul })
+    QRCode.toString(props.url, { margin: 0, type: 'svg', width: props.qrSize * mul })
       .then(svg => {
         qrSvg.value = svg
         resolve(svg)

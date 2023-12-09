@@ -11,7 +11,7 @@
       </div>
     </template>
 
-    <UForm class="space-y-4" @submit="emit('save')" :validate="validate" :state="selectedPart">
+    <UForm class="space-y-4" @submit="save" :validate="validate" :state="selectedPart">
       <div class="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4">
         <UFormGroup label="Part" name="part">
           <UInput v-model=selectedPart.part color="white" variant="outline" placeholder="Part type" />
@@ -25,9 +25,6 @@
         <UFormGroup label="Footprint" name="footprint">
           <UInput v-model=selectedPart.footprint color="white" variant="outline" placeholder="Footprint" />
         </UFormGroup>
-        <UFormGroup label="Quantity" name="quantity">
-          <UInput v-model=selectedPart.quantity color="white" variant="outline" placeholder="1000" />
-        </UFormGroup>
 
         <UFormGroup label="Minimum quantity" name="min_quantity">
           <UInput v-model=selectedPart.min_quantity color="white" variant="outline" placeholder="0" />
@@ -38,22 +35,36 @@
         <UFormGroup label="Ordering URL" name="ordering_url">
           <UInput v-model=selectedPart.ordering_url color="white" variant="outline" placeholder="" />
         </UFormGroup>
-        <UFormGroup label="Location" name="location">
-          <USelectMenu v-model="selectedPart.location_id" :options="locations" value-attribute="id"
-            option-attribute="name">
-            <template #label>
-              {{ current ? current.name : 'None' }}
-            </template>
-          </USelectMenu>
-          <UButton type="submit" class="hidden" @click="emit('save')" />
+
+      </div>
+      <div>
+        <UFormGroup label="Locations" name="locations">
+          <div v-for="lp in selectedLocations" class="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4 mb-4">
+            <UFormGroup label="Location">
+              <USelectMenu v-model="lp.locations" :options="locations">
+                <template #label>
+                  {{ lp.locations.name ? lp.locations.name : 'None' }}
+                </template>
+                <template #option="{ option: location }">
+                  {{ location.name }}
+                </template>
+              </USelectMenu>
+            </UFormGroup>
+            <UFormGroup label="Quantity">
+              <UInput type="number" step="0.05" v-model="lp.quantity" />
+            </UFormGroup>
+          </div>
+
+
         </UFormGroup>
       </div>
-
-
+      <UButton icon="i-heroicons-outline-plus" label="Add location"
+        @click="selectedLocations.push({ quantity: 0, locations: {} })" />
+      <UButton type="submit" class="hidden" @click="emit('save')" />
     </UForm>
 
     <template #footer>
-      <UButton class="mr-4" @click="emit('save')" :loading="saving">
+      <UButton class="mr-4" @click="save" :loading="saving">
         <span v-if="saving">Saving...</span>
         <span v-else>Save</span>
       </UButton>
@@ -64,15 +75,16 @@
 </template>
 
 <script lang="ts" setup>
+import type { UButton } from '#build/components';
 
+const toast = useToast()
+
+const user = useSupabaseUser()
 const client = useSupabaseClient()
 const emit = defineEmits()
 
+
 const props = defineProps({
-  saving: {
-    type: Boolean,
-    required: true,
-  },
   selectedPart: {
     type: Object as Part,
     required: true,
@@ -83,9 +95,9 @@ const props = defineProps({
   },
 });
 
-onMounted(() => {
-  console.log('selected part', props.selectedPart)
-})
+
+
+const saving = ref(false)
 
 const { data: locations } = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
@@ -93,7 +105,8 @@ const { data: locations } = await useAsyncData('locations', async () => {
   return data
 })
 
-const current = computed(() => locations.value.find(l => l.id === props.selectedPart.location_id))
+const selectedLocations = ref(props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }))
+
 
 const validate = (state: any): FormError[] => {
   const errors = []
@@ -102,6 +115,79 @@ const validate = (state: any): FormError[] => {
   return errors
 }
 
+
+const save = async () => {
+  saving.value = true
+  const p = { ...props.selectedPart }
+
+  delete p.location_parts
+  delete p.project_parts
+
+  let part_id = p.id
+
+  if (part_id) {
+    p.owner_id = user.value.id
+    const r = await client.from('parts').update({ ...p }).eq('id', part_id)
+    if (r.error) {
+      toast.add({
+        id: 'part_save_error',
+        title: 'Part save failed.',
+        description: r.error.message,
+        icon: 'i-heroicons-outline-ecxclamation-triangle',
+        timeout: 4000,
+        color: 'red'
+      })
+    }
+  } else {
+    p.owner_id = user.value.id
+    delete p.id
+    const r = await client.from('parts').insert({ ...p }).select('id')
+    if (r.error) {
+      toast.add({
+        id: 'part_save_error',
+        title: 'Could not save part.',
+        description: r.error.message,
+        icon: 'i-heroicons-outline-ecxclamation-triangle',
+        timeout: 4000,
+        color: 'red'
+      })
+      return;
+    } else {
+      part_id = r.data[0].id
+    }
+  }
+  // Create of update location_parts
+  for await (const loc of selectedLocations.value) {
+    console.log('saving ', loc)
+    let r
+    if (loc.id) {
+      r = await client.from('location_parts').update({ part_id: part_id, location_id: loc.locations.id, quantity: loc.quantity }).eq('id', loc.id)
+    } else {
+      r = await client.from('location_parts').insert({ part_id: part_id, location_id: loc.locations.id, quantity: loc.quantity })
+    }
+
+    if (r.error) {
+      let msg = r.error.message
+      if (r.error.code === "23505") {
+        msg = 'This part already exists at this location'
+      } else if (r.error.code === "23502") {
+        msg = 'Please choose a valid location for this part'
+      }
+      toast.add({
+        id: 'part_save_error_duplicate'+loc.locations.id,
+        title: 'Could not save part location.',
+        description: msg,
+        icon: 'i-heroicons-outline-ecxclamation-triangle',
+        timeout: 10000,
+        color: 'red'
+      })
+      return;
+    }
+  }
+  emit('refresh')
+  saving.value = false
+  emit('close')
+}
 
 </script>
 

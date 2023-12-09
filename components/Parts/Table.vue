@@ -25,28 +25,33 @@
       <template #value-data="{ row }">
         <UTooltip :text="row.value">
           <div class="max-w-[150px] truncate overflow-hidden">
-
             {{ row.value }}
-
           </div>
         </UTooltip>
       </template>
 
       <template #quantity-data="{ row }">
-        <UBadge :color="row.quantity <= row.min_quantity ? 'red' : 'primary'"
-          :variant="row.quantity <= row.min_quantity ? 'solid' : 'outline'">
-          {{ row.quantity }}
+        <UBadge :color="qty(row) <= row.min_quantity ? 'red' : 'primary'"
+          :variant="qty(row) <= row.min_quantity ? 'solid' : 'outline'">
+          {{ qty(row) }}
         </UBadge>
 
       </template>
 
-      <template #locations.name-data="{ row }">
-        <UButton v-if="row.locations && row.locations.name" variant="link" :to="`/locations/${row.locations.id}`">
-          {{ row.locations.name }}
-        </UButton>
+      <template #locations-data="{ row }">
+        <div v-if="row.location_parts && row.location_parts.length">
+          <div class="max-w-[150px] truncate overflow-hidden">
+            <UTooltip v-for="lp in row.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
+
+              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                {{ lp.locations.name }}
+              </UButton>
+
+            </UTooltip>
+          </div>
+        </div>
         <div v-else>
-          <USelect :options="locations" option-attribute="name" value-attribute="id" v-model="row.location_id"
-            @change="changeLocation(row)" />
+          None
         </div>
       </template>
 
@@ -54,9 +59,7 @@
       <template #footprint-data="{ row }">
         <UTooltip :text="row.footprint">
           <div class="max-w-[150px] truncate overflow-hidden">
-
             {{ row.footprint }}
-
           </div>
         </UTooltip>
       </template>
@@ -105,8 +108,7 @@
     <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal = false"
       @refresh="emit('refresh')" />
 
-    <PartsPartModal :saving="saving" :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false"
-      @save="savePart" />
+    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" />
     <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
 
   </div>
@@ -147,6 +149,10 @@ const sort = ref({
 })
 
 
+const qty = (row: Part) => {
+  return row.location_parts.reduce((acc, lp) => lp.quantity + acc, 0)
+}
+
 const sorted = computed(() => {
   return props.parts.sort((a: Part, b: Part) => {
     console.log(sort.value.column, sort.value.direction)
@@ -164,7 +170,7 @@ const sorted = computed(() => {
       case 'locations.name':
         if (a.locations && b.locations) {
           cmp = a.locations.name.localeCompare(b.locations.name)
-         break;
+          break;
         }
         if (a.locations) {
           cmp = 1
@@ -174,12 +180,12 @@ const sorted = computed(() => {
           cmp = -1
           break;
         }
-        
+
       case 'quantity':
-        cmp = a.quantity - b.quantity 
+        cmp = a.quantity - b.quantity
         break;
       case 'min_quantity':
-        cmp = a.min_quantity - b.min_quantity 
+        cmp = a.min_quantity - b.min_quantity
         break;
       default:
         break;
@@ -217,8 +223,8 @@ const columns = [
     sortable: true,
   },
   {
-    key: "locations.name",
-    label: "Location",
+    key: "locations",
+    label: "Locations",
     sortable: true,
   },
   {
@@ -247,13 +253,13 @@ const columns = [
   },
 ]
 
-const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, locations(id, name), project_parts(id, projects(id, name)) location_id`
+const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, location_parts(id, locations(id,name), quantity), project_parts(id, projects(id, name))`
 
 const partModal = ref(false)
 const qrModal = ref(false)
 const moveModal = ref(false)
 const qrPart = ref({})
-const saving = ref(false)
+
 const deleting = ref(0)
 const deletingAll = ref(false)
 const emit = defineEmits(['refresh'])
@@ -274,17 +280,11 @@ let selectedPart: Part = reactive({
   min_quantity: 0,
   price: 0,
   ordering_url: '',
-  location_id: props.location ? props.location.id : null,
   id: null,
   owner_id: null,
-  locations: { ...props.location }
+  location_parts: []
 })
 
-const changeLocation = async (row) => {
-  console.log(row.location_id)
-  await client.from('parts').update({ 'location_id': row.location_id }).eq('id', row.id)
-  emit('refresh')
-}
 
 const createPart = () => {
   partModal.value = true;
@@ -319,43 +319,6 @@ const printTags = () => {
   window.open(routeData.href, '_blank');
 }
 
-const savePart = async () => {
-  saving.value = true
-  const p = { ...selectedPart }
-
-  delete p.locations
-
-  if (p.id) {
-    p.owner_id = user.value.id
-    const r = await client.from('parts').update({ ...p }).select(partFields)
-      .eq('id', p.id)
-    if (r.error) {
-      alert(r.error.message)
-    } else {
-      partModal.value = false;
-      console.log(r)
-      const newPart = r.data[0]
-
-      const np = props.parts.findIndex((p) => p.id === newPart.id)
-
-      props.parts[np] = newPart
-      emit('refresh')
-    }
-    saving.value = false
-  } else {
-    p.owner_id = user.value.id
-    delete p.id
-    const r = await client.from('parts').insert({ ...p }).select(partFields)
-    if (r.error) {
-      alert(r.error.message)
-    } else {
-      partModal.value = false;
-      props.parts.push(r.data[0])
-      emit('refresh')
-    }
-    saving.value = false
-  }
-}
 </script>
 
 <style></style>

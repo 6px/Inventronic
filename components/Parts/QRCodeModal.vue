@@ -10,7 +10,7 @@
       <div id="image">
         <CommonQrCode
           :title="part.part === part.value ? part.part : part.part + ' ' + part.value"
-          :subtitle="part.footprint + '\n' + (part.locations ? part.locations.name : '')"
+          :subtitle="part.footprint"
           :description="part.description"
           :description-size="2"
           :subtitle-size="2.5"

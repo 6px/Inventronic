@@ -16,12 +16,17 @@
               <span
                 :class="[current.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
                 aria-hidden="true" />
-              <span class="truncate">{{ current.part === current.value ? current.part : current.part + ' ' + current.value }}</span>            </template>
+              <span class="truncate">
+                {{ current.part === current.value ? current.part : current.part + ' ' + current.value }}
+              </span>
+            </template>
             <template #option="{ option: part }">
               <span
                 :class="[part.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
                 aria-hidden="true" />
-              <span class="truncate">{{ part.part === part.value ? part.part : part.part + ' ' + part.value }}</span>
+              <span class="truncate">
+                {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
+              </span>
             </template>
           </USelectMenu>
         </UFormGroup>
@@ -33,7 +38,7 @@
         </UFormGroup>
       </UForm>
       <template #footer>
-        <UButton class="mx-4" label="Print" @click="save" />
+        <UButton :loading="saving" class="mx-4" label="Save" @click="save" />
         <UButton class="mx-4" label="Cancel" @click="$emit('close')" />
       </template>
     </UCard>
@@ -56,13 +61,15 @@ const props = defineProps({
 })
 const open = ref(false)
 
+const saving = ref(false)
+
 const state = reactive({
   part_id: props.projectPart.part_id,
   quantity: props.projectPart.quantity,
   references: props.projectPart.references,
 })
 
-const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, locations(id, name), project_parts(id, projects(id, name), part_id) location_id`
+const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, location_parts(id, locations(id,name), quantity), project_parts(id, projects(id, name), part_id)`
 
 const { data: parts, refresh } = await useAsyncData('parts', async () => {
   const { data } = await client.from('parts').select(partFields).order('created_at')
@@ -71,9 +78,11 @@ const { data: parts, refresh } = await useAsyncData('parts', async () => {
 })
 
 const save = async () => {
+  saving.value = true
   const pp = { ...state }
 
   await client.from('project_parts').update(pp).eq('id', props.projectPart.id)
+  saving.value = false
 }
 
 const current = computed(() => parts.value.find(p => p.id === props.projectPart.part_id))

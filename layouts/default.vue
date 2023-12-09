@@ -18,6 +18,7 @@
     </PageContainer>
     <AppFooter />
   </AppContainer>
+  <UNotifications />
 </template>
 
 <script lang="ts" setup>
