@@ -64,7 +64,7 @@
       <template #project_parts-data="{ row }">
         <div v-if="row.project_parts">
           <div class="max-w-[150px] truncate overflow-hidden">
-            <UButton v-for="pp in row.project_parts" :to="`/projects/${pp.projects.id}`" variant="link" class="p-0">
+            <UButton v-for="pp in row.project_parts" :to="`/projects/${pp.projects.id}`" variant="link" class="p-0 mr-2">
               {{ pp.projects.name }}
             </UButton>
           </div>
