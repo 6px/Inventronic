@@ -1,13 +1,14 @@
 <template>
   <div>
     <div class="flex justify-between items-end">
-      
+
       <div :class="selected.length ? '' : 'h-8'">
-        <UButtonGroup size="sm" orientation="horizontal"  v-if="selected.length">
-          
+        <UButtonGroup size="sm" orientation="horizontal" v-if="selected.length">
+
           <UButton icon="i-heroicons-outline-qr-code" label="Print labels" color="white" @click="printTags" />
-          <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete" @click="deleteParts" />
-          
+          <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete"
+            @click="deleteParts" />
+
         </UButtonGroup>
       </div>
 
@@ -15,15 +16,15 @@
         <USelect class="mr-4" :options="['10', '20', '50', '100', 'All']" v-model="pageCount" />
       </UFormGroup>
     </div>
-    <UDivider class="mt-4 mb-0"/>
-    <UTable :rows="rows" :columns="columns" :ui="{ td: { base: '' } }" v-model="selected">
+    <UDivider class="mt-4 mb-0" />
+    <UTable v-model:sort="sort" :rows="rows" :columns="columns" :ui="{ td: { base: '' } }" v-model="selected">
       <template #part-data="{ row }">
         <strong>{{ row.part }}</strong>
       </template>
 
       <template #value-data="{ row }">
         <UTooltip :text="row.value">
-          <div class="max-w-[200px] truncate overflow-hidden">
+          <div class="max-w-[150px] truncate overflow-hidden">
 
             {{ row.value }}
 
@@ -52,12 +53,22 @@
 
       <template #footprint-data="{ row }">
         <UTooltip :text="row.footprint">
-          <div class="max-w-[200px] truncate overflow-hidden">
+          <div class="max-w-[150px] truncate overflow-hidden">
 
             {{ row.footprint }}
 
           </div>
         </UTooltip>
+      </template>
+
+      <template #project_parts-data="{ row }">
+        <div v-if="row.project_parts">
+          <div class="max-w-[150px] truncate overflow-hidden">
+            <UButton v-for="pp in row.project_parts" :to="`/projects/${pp.projects.id}`" variant="link" class="p-0">
+              {{ pp.projects.name }}
+            </UButton>
+          </div>
+        </div>
       </template>
 
 
@@ -71,20 +82,21 @@
       </template>
     </UTable>
 
-    <UDivider/>
+    <UDivider />
 
-    <div
-      class="flex justify-between px-3 py-3.5">
+    <div class="flex justify-between px-3 py-3.5">
       <div :class="selected.length ? '' : 'h-8'">
-        <UButtonGroup size="sm" orientation="horizontal"  v-if="selected.length">
+        <UButtonGroup size="sm" orientation="horizontal" v-if="selected.length">
           <UButton icon="i-heroicons-outline-qr-code" label="Print labels" color="white" @click="printTags" />
-          <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete" @click="deleteParts" />
+          <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete"
+            @click="deleteParts" />
         </UButtonGroup>
       </div>
       <div>
-        <UPagination v-if="pageCount !== 'All' && parts.length > parseInt(pageCount, 10)" v-model="page" :page-count="parseInt(pageCount, 10)" :total="parts.length" />
+        <UPagination v-if="pageCount !== 'All' && parts.length > parseInt(pageCount, 10)" v-model="page"
+          :page-count="parseInt(pageCount, 10)" :total="parts.length" />
       </div>
-      </div>
+    </div>
 
     <UButton icon="i-heroicons-outline-plus" class="mt-6" :label="`Create part ${location ? 'here' : ''}`"
       @click="createPart" />
@@ -101,7 +113,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { UDivider } from '#build/components';
+import type { NuxtLink, UDivider } from '#build/components';
 import type { UButton } from '#ui-colors/components';
 
 const client = useSupabaseClient()
@@ -129,14 +141,63 @@ const pageCount = ref('20')
 
 const selected = ref([])
 
+const sort = ref({
+  column: 'part',
+  direction: 'desc'
+})
+
+
+const sorted = computed(() => {
+  return props.parts.sort((a: Part, b: Part) => {
+    console.log(sort.value.column, sort.value.direction)
+    let cmp = 0
+    switch (sort.value.column) {
+      case 'part':
+        cmp = a.part.localeCompare(b.part)
+        break;
+      case 'value':
+        cmp = a.value.localeCompare(b.value)
+        break;
+      case 'footprint':
+        cmp = a.footprint.localeCompare(b.footprint)
+        break;
+      case 'locations.name':
+        if (a.locations && b.locations) {
+          cmp = a.locations.name.localeCompare(b.locations.name)
+         break;
+        }
+        if (a.locations) {
+          cmp = 1
+          break;
+        }
+        if (b.locations) {
+          cmp = -1
+          break;
+        }
+        
+      case 'quantity':
+        cmp = a.quantity - b.quantity 
+        break;
+      case 'min_quantity':
+        cmp = a.min_quantity - b.min_quantity 
+        break;
+      default:
+        break;
+
+    }
+
+    return sort.value.direction === 'asc' ? cmp : -cmp
+  })
+})
+
 const rows = computed(() => {
   if (pageCount.value === 'All') {
-    return props.parts
+    return sorted.value
   }
 
   const pc = parseInt(pageCount.value, 10)
-  
-  return props.parts.slice((page.value - 1) * pc, (page.value) * pc)
+
+  return sorted.value.slice((page.value - 1) * pc, (page.value) * pc)
 })
 
 const columns = [
@@ -167,13 +228,18 @@ const columns = [
   },
   {
     key: "quantity",
-    label: "Quantity",
+    label: "Qty",
     sortable: true,
   },
   {
     key: "min_quantity",
-    label: "Min Quantity",
+    label: "Min Qty",
     sortable: true,
+  },
+
+  {
+    key: "project_parts",
+    label: "Projects",
   },
   {
     key: "id",
@@ -181,7 +247,7 @@ const columns = [
   },
 ]
 
-const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, locations(id, name), location_id`
+const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, locations(id, name), project_parts(id, projects(id, name)) location_id`
 
 const partModal = ref(false)
 const qrModal = ref(false)
@@ -249,7 +315,7 @@ const printTag = (row: Part) => {
 }
 
 const printTags = () => {
-  const routeData = router.resolve({path: '/parts/print', query: {ids: selected.value.map(p => p.id)}});
+  const routeData = router.resolve({ path: '/parts/print', query: { ids: selected.value.map(p => p.id) } });
   window.open(routeData.href, '_blank');
 }
 

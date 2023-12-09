@@ -44,6 +44,9 @@
         <UButton class="p-0" v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
           {{ row.parts.part }}
         </UButton>
+        <div v-else>
+          {{ row.parts.part }}
+        </div>
       </template>
       
       <template #parts.value-data="{ row }">
@@ -53,6 +56,9 @@
               {{ row.parts.value }}
             </div>
           </UButton>
+          <div v-else class="max-w-[100px] truncate overflow-hidden">
+              {{ row.parts.value }}
+            </div>
         </UTooltip>
       </template>
 
