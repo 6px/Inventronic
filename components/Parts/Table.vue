@@ -108,7 +108,7 @@
     <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal = false"
       @refresh="emit('refresh')" />
 
-    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" />
+    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" @refresh="emit('refresh')" />
     <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
 
   </div>

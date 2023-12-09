@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="open" @close="emit('close')" :ui="{width: 'w-full sm:max-w-2xl'}">
-    <PartsForm :modal="true" :selectedPart="selectedPart" @close="emit('close')" />
+    <PartsForm :modal="true" :selectedPart="selectedPart" @close="emit('close')" @refresh="emit('refresh')" />
   </UModal>
 </template>
 
@@ -8,7 +8,7 @@
 import type { PartsForm } from '#ui-colors/components';
 
 
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close', 'refresh'])
 
 const props = defineProps({
   partModal: {

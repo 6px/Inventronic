@@ -11,7 +11,7 @@
       </template>
       <UForm :state="state" :validate="validate">
         <UFormGroup label="Part" class="mb-4">
-          <USelectMenu v-model="projectPart.part_id" :options="parts" value-attribute="id" option-attribute="name">
+          <USelectMenu v-model="state.part_id" :options="parts" value-attribute="id" option-attribute="name">
             <template #label>
               <span
                 :class="[current.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
@@ -31,10 +31,10 @@
           </USelectMenu>
         </UFormGroup>
         <UFormGroup label="Quantity" class="mb-4">
-          <UInput v-model="projectPart.quantity" />
+          <UInput v-model="state.quantity" />
         </UFormGroup>
         <UFormGroup label="References">
-          <UInput v-model="projectPart.references" />
+          <UInput v-model="state.references" />
         </UFormGroup>
       </UForm>
       <template #footer>
