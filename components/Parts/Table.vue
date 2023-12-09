@@ -35,7 +35,7 @@
           :variant="qty(row) <= row.min_quantity ? 'solid' : 'outline'">
           {{ qty(row) }}
         </UBadge>
-
+        {{ row.quantity }}
       </template>
 
       <template #locations-data="{ row }">
