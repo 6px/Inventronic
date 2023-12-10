@@ -55,7 +55,7 @@ const props = defineProps({
     required: true,
   },
   projectPart: {
-    part: Object as ProjectPart,
+    type: Object as ProjectPart,
     required: true,
   },
 })

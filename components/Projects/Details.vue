@@ -103,13 +103,19 @@ const nparts = computed(() => {
 
   props.project.project_parts.forEach((pp: ProjectPart) => {
     const part = props.parts.find(p => p.id === pp.parts.id)
-    if (!part) {
+    let qty = 0
+    if (part) {
+      qty = part.location_parts.reduce((acc: number, lp: LocationPart) => {
+        return acc + lp.quantity
+      }, 0)
+    }
+    if (qty == 0) {
       nparts = 0
-    } else if (Math.floor(part.quantity / pp.quantity) < nparts) {
-      nparts = Math.floor(part.quantity / pp.quantity)
+    } else if (Math.floor(qty / pp.quantity) < nparts) {
+      nparts = Math.floor(qty / pp.quantity)
       limitingPart.value = part
     }
-    if (part && Math.floor(part.quantity / pp.quantity) === 0) {
+    if (part && Math.floor(qty / pp.quantity) === 0) {
       nparts = 0
       m.push(part)
     }
