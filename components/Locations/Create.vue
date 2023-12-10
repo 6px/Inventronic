@@ -56,6 +56,8 @@ const props = defineProps({
 
 const client = useSupabaseClient()
 const user = useSupabaseUser()
+const toast = useToast()
+
 const emit = defineEmits()
 const location = reactive({
   name: "",
@@ -81,7 +83,14 @@ const save = async () => {
     const r = await client.from('locations').update({ ...p }).select('id, name')
     .eq('id', p.id)
     if (r.error) {
-      alert(r.error.message)
+      toast.add({
+        id: 'location_save_error',
+        title: `Could not update location ${p.name}.`,
+        description: r.error.message,
+        icon: 'i-heroicons-outline-exclamation-triangle',
+        timeout: 4000,
+        color: 'red'
+      })
     } else {
       emit('close')
       // TODO trigger refresh
@@ -90,10 +99,16 @@ const save = async () => {
     saving.value = false
   } else {
     p.owner_id = user.value.id
-    delete p.id
     const r = await client.from('locations').insert({ ...p }).select('id, name')
     if (r.error) {
-      alert(r.error.message)
+      toast.add({
+        id: 'location_update_error',
+        title: `Could not create location ${p.name}.`,
+        description: r.error.message,
+        icon: 'i-heroicons-outline-exclamation-triangle',
+        timeout: 4000,
+        color: 'red'
+      })
     } else {
       emit('close')
       // TODO refresh locations

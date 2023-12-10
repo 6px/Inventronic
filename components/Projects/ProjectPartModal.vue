@@ -48,6 +48,7 @@
 <script lang="ts" setup>
 const emit = defineEmits(['close', 'refresh'])
 const client = useSupabaseClient()
+const toast = useToast()
 
 const props = defineProps({
   open: {
@@ -75,10 +76,23 @@ const save = async () => {
   saving.value = true
   const pp = { ...props.projectPart }
   delete pp.parts
-  await client.from('project_parts').update(pp).eq('id', props.projectPart.id)
-  emit('refresh')
-  saving.value = false
-  emit('close')
+  const r = await client.from('project_parts').update(pp).eq('id', props.projectPart.id)
+
+  if (r.error) {
+    toast.add({
+      id: 'project_part_save_error',
+      title: 'Could not save project part.',
+      description: r.error.message,
+      icon: 'i-heroicons-outline-exclamation-triangle',
+      timeout: 4000,
+      color: 'red'
+    })
+    saving.value = false
+  } else {
+    emit('refresh')
+    saving.value = false
+    emit('close')
+  }
 }
 
 const current = computed(() => parts.value.find(p => p.id === props.projectPart.part_id))

@@ -1,6 +1,7 @@
 <template>
-  <UModal v-model="open" :ui="{base: 'overflow-visible relative text-left rtl:text-right w-full flex flex-col'}" @close="emit('close')">
-    <UCard :ui="{ base:'', ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+  <UModal v-model="open" :ui="{ base: 'overflow-visible relative text-left rtl:text-right w-full flex flex-col' }"
+    @close="emit('close')">
+    <UCard :ui="{ base: '', ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
         <div class="flex items-center justify-between">
           <h2>Move part to {{ location.name }}</h2>
@@ -9,48 +10,35 @@
       </template>
       <!-- <UForm class="space-y-8" @submit="save" :validate="validate" :state="selectedPart">
         <UFormGroup label="Part" name="part"> -->
-          <USelectMenu
-            v-model="selected"
-            :options="parts"
-            multiple
-            searchable
-            placeholder="Select parts to move to this location"
-            :uiMenu="{option: {container:'w-full block'}}"
-          >
-            <template #label>
-              <span v-if="selected.length" class="truncate">{{ selected.map((p: Part) => (p.part ? p.part : '')+' '+p.value).join(', ') }}</span>
-              <span v-else>Select parts</span>
-            </template>
-            <template #option="{ option: part, selected: sel }">
-              <div class="flex flex-row justify-between px-1">
-                <div class="truncate grow">{{ part.part }} {{ part.value }}</div>
-                <div v-if="part.location_parts && part.location_parts.length > 0" class="truncate shrink text-slate-600 dark:text-slate-200">{{ part.location_parts.map((lp: LocationPart) => lp.locations.name).join(', ') }}</div>
-                <div v-else class="truncate shrink text-slate-600 dark:text-slate-200">None</div>
+      <USelectMenu v-model="selected" :options="parts" multiple searchable
+        placeholder="Select parts to move to this location" :uiMenu="{ option: { container: 'w-full block' } }">
+        <template #label>
+          <span v-if="selected.length" class="truncate">{{ selected.map((p: Part) => (p.part ? p.part : '') + '
+                      '+p.value).join(', ') }}</span>
+          <span v-else>Select parts</span>
+        </template>
+        <template #option="{ option: part, selected: sel }">
+          <div class="flex flex-row justify-between px-1">
+            <div class="truncate grow">{{ part.part }} {{ part.value }}</div>
+            <div v-if="part.location_parts && part.location_parts.length > 0"
+              class="truncate shrink text-slate-600 dark:text-slate-200">{{ part.location_parts.map((lp: LocationPart) =>
+                lp.locations.name).join(', ') }}</div>
+            <div v-else class="truncate shrink text-slate-600 dark:text-slate-200">None</div>
 
-                <div class="w-5 pe-2" v-if="!sel"></div>
-              </div>
-            </template>
-          </USelectMenu>
-        <!-- </UFormGroup>
+            <div class="w-5 pe-2" v-if="!sel"></div>
+          </div>
+        </template>
+      </USelectMenu>
+      <!-- </UFormGroup>
       </UForm> -->
 
       <template #footer>
-        <UButton
-          class="mr-4"
-          @click="save"
-          :loading="saving"
-        >
+        <UButton class="mr-4" @click="save" :loading="saving">
           <span v-if="saving">Moving...</span>
           <span v-else>Move</span>
         </UButton>
         or
-        <UButton
-          variant="link"
-          color="white"
-          class="ml-0"
-          label="Cancel"
-          @click="$emit('close')"
-        />
+        <UButton variant="link" color="white" class="ml-0" label="Cancel" @click="$emit('close')" />
       </template>
 
     </UCard>
@@ -59,6 +47,7 @@
 
 <script lang="ts" setup>
 const client = useSupabaseClient()
+const toast = useToast()
 const emit = defineEmits()
 const props = defineProps({
   open: {
@@ -76,12 +65,12 @@ const selected = ref([])
 
 watch(
   () => props.open,
-  () => {open.value = props.open}
+  () => { open.value = props.open }
 )
 
 const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, locations(id, name), quantity)`
 
-const {data: parts} = await useAsyncData('parts', async () => {
+const { data: parts } = await useAsyncData('parts', async () => {
   const { data } = await client.from('parts').select(partFields).order('created_at')
 
   return data
@@ -89,20 +78,32 @@ const {data: parts} = await useAsyncData('parts', async () => {
 
 const save = async () => {
   saving.value = true
+  let err = 0
   for await (const part of selected.value) {
     const r = await client.from('location_parts')
-      .insert({ part_id: part.id, location_id: props.location.id})
+      .insert({ part_id: part.id, location_id: props.location.id })
+
+    if (r.error) {
+      err++
+      toast.add({
+        id: 'part_move_error' + part.id,
+        title: `Could not move part ${part.part} ${part.value}.`,
+        description: r.error.message,
+        icon: 'i-heroicons-outline-exclamation-triangle',
+        timeout: 4000,
+        color: 'red'
+      })
+    }
   }
   saving.value = false
-
-  emit('refresh')
-  emit('close')
+  if (err === 0) {
+    emit('refresh')
+    emit('close')
+  }
 }
 
 
 </script>
 
-<style>
-
-</style>
+<style></style>
 

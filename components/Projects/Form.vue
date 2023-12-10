@@ -4,12 +4,13 @@
       <div class="flex items-center justify-between">
         <h2 class="text-xl font-bold u-text-white" v-if="project.id">Edit project</h2>
         <h2 class="text-xl font-bold u-text-white" v-else>Create project</h2>
-        <UButton v-if="modal" color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
+        <UButton v-if="modal" color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+          @click="emit('close')" />
       </div>
     </template>
     <UForm :validate="validate" :state="state" @submit="save" class="space-y-4">
-      <UFormGroup label="Project name">
-        <UInput v-model="state.name" />
+      <UFormGroup label="Project name" name="name">
+        <UInput v-model="state.name" required />
       </UFormGroup>
       <UFormGroup label="Description">
         <UInput v-model="state.description" />
@@ -32,7 +33,7 @@
 
 import type { UInput } from '#ui-colors/components';
 
-
+const toast = useToast()
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 const emit = defineEmits(['refresh', 'saved'])
@@ -56,17 +57,30 @@ const state = reactive({
 
 const save = async () => {
   saving.value = true
+  let r
   if (props.project.id) {
-    await client.from('projects')
-    .update({...state})
-    .eq('id', props.project.id)
+    r = await client.from('projects')
+      .update({ ...state })
+      .eq('id', props.project.id)
   } else {
-    await client.from('projects')
-    .insert({...state})
+    r = await client.from('projects')
+      .insert({ ...state })
   }
-  
+
+  if (r.error) {
+    toast.add({
+      id: 'project save_error',
+      title: `Could not project ${props.project.name}.`,
+      description: r.error.message,
+      icon: 'i-heroicons-outline-exclamation-triangle',
+      timeout: 4000,
+      color: 'red'
+    })
+  } else {
+    emit('saved')
+  }
+
   saving.value = false;
-  emit('saved')
 }
 
 const validate = (state: any): FormError[] => {
@@ -76,6 +90,4 @@ const validate = (state: any): FormError[] => {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

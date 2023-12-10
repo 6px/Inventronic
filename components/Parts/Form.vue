@@ -147,7 +147,7 @@ const save = async () => {
         id: 'part_save_error',
         title: 'Part save failed.',
         description: r.error.message,
-        icon: 'i-heroicons-outline-ecxclamation-triangle',
+        icon: 'i-heroicons-outline-exclamation-triangle',
         timeout: 4000,
         color: 'red'
       })
@@ -161,7 +161,7 @@ const save = async () => {
         id: 'part_save_error',
         title: 'Could not save part.',
         description: r.error.message,
-        icon: 'i-heroicons-outline-ecxclamation-triangle',
+        icon: 'i-heroicons-outline-exclamation-triangle',
         timeout: 4000,
         color: 'red'
       })
@@ -191,7 +191,7 @@ const save = async () => {
         id: 'part_save_error_duplicate' + loc.locations.id,
         title: 'Could not save part location.',
         description: msg,
-        icon: 'i-heroicons-outline-ecxclamation-triangle',
+        icon: 'i-heroicons-outline-exclamation-triangle',
         timeout: 10000,
         color: 'red'
       })
