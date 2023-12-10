@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'refresh'])
 const client = useSupabaseClient()
 
 const props = defineProps({
@@ -76,6 +76,7 @@ const save = async () => {
   const pp = { ...props.projectPart }
   delete pp.parts
   await client.from('project_parts').update(pp).eq('id', props.projectPart.id)
+  emit('refresh')
   saving.value = false
   emit('close')
 }

@@ -117,10 +117,10 @@
     </div>
 
     <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <UPagination v-model="page" :page-count="pageCount" :total="project.project_parts.length" />
+      <UPagination v-if="pageCount < project.project_parts.length" v-model="page" :page-count="pageCount" :total="project.project_parts.length" />
     </div>
     <ProjectsPartQRCodeModal :open="qrModal" :projectPart="qrPart" @close="qrModal = false" />
-    <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal = false" />
+    <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal = false" @refresh="emit('refresh')" />
 
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal = false"
       @save="savePart" />
