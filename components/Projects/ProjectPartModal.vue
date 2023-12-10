@@ -9,9 +9,9 @@
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
         </div>
       </template>
-      <UForm :state="state" :validate="validate">
-        <UFormGroup label="Part" class="mb-4">
-          <USelectMenu v-model="state.part_id" :options="parts" value-attribute="id" option-attribute="name">
+      <UForm :state="projectPart" :validate="validate">
+        <UFormGroup label="Part" class="mb-4" name="part_id">
+          <USelectMenu v-model="projectPart.part_id" :options="parts" value-attribute="id" option-attribute="name">
             <template #label>
               <span
                 :class="[current.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
@@ -30,11 +30,11 @@
             </template>
           </USelectMenu>
         </UFormGroup>
-        <UFormGroup label="Quantity" class="mb-4">
-          <UInput v-model="state.quantity" />
+        <UFormGroup label="Quantity" class="mb-4" name="quantity">
+          <UInput v-model="projectPart.quantity" />
         </UFormGroup>
-        <UFormGroup label="References">
-          <UInput v-model="state.references" />
+        <UFormGroup label="References" name="references">
+          <UInput v-model="projectPart.references" />
         </UFormGroup>
       </UForm>
       <template #footer>
@@ -63,12 +63,6 @@ const open = ref(false)
 
 const saving = ref(false)
 
-const state = reactive({
-  part_id: props.projectPart.part_id,
-  quantity: props.projectPart.quantity,
-  references: props.projectPart.references,
-})
-
 const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, location_parts(id, locations(id,name), quantity), project_parts(id, projects(id, name), part_id)`
 
 const { data: parts, refresh } = await useAsyncData('parts', async () => {
@@ -79,10 +73,11 @@ const { data: parts, refresh } = await useAsyncData('parts', async () => {
 
 const save = async () => {
   saving.value = true
-  const pp = { ...state }
-
+  const pp = { ...props.projectPart }
+  delete pp.parts
   await client.from('project_parts').update(pp).eq('id', props.projectPart.id)
   saving.value = false
+  emit('close')
 }
 
 const current = computed(() => parts.value.find(p => p.id === props.projectPart.part_id))
@@ -94,7 +89,7 @@ watch(
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.name) errors.push({ path: 'name', message: 'Required' })
+  if (!state.part_id) errors.push({ path: 'part_id', message: 'Required' })
   return errors
 }
 </script>
