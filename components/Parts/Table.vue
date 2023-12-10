@@ -149,7 +149,7 @@ const sort = ref({
 
 
 const qty = (row: Part) => {
-  return row.location_parts.reduce((acc, lp) => lp.quantity + acc, 0)
+  return row.location_parts ? row.location_parts.reduce((acc, lp) => lp.quantity + acc, 0) : 0
 }
 
 const sorted = computed(() => {

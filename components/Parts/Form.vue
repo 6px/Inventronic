@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex items-center justify-between">
         <h2 v-if="selectedPart.id">
-          Editing <strong>{{ selectedPart.part }} {{ selectedPart.value }}</strong>
+          Editing <strong>{{ part_type.label }} {{ selectedPart.value }}</strong>
         </h2>
         <h2 v-else>Create new part</h2>
         <UButton v-if="modal" color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
@@ -14,7 +14,9 @@
     <UForm class="space-y-4" @submit="save" :validate="validate" :state="selectedPart">
       <div class="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4">
         <UFormGroup label="Part" name="part">
-          <UInput v-model=selectedPart.part color="white" variant="outline" placeholder="Part type" />
+          <USelectMenu v-model="part_type" :options="part_types" searchable creatable>
+          </USelectMenu>
+          <!-- <UInput v-model=selectedPart.part color="white" variant="outline" placeholder="Part type" /> -->
         </UFormGroup>
         <UFormGroup label="Value" name="value">
           <UInput v-model=selectedPart.value color="white" variant="outline" placeholder="Part value" />
@@ -98,6 +100,13 @@ const props = defineProps({
 
 
 const saving = ref(false)
+const part_type = ref({label: props.selectedPart.part})
+
+const { data: parts } = await useAsyncData('parts', async () => {
+  const { data } = await client.from('parts').select().order('created_at')
+
+  return data
+})
 
 const { data: locations } = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
@@ -107,6 +116,9 @@ const { data: locations } = await useAsyncData('locations', async () => {
 
 const selectedLocations = ref(props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }))
 
+const part_types = computed(() => {
+  return parts.value.map((p: Part) => {return {label: p.part}})
+})
 
 const validate = (state: any): FormError[] => {
   const errors = []
@@ -119,11 +131,13 @@ const validate = (state: any): FormError[] => {
 const save = async () => {
   saving.value = true
   const p = { ...props.selectedPart }
-
+  p.part = part_type.value.label
   delete p.location_parts
   delete p.project_parts
 
   let part_id = p.id
+
+  console.log('saving part', p)
 
   if (part_id) {
     p.owner_id = user.value.id
@@ -174,7 +188,7 @@ const save = async () => {
         msg = 'Please choose a valid location for this part'
       }
       toast.add({
-        id: 'part_save_error_duplicate'+loc.locations.id,
+        id: 'part_save_error_duplicate' + loc.locations.id,
         title: 'Could not save part location.',
         description: msg,
         icon: 'i-heroicons-outline-ecxclamation-triangle',
@@ -184,9 +198,10 @@ const save = async () => {
       return;
     }
   }
-  emit('refresh')
   saving.value = false
   emit('close')
+  emit('refresh')
+  
 }
 
 </script>
