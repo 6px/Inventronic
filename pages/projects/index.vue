@@ -51,10 +51,8 @@ useHead({
   title: 'Projects', 
 })
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, locations(id, name), quantity)`
-
 const {data: parts} = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields).order('created_at')
+  const { data } = await client.from('parts').select(partFields()).order('created_at')
 
   return data
 })

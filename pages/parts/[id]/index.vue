@@ -18,10 +18,9 @@
 
   const saving = ref(false)
 
-  const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, locations(id, name), quantity)`
 
   const {data: part, refresh} = await useAsyncData(`part-${route.params.id}`, async () => {
-    const { data } = await client.from('parts').select(partFields).eq('id', b64uuid(route.params.id)).order('created_at')
+    const { data } = await client.from('parts').select(partFields()).eq('id', b64uuid(route.params.id)).order('created_at')
 
     return data[0]
   })
@@ -45,7 +44,7 @@ useHead({
 
     if (p.id) {
       p.owner_id = user.value.id
-      const r = await client.from('parts').update({ ...p }).select(partFields)
+      const r = await client.from('parts').update({ ...p }).select(partFields())
       .eq('id', p.id)
       if (r.error) {
         alert(r.error.message)

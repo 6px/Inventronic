@@ -48,12 +48,25 @@
       </template>
 
       <template #parts.part-data="{ row }">
-        <UButton class="p-0" v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
-          {{ row.parts.part }}
-        </UButton>
+        <div v-if="row.parts.id">
+          <UButton class="p-0" variant="link" @click="editPart(row.parts)">
+            {{ row.parts.part }}
+          </UButton>
+          <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parts.parent" :to="`/parts/${uuidb64(row.parts.parent.id)}`">
+            {{ row.parts.quantity_of }} × {{ row.parts.parent.part === row.parts.parent.value ? '' :  row.parts.parent.part }} {{ row.parts.parent.value }}
+          </UButton>
+        </div>
         <div v-else>
           {{ row.parts.part }}
         </div>
+
+        <div>
+          <strong>
+            {{ row.part }}
+          </strong>
+        </div>
+        
+
       </template>
 
       <template #parts.value-data="{ row }">
@@ -179,8 +192,6 @@ const { data: locations } = await useAsyncData('locations', async () => {
   return data
 })
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, parts(id, name), quantity), project_parts(id, projects(id, name, description))`
-
 
 const refresh = () => {
   emit('refresh')
@@ -246,7 +257,7 @@ const savePart = async () => {
   delete p.locations
   if (p.id) {
     p.owner_id = user.value.id
-    const r = await client.from('parts').update({ ...p }).eq('id', p.id).select(partFields)
+    const r = await client.from('parts').update({ ...p }).eq('id', p.id).select(partFields())
       .eq('id', p.id)
     if (r.error) {
       alert(r.error.message)
@@ -259,7 +270,7 @@ const savePart = async () => {
   } else {
     p.owner_id = user.value.id
     delete p.id
-    const r = await client.from('parts').insert({ ...p }).select(partFields)
+    const r = await client.from('parts').insert({ ...p }).select(partFields())
     if (r.error) {
       alert(r.error.message)
     } else {
@@ -306,7 +317,7 @@ const createPart = async (row: ProjectPart) => {
   p.location_id = parseInt(p.location_id, 10)
   p.owner_id = user.value.id
   delete p.id
-  const r = await client.from('parts').insert({ ...p }).select(partFields)
+  const r = await client.from('parts').insert({ ...p }).select(partFields())
   console.log('saving part', p)
   if (r.error) {
     alert(r.error.message)

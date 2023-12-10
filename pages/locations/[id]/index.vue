@@ -71,8 +71,7 @@ const user = useSupabaseUser()
 const create = ref(false)
 const qrcode = ref(false)
 const saving = ref(false)
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, project_parts(id, projects(id, name, description))`
-const locationFields = `id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields})), locations(id, name, description, location_parts(parts(${partFields}))))))))`
+const locationFields = `id, name, description, location_parts(parts(${partFields()})), locations(id, name, description, location_parts(parts(${partFields()})), locations(id, name, description, location_parts(parts(${partFields()})), locations(id, name, description, location_parts(parts(${partFields()})), locations(id, name, description, location_parts(parts(${partFields()})), locations(id, name, description, location_parts(parts(${partFields()})), locations(id, name, description, location_parts(parts(${partFields()}))))))))`
 
 const { data: location, refresh } = await useAsyncData(`location-${route.params.id}`, async () => {
   const { data } = await client.from('locations').select(locationFields).eq('id', b64uuid(route.params.id)).order('created_at')

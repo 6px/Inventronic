@@ -13,10 +13,52 @@
 
     <UForm class="space-y-4" @submit="save" :validate="validate" :state="selectedPart">
       <div class="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4">
+        <UFormGroup label="Part of" name="parent_id">
+          <USelectMenu v-model="selectedPart.parent" :options="parts" searchable
+            :uiMenu="{ option: { container: 'w-full block' } }">
+            <template #label>
+              <span v-if="selectedPart.parent && selectedPart.parent.part" class="truncate">
+                {{ selectedPart.parent.part === selectedPart.parent.value ? selectedPart.parent.part : selectedPart.parent.part + ' ' + selectedPart.parent.value }}
+
+              </span>
+              <span v-else>None</span>
+            </template>
+            <template #option="{ option: part, selected: sel }">
+              <div class="flex flex-row justify-between px-1">
+                <div class="grow">
+                  <div class="flex flex-row justify-between">
+                    <div class="truncate grow">
+                      {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
+                    </div>
+
+
+                    <div v-if="part.location_parts && part.location_parts.length > 0"
+                      class="truncate shrink text-slate-600 dark:text-slate-200">
+                      <UBadge color="white" v-for="lp in part.location_parts" size="sm" class="text-xs">
+                        {{ lp.locations.name }}
+                      </UBadge>                    
+                    </div>
+
+                    <div v-else class="truncate shrink text-slate-600 dark:text-slate-200"></div>
+                  </div>
+                  <div class="text-xs text-slate-400 ">
+                    {{ part.footprint}}
+                  </div>
+                </div>
+
+
+                <div class="w-5 pe-2" v-if="!sel"></div>
+              </div>
+            </template>
+          </USelectMenu>
+        </UFormGroup>
+        <UFormGroup label="Quantity of" name="qty_of">
+          <UInput type="number" step="0.05" v-model=selectedPart.quantity_of color="white" variant="outline"
+            placeholder="Quantity of referenced part" />
+        </UFormGroup>
         <UFormGroup label="Part" name="part">
           <USelectMenu v-model="part_type" :options="part_types" searchable creatable>
           </USelectMenu>
-          <!-- <UInput v-model=selectedPart.part color="white" variant="outline" placeholder="Part type" /> -->
         </UFormGroup>
         <UFormGroup label="Value" name="value">
           <UInput v-model=selectedPart.value color="white" variant="outline" placeholder="Part value" />
@@ -100,10 +142,10 @@ const props = defineProps({
 
 
 const saving = ref(false)
-const part_type = ref({label: props.selectedPart.part})
+const part_type = ref({ label: props.selectedPart.part })
 
 const { data: parts } = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select().order('created_at')
+  const { data } = await client.from('parts').select(partFields()).order('created_at')
 
   return data
 })
@@ -117,7 +159,7 @@ const { data: locations } = await useAsyncData('locations', async () => {
 const selectedLocations = ref(props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }))
 
 const part_types = computed(() => {
-  return parts.value.map((p: Part) => {return {label: p.part}})
+  return parts.value.map((p: Part) => { return { label: p.part } })
 })
 
 const validate = (state: any): FormError[] => {
@@ -134,6 +176,13 @@ const save = async () => {
   p.part = part_type.value.label
   delete p.location_parts
   delete p.project_parts
+  delete p.quantity
+
+  if (p.parent && p.parent.id) {
+    p.parent_id = p.parent.id
+  }
+
+  delete p.parent
 
   let part_id = p.id
 
@@ -141,7 +190,7 @@ const save = async () => {
 
   if (part_id) {
     p.owner_id = user.value.id
-    const r = await client.from('parts').update({ ...p }).eq('id', part_id)
+    const r = await client.from('parts').update({ ...p }).eq('id', part_id).select(partFields())
     if (r.error) {
       toast.add({
         id: 'part_save_error',
@@ -155,7 +204,7 @@ const save = async () => {
   } else {
     p.owner_id = user.value.id
     delete p.id
-    const r = await client.from('parts').insert({ ...p }).select('id')
+    const r = await client.from('parts').insert({ ...p }).select(partFields())
     if (r.error) {
       toast.add({
         id: 'part_save_error',
@@ -201,7 +250,7 @@ const save = async () => {
   saving.value = false
   emit('close')
   emit('refresh')
-  
+
 }
 
 </script>

@@ -19,7 +19,14 @@
     <UDivider class="mt-4 mb-0" />
     <UTable v-model:sort="sort" :rows="rows" :columns="columns" :ui="{ td: { base: '' } }" v-model="selected">
       <template #part-data="{ row }">
-        <strong>{{ row.part }}</strong>
+        <div>
+          <strong>
+            {{ row.part }}
+          </strong>
+        </div>
+        <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parent" :to="`/parts/${uuidb64(row.parent.id)}`">
+          {{ row.quantity_of }} × {{ row.parent.part === row.parent.value ? '' :  row.parent.part }} {{ row.parent.value }}
+        </UButton>
       </template>
 
       <template #value-data="{ row }">
@@ -251,8 +258,6 @@ const columns = [
     label: "Tools",
   },
 ]
-
-const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, location_parts(id, locations(id,name), quantity), project_parts(id, projects(id, name))`
 
 const partModal = ref(false)
 const qrModal = ref(false)

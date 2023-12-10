@@ -13,8 +13,7 @@
       <USelectMenu v-model="selected" :options="parts" multiple searchable
         placeholder="Select parts to move to this location" :uiMenu="{ option: { container: 'w-full block' } }">
         <template #label>
-          <span v-if="selected.length" class="truncate">{{ selected.map((p: Part) => (p.part ? p.part : '') + '
-                      '+p.value).join(', ') }}</span>
+          <span v-if="selected.length" class="truncate">{{ selected.map((p: Part) => (p.part === p.value ? p.part : '') + ' '+p.value).join(', ') }}</span>
           <span v-else>Select parts</span>
         </template>
         <template #option="{ option: part, selected: sel }">
@@ -68,10 +67,8 @@ watch(
   () => { open.value = props.open }
 )
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, locations(id, name), quantity)`
-
 const { data: parts } = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields).order('created_at')
+  const { data } = await client.from('parts').select(partFields()).order('created_at')
 
   return data
 })

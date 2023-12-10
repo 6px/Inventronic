@@ -64,10 +64,8 @@ const open = ref(false)
 
 const saving = ref(false)
 
-const partFields = `id, part, value, description, footprint, quantity, price, ordering_url, min_quantity, location_parts(id, locations(id,name), quantity), project_parts(id, projects(id, name), part_id)`
-
 const { data: parts, refresh } = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields).order('created_at')
+  const { data } = await client.from('parts').select(partFields()).order('created_at')
 
   return data
 })

@@ -26,10 +26,9 @@ const cnt = ref(0)
 const client = useSupabaseClient()
 
 
-const partFields = `id, part, value, description, footprint, quantity, min_quantity, price, ordering_url, location_parts(id, locations(id, name), quantity)`
 
 const {data: parts, refresh} = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields).in('id', route.query.ids).order('created_at')
+  const { data } = await client.from('parts').select(partFields()).in('id', route.query.ids).order('created_at')
   
   return data
 })
