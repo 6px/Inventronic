@@ -83,7 +83,7 @@
       </div>
       <div v-if="selectedPart.parent && selectedPart.parent.id">
         <h2>Locations</h2>
-        <UTable v-if="selectedPart.parent && selectedPart.parent.location_parts && selectedPart.parent.location_parts.length" :rows="[...selectedPart.parent.location_parts.map((lp:LocationPart) => { return {name: lp.locations.name, quantity: lp.quantity}}), {name: 'TOTAL', quantity: selectedPart.parent.location_parts.reduce((acc: number, lp: LocationPart) => acc + lp.quantity, 0)}]" />
+        <UTable v-if="selectedPart.parent && selectedPart.parent.location_parts && selectedPart.parent.location_parts.length" :rows="[...selectedPart.parent.location_parts.map((lp:LocationPart) => { return {name: lp.locations.name, quantity: lp.quantity + ' ' + selectedPart.parent.part + ' ' + selectedPart.parent.value}}), {name: 'TOTAL', quantity: selectedPart.parent.location_parts.reduce((acc: number, lp: LocationPart) => acc + lp.quantity, 0)}]" />
         <div v-else class="text-center py-4 text-slate-400 text-sm">
           No stock.
           <UButton class="px-0" variant="link" label="Edit parent part" @click="setParent" /> 

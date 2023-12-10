@@ -84,11 +84,20 @@ const build = async () => {
 
   for await (const pp of props.project.project_parts) {
     const part = props.parts.find(p => p.id === pp.parts.id)
+    // TODO handle case where part is made up of another part
     if(!part) {
       return
     }
-    const newQty = part.quantity - pp.quantity * buildnum.value;
-    await client.from('parts').update({ quantity: newQty }).eq('id', part.id)
+    // Remove from part location
+    const loc = part.location_parts.find(lp => lp.quantity > 0)
+    if (!loc) {
+      return
+    }
+    let newQty = loc.quantity - pp.quantity * buildnum.value
+    if (part.parent) {
+      newQty = loc.quantity - pp.quantity * buildnum.value * part.quantity_of
+    }
+    await client.from('location_parts').update({ quantity: newQty }).eq('id', loc.id)
   }
 
   emit('refresh')
@@ -104,10 +113,15 @@ const nparts = computed(() => {
   props.project.project_parts.forEach((pp: ProjectPart) => {
     const part = props.parts.find(p => p.id === pp.parts.id)
     let qty = 0
-    if (part) {
+    if (part && !part.parent) {
       qty = part.location_parts.reduce((acc: number, lp: LocationPart) => {
         return acc + lp.quantity
       }, 0)
+    } else if (part.parent) {
+      //TODO handle case where part is made up of another part
+      qty = part.parent.location_parts.reduce((acc: number, lp: LocationPart) => {
+        return acc + lp.quantity
+      }, 0) / part.quantity_of
     }
     if (qty == 0) {
       nparts = 0

@@ -54,6 +54,16 @@
             </UTooltip>
           </div>
         </div>
+        <div v-else-if="row.parent && row.parent.location_parts && row.parent.location_parts.length">
+          <div class="max-w-[150px] truncate overflow-hidden">
+            <UTooltip v-for="lp in row.parent.location_parts" :text="`${lp.quantity} items of ${row.parent.part === row.parent.value ? '' : row.parent.part} ${row.parent.value} in ${lp.locations.name}`">
+              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                {{ lp.locations.name }}
+              </UButton>
+
+            </UTooltip>
+          </div>
+        </div>
         <div v-else>
           None
         </div>
@@ -155,6 +165,9 @@ const sort = ref({
 
 
 const qty = (row: Part) => {
+  if (row.parent) {
+    return row.parent.location_parts.reduce((acc, lp) => lp.quantity + acc, 0) / row.quantity_of
+  }
   return row.location_parts ? row.location_parts.reduce((acc, lp) => lp.quantity + acc, 0) : 0
 }
 

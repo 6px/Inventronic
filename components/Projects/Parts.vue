@@ -104,15 +104,26 @@
 
 
       <template #parts.quantity-data="{ row }">
-        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) ? 'red' : 'green'"
-          class="ml-2 shrink">{{ row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) }}</UBadge>
+        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > qty(row) ? 'red' : 'green'"
+          class="ml-2 shrink">
+          {{ qty(row) }}
+        </UBadge>
       </template>
 
       <template #locations-data="{ row }">
         <div v-if="row.parts.location_parts && row.parts.location_parts.length">
           <div class="max-w-[150px] truncate overflow-hidden">
             <UTooltip v-for="lp in row.parts.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
+              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                {{ lp.locations.name }}
+              </UButton>
 
+            </UTooltip>
+          </div>
+        </div>
+        <div v-else-if="row.parts.parent && row.parts.parent.location_parts && row.parts.parent.location_parts.length">
+          <div class="max-w-[150px] truncate overflow-hidden">
+            <UTooltip v-for="lp in row.parts.parent.location_parts" :text="`${lp.quantity} items of ${row.parts.parent.part === row.parts.parent.value ? '' : row.parts.parent.part} ${row.parts.parent.value} in ${lp.locations.name}`">
               <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
                 {{ lp.locations.name }}
               </UButton>
@@ -202,6 +213,13 @@ const setParent = () => {
   partModal.value = false
   selectedPart.value = selectedPart.value.parent
   partModal.value = true
+}
+
+const qty = (row) => {
+  if (row.parts.parent) {
+    return row.parts.parent.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) / row.parts.quantity_of
+  }
+  return row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0)
 }
 
 
