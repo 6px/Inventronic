@@ -2,7 +2,12 @@
   <div class="w-full my-2">
     <h1 class="mb-8 text-4xl font-bold u-text-white text-center">
       {{ project.name }} 
-      <UButton class="ml-4" icon="i-heroicons-outline-qr-code" @click="qrModal=true"/>
+      <UTooltip text="Print label">
+        <UButton class="ml-4" icon="i-heroicons-outline-qr-code" @click="qrModal=true"/>
+      </UTooltip>
+      <UTooltip text="Print project BOM">
+        <UButton class="ml-4" icon="i-heroicons-outline-document-chart-bar" :to="`/projects/${project.id}/print`"/>
+      </UTooltip>
     </h1>
     <UContainer>
       <div class="md:grid md:grid-cols-2 md:gap-x-2">

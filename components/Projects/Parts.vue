@@ -52,7 +52,7 @@
           <UButton class="p-0" variant="link" @click="editPart(row.parts)">
             {{ row.parts.part }}
           </UButton>
-          <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parts.parent" :to="`/parts/${uuidb64(row.parts.parent.id)}`">
+          <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parts.parent" @click="editPart(row.parts.parent)">
             {{ row.parts.quantity_of }} × {{ row.parts.parent.part === row.parts.parent.value ? '' :  row.parts.parent.part }} {{ row.parts.parent.value }}
           </UButton>
         </div>
@@ -136,7 +136,7 @@
     <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal = false" @refresh="emit('refresh')" />
 
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal = false"
-      @save="savePart" />
+      @save="savePart" @setParent="setParent" />
   </UCard>
 </template>
 
@@ -196,6 +196,14 @@ const { data: locations } = await useAsyncData('locations', async () => {
 const refresh = () => {
   emit('refresh')
 }
+
+const setParent = () => {
+  console.log('table setting parent')
+  partModal.value = false
+  selectedPart.value = selectedPart.value.parent
+  partModal.value = true
+}
+
 
 watch(
   () => props.project,

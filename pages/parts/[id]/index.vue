@@ -1,6 +1,6 @@
 <template>
 
-    <PartsForm :modal="false" :selectedPart="part" :saving="saving" @save="savePart" />
+    <PartsForm :modal="false" :selectedPart="part" :saving="saving" @save="savePart" @setParent="router.push(`/parts/${uuidb64(part.parent.id)}`)" />
 
     <PartsQRCodeModal :partModal="qrModal" :selectedPart="part" @close="qrModal=false" />
 
@@ -11,6 +11,7 @@
 <script lang="ts" setup>
 
   const route = useRoute()
+  const router = useRouter()
   const client = useSupabaseClient()
   const user = useSupabaseUser()
 

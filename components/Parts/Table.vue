@@ -20,11 +20,9 @@
     <UTable v-model:sort="sort" :rows="rows" :columns="columns" :ui="{ td: { base: '' } }" v-model="selected">
       <template #part-data="{ row }">
         <div>
-          <strong>
-            {{ row.part }}
-          </strong>
+          <UButton variant="link" :label="row.part" @click="editPart(row)" />
         </div>
-        <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parent" :to="`/parts/${uuidb64(row.parent.id)}`">
+        <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parent" @click="editPart(row.parent)">
           {{ row.quantity_of }} × {{ row.parent.part === row.parent.value ? '' :  row.parent.part }} {{ row.parent.value }}
         </UButton>
       </template>
@@ -114,7 +112,7 @@
     <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal = false"
       @refresh="emit('refresh')" />
 
-    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" @refresh="emit('refresh')" />
+    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" @refresh="emit('refresh')" @setParent="setParent" />
     <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
 
   </div>
@@ -153,6 +151,7 @@ const sort = ref({
   column: 'part',
   direction: 'desc'
 })
+
 
 
 const qty = (row: Part) => {
@@ -275,27 +274,22 @@ const { data: locations } = await useAsyncData('locations', async () => {
 })
 
 
-let selectedPart: Part = reactive({
-  part: '',
-  value: '',
-  description: '',
-  footprint: '',
-  quantity: 0,
-  min_quantity: 0,
-  price: 0,
-  ordering_url: '',
-  id: null,
-  owner_id: null,
-  location_parts: []
+let selectedPart: Part = ref({
 })
 
+const setParent = () => {
+  console.log('table setting parent')
+  partModal.value = false
+  selectedPart.value = selectedPart.value.parent
+  partModal.value = true
+}
 
 const createPart = () => {
   partModal.value = true;
 }
 
 const editPart = (row: Part) => {
-  selectedPart = row
+  selectedPart.value = row
   partModal.value = true
 }
 

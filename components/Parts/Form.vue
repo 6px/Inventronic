@@ -81,10 +81,19 @@
         </UFormGroup>
 
       </div>
-      <div>
+      <div v-if="selectedPart.parent && selectedPart.parent.id">
+        <h2>Locations</h2>
+        <UTable v-if="selectedPart.parent && selectedPart.parent.location_parts && selectedPart.parent.location_parts.length" :rows="[...selectedPart.parent.location_parts.map((lp:LocationPart) => { return {name: lp.locations.name, quantity: lp.quantity}}), {name: 'TOTAL', quantity: selectedPart.parent.location_parts.reduce((acc: number, lp: LocationPart) => acc + lp.quantity, 0)}]" />
+        <div v-else class="text-center py-4 text-slate-400 text-sm">
+          No stock.
+          <UButton class="px-0" variant="link" label="Edit parent part" @click="setParent" /> 
+          to add stock at selected locations
+        </div>
+        </div>
+      <div v-else>
         <UFormGroup label="Locations" name="locations">
-          <div v-for="lp in selectedLocations" class="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4 mb-4">
-            <UFormGroup label="Location">
+          <div v-for="lp in selectedLocations" class="flex flex-row items-end mb-4">
+            <UFormGroup label="Location" class="grow">
               <USelectMenu v-model="lp.locations" :options="locations">
                 <template #label>
                   {{ lp.locations.name ? lp.locations.name : 'None' }}
@@ -94,16 +103,18 @@
                 </template>
               </USelectMenu>
             </UFormGroup>
-            <UFormGroup label="Quantity">
+            <UFormGroup label="Quantity" class="grow ml-4">
               <UInput type="number" step="0.05" v-model="lp.quantity" />
             </UFormGroup>
+            <UButton class="shrink ml-4 h-8 w-8 mb-1" icon="i-heroicons-outline-trash" color="red" @click="deleteLocation(lp)" />
           </div>
 
 
         </UFormGroup>
+      
+        <UButton icon="i-heroicons-outline-plus" label="Add location"
+        @click="selectedLocations.push({key: Math.random()*1000000, quantity: 0, locations: {} })" />
       </div>
-      <UButton icon="i-heroicons-outline-plus" label="Add location"
-        @click="selectedLocations.push({ quantity: 0, locations: {} })" />
       <UButton type="submit" class="hidden" @click="emit('save')" />
     </UForm>
 
@@ -119,7 +130,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { UButton } from '#build/components';
 
 const toast = useToast()
 
@@ -150,6 +160,16 @@ const { data: parts } = await useAsyncData('parts', async () => {
   return data
 })
 
+const setParent = () => {
+  console.log('form setting parent')
+  emit('setParent')
+}
+
+watch(
+  () => props.selectedPart,
+  () => {part_type.value = { label: props.selectedPart.part }}
+)
+
 const { data: locations } = await useAsyncData('locations', async () => {
   const { data } = await client.from('locations').select().order('created_at')
 
@@ -167,6 +187,14 @@ const validate = (state: any): FormError[] => {
   if (!state.name) errors.push({ path: 'name', message: 'Required' })
   if (!state.quantity) errors.push({ path: 'quantity', message: 'Required' })
   return errors
+}
+
+const deleteLocation = async (lp: LocationPart) => {
+  if (lp.id) {
+    selectedLocations.value = selectedLocations.value.filter(ll => lp.id !== ll.id)
+  } else if (lp.key) {
+    selectedLocations.value = selectedLocations.value.filter(ll => lp.key !== ll.key)
+  }
 }
 
 
@@ -219,16 +247,14 @@ const save = async () => {
       part_id = r.data[0].id
     }
   }
+
+  // Delete all locations_parts for this part
+
+  await client.from('location_parts').delete().eq('part_id', part_id)
   // Create of update location_parts
   for await (const loc of selectedLocations.value) {
     console.log('saving ', loc)
-    let r
-    if (loc.id) {
-      r = await client.from('location_parts').update({ part_id: part_id, location_id: loc.locations.id, quantity: loc.quantity }).eq('id', loc.id)
-    } else {
-      r = await client.from('location_parts').insert({ part_id: part_id, location_id: loc.locations.id, quantity: loc.quantity })
-    }
-
+    const r = await client.from('location_parts').insert({ part_id: part_id, location_id: loc.locations.id, quantity: loc.quantity })
     if (r.error) {
       let msg = r.error.message
       if (r.error.code === "23505") {
