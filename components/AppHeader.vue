@@ -33,7 +33,7 @@
             <UPopover :popper="{ arrow: true, placement: 'bottom-end' }">
               <UButton color="white" variant="ghost" trailing-icon="i-heroicons-chevron-down-20-solid">
                 <img
-                  :src="`https://gravatar.com/avatar/${hash}`"
+                  :src="`https://gravatar.com/avatar/${hash}?d=identicon`"
                   alt="user avatar"
                   class="w-8 h-8 rounded-full"
                 />

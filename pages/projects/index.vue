@@ -20,7 +20,8 @@
 
         </template>
         <template #buildable-data="{ row }">
-          <UBadge color="white">{{ nparts(row) }} PCBs</UBadge>
+          <UBadge v-if="nparts(row) < Infinity" color="white">{{ nparts(row) }} PCBs</UBadge>
+          <UBadge v-else color="white">Unknown</UBadge>
         </template>
 
         <template #project_parts-data="{ row }">

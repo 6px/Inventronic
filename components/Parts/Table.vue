@@ -159,7 +159,7 @@ const selected = ref([])
 
 const sort = ref({
   column: 'part',
-  direction: 'desc'
+  direction: 'asc'
 })
 
 
@@ -173,7 +173,6 @@ const qty = (row: Part) => {
 
 const sorted = computed(() => {
   return props.parts.sort((a: Part, b: Part) => {
-    console.log(sort.value.column, sort.value.direction)
     let cmp = 0
     switch (sort.value.column) {
       case 'part':
