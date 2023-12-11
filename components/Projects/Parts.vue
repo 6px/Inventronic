@@ -6,144 +6,160 @@
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
           <UButton color="white" label="Add parts" trailing-icon="i-heroicons-chevron-down-20-solid" />
           <ProjectsUploadModal @change="kicadCSV($event)" :open="uploadModal" @close="uploadModal = false" />
-          <ProjectsProjectPartModal :open="newppModal" :projectPart="newppPart" @close="newppModal = false" @refresh="refresh" />
+          <ProjectsProjectPartModal :open="newppModal" :projectPart="newppPart" @close="newppModal = false"
+            @refresh="refresh" />
         </UDropdown>
       </div>
     </template>
-    <UTable :rows="rows" :columns="columns" :ui="{ td: { base: '' } }">
-      <template #id-data="{ row }">
-        <div class="flex flex-row">
-          <div v-if="row.id">
-            <UTooltip text="Print project part label">
-              <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
-            </UTooltip>
-          </div>
-          <div v-if="row.id">
-            <UTooltip text="Edit project part">
-              <UButton class="mr-2" label="" icon="i-heroicons-outline-pencil" @click="editProjectPart(row)" />
-            </UTooltip>
-          </div>
-          <div v-if="row.id">
-            <UTooltip text="Remove part from this project">
-              <UButton class="mr-2" :loading="deleting === row.id" label="" color="red"
-                :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" @click="removeProjectPart(row)" />
-            </UTooltip>
-          </div>
+    <div>
+      <div :class="selected.length ? '' : 'h-8'">
+        <UButtonGroup size="sm" orientation="horizontal" v-if="selected.length">
 
-          <div v-else-if="row.parts.id">
-            <UTooltip text="Add to this project">
-              <UButton class="mr-2" label=""
-                :icon="adding[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
-                :loading="adding[row.parts.part + row.parts.value]" @click="addPart(row)" />
-            </UTooltip>
+          <UButton icon="i-heroicons-outline-qr-code" label="Print labels" color="white" @click="printTags" />
+          <UButton :loading="deletingAll" icon="i-heroicons-outline-trash" color="red" label="Delete"
+            @click="deleteParts" />
+
+        </UButtonGroup>
+      </div>
+      <UTable v-model="selected" :rows="rows" :columns="columns" :ui="{ td: { base: '' } }">
+        <template #id-data="{ row }">
+          <div class="flex flex-row">
+            <div v-if="row.id">
+              <UTooltip text="Print project part label">
+                <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="printTag(row)" />
+              </UTooltip>
+            </div>
+            <div v-if="row.id">
+              <UTooltip text="Edit project part">
+                <UButton class="mr-2" label="" icon="i-heroicons-outline-pencil" @click="editProjectPart(row)" />
+              </UTooltip>
+            </div>
+            <div v-if="row.id">
+              <UTooltip text="Remove part from this project">
+                <UButton class="mr-2" :loading="deleting === row.id" label="" color="red"
+                  :icon="deleting === row.id ? '' : 'i-heroicons-outline-trash'" @click="removeProjectPart(row)" />
+              </UTooltip>
+            </div>
+
+            <div v-else-if="row.parts.id">
+              <UTooltip text="Add to this project">
+                <UButton class="mr-2" label=""
+                  :icon="adding[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
+                  :loading="adding[row.parts.part + row.parts.value]" @click="addPart(row)" />
+              </UTooltip>
+            </div>
+            <div v-else>
+
+              <UTooltip text="Create this part and add it to this project">
+                <UButton class="mr-2" label=""
+                  :icon="creating[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
+                  @click="createPart(row)" :loading="creating[row.parts.part + row.parts.value]" />
+              </UTooltip>
+            </div>
+          </div>
+        </template>
+
+        <template #parts.part-data="{ row }">
+          <div v-if="row.parts.id">
+            <UButton class="p-0" variant="link" @click="editPart(row.parts)">
+              {{ row.parts.part }}
+            </UButton>
+            <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parts.parent"
+              @click="editPart(row.parts.parent)">
+              {{ row.parts.quantity_of }} × {{ row.parts.parent.part === row.parts.parent.value ? '' :
+                row.parts.parent.part }} {{ row.parts.parent.value }}
+            </UButton>
           </div>
           <div v-else>
-
-            <UTooltip text="Create this part and add it to this project">
-              <UButton class="mr-2" label=""
-                :icon="creating[row.parts.part + row.parts.value] ? '' : 'i-heroicons-outline-plus'"
-                @click="createPart(row)" :loading="creating[row.parts.part + row.parts.value]" />
-            </UTooltip>
-          </div>
-        </div>
-      </template>
-
-      <template #parts.part-data="{ row }">
-        <div v-if="row.parts.id">
-          <UButton class="p-0" variant="link" @click="editPart(row.parts)">
             {{ row.parts.part }}
-          </UButton>
-          <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parts.parent" @click="editPart(row.parts.parent)">
-            {{ row.parts.quantity_of }} × {{ row.parts.parent.part === row.parts.parent.value ? '' :  row.parts.parent.part }} {{ row.parts.parent.value }}
-          </UButton>
-        </div>
-        <div v-else>
-          {{ row.parts.part }}
-        </div>
+          </div>
 
-        <div>
-          <strong>
-            {{ row.part }}
-          </strong>
-        </div>
-        
+          <div>
+            <strong>
+              {{ row.part }}
+            </strong>
+          </div>
 
-      </template>
 
-      <template #parts.value-data="{ row }">
-        <UTooltip :text="row.parts.value">
-          <UButton class="p-0 " v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
-            <div class="max-w-[100px] truncate overflow-hidden">
+        </template>
+
+        <template #parts.value-data="{ row }">
+          <UTooltip :text="row.parts.value">
+            <UButton class="p-0 " v-if="row.parts.id" variant="link" @click="editPart(row.parts)">
+              <div class="max-w-[100px] truncate overflow-hidden">
+                {{ row.parts.value }}
+              </div>
+            </UButton>
+            <div v-else class="max-w-[100px] truncate overflow-hidden">
               {{ row.parts.value }}
             </div>
-          </UButton>
-          <div v-else class="max-w-[100px] truncate overflow-hidden">
-            {{ row.parts.value }}
+          </UTooltip>
+        </template>
+
+        <template #parts.footprint-data="{ row }">
+          <UTooltip :text="row.parts.footprint">
+            <div class="max-w-[100px] truncate overflow-hidden">
+
+              {{ row.parts.footprint }}
+
+            </div>
+          </UTooltip>
+        </template>
+
+        <template #quantity-data="{ row }">
+          <div
+            class="shrink flex flex-row space-between form-input relative w-18 disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-sm p-0 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400">
+            <UInput v-model="row.quantity" variant="none" class="w-20" />
+            <UButton class="rounded-s-none m-0" @click="saveQuantity(row)"
+              :icon="saveQty[row.id] ? '' : 'i-heroicons-outline-arrow-down-on-square'" :loading="saveQty[row.id]" />
           </div>
-        </UTooltip>
-      </template>
+        </template>
 
-      <template #parts.footprint-data="{ row }">
-        <UTooltip :text="row.parts.footprint">
-          <div class="max-w-[100px] truncate overflow-hidden">
 
-            {{ row.parts.footprint }}
 
+        <template #parts.quantity-data="{ row }">
+          <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > qty(row) ? 'red' : 'green'"
+            class="ml-2 shrink">
+            {{ qty(row) }}
+          </UBadge>
+        </template>
+
+        <template #locations-data="{ row }">
+          <div v-if="row.parts.parent && row.parts.parent.location_parts && row.parts.parent.location_parts.length">
+            <div class="max-w-[150px] truncate overflow-hidden">
+              <UTooltip v-for="lp in row.parts.parent.location_parts"
+                :text="`${lp.quantity} items of ${row.parts.parent.part === row.parts.parent.value ? '' : row.parts.parent.part} ${row.parts.parent.value} in ${lp.locations.name}`">
+                <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                  {{ lp.locations.name }}
+                </UButton>
+
+              </UTooltip>
+            </div>
           </div>
-        </UTooltip>
-      </template>
+          <div v-else-if="row.parts.location_parts && row.parts.location_parts.length">
+            <div class="max-w-[150px] truncate overflow-hidden">
+              <UTooltip v-for="lp in row.parts.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
+                <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                  {{ lp.locations.name }}
+                </UButton>
 
-      <template #quantity-data="{ row }">
-        <div
-          class="shrink flex flex-row space-between form-input relative w-18 disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-sm p-0 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400">
-          <UInput v-model="row.quantity" variant="none" class="w-20" />
-          <UButton class="rounded-s-none m-0" @click="saveQuantity(row)"
-            :icon="saveQty[row.id] ? '' : 'i-heroicons-outline-arrow-down-on-square'" :loading="saveQty[row.id]" />
-        </div>
-      </template>
-
-
-
-      <template #parts.quantity-data="{ row }">
-        <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > qty(row) ? 'red' : 'green'"
-          class="ml-2 shrink">
-          {{ qty(row) }}
-        </UBadge>
-      </template>
-
-      <template #locations-data="{ row }">
-        <div v-if="row.parts.parent && row.parts.parent.location_parts && row.parts.parent.location_parts.length">
-          <div class="max-w-[150px] truncate overflow-hidden">
-            <UTooltip v-for="lp in row.parts.parent.location_parts" :text="`${lp.quantity} items of ${row.parts.parent.part === row.parts.parent.value ? '' : row.parts.parent.part} ${row.parts.parent.value} in ${lp.locations.name}`">
-              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                {{ lp.locations.name }}
-              </UButton>
-
-            </UTooltip>
+              </UTooltip>
+            </div>
           </div>
-        </div>
-        <div v-else-if="row.parts.location_parts && row.parts.location_parts.length">
-          <div class="max-w-[150px] truncate overflow-hidden">
-            <UTooltip v-for="lp in row.parts.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
-              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                {{ lp.locations.name }}
-              </UButton>
 
-            </UTooltip>
+          <div v-else>
+            None
           </div>
-        </div>
-        
-        <div v-else>
-          None
-        </div>
-      </template>
-    </UTable>
-    <div class="text-right" v-if="newParts">
-      <UButton @click="addAll">Add all</UButton>
+        </template>
+      </UTable>
+      <div class="text-right" v-if="newParts">
+        <UButton @click="addAll">Add all</UButton>
+      </div>
     </div>
 
     <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <UPagination v-if="pageCount < project.project_parts.length" v-model="page" :page-count="pageCount" :total="project.project_parts.length" />
+      <UPagination v-if="pageCount < project.project_parts.length" v-model="page" :page-count="pageCount"
+        :total="project.project_parts.length" />
     </div>
     <ProjectsPartQRCodeModal :open="qrModal" :projectPart="qrPart" @close="qrModal = false" />
     <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal = false" @refresh="emit('refresh')" />
@@ -168,6 +184,7 @@ const props = defineProps({
   },
 })
 
+const router = useRouter()
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 const emit = defineEmits(['refresh', 'setParts'])
@@ -189,7 +206,10 @@ const ppModal = ref(false)
 const ppPart = ref({})
 
 const newppModal = ref(false)
-const newppPart = ref({project_id: props.project.id})
+const newppPart = ref({ project_id: props.project.id })
+
+const selected = ref([])
+const deletingAll = ref(false)
 
 const newParts = computed(() => {
   return projectParts.value.find(pp => !pp.id)
@@ -220,11 +240,14 @@ const setParent = () => {
   partModal.value = true
 }
 
+
+
+
 const qty = (row) => {
   if (row.parts.parent) {
-    return row.parts.parent.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) / row.parts.quantity_of
+    return Math.round(100 * row.parts.parent.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) / row.parts.quantity_of) / 100
   }
-  return row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0)
+  return Math.round(100 * row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0)) / 100
 }
 
 
@@ -234,6 +257,19 @@ watch(
     projectParts.value = props.project.project_parts;
   }
 )
+
+const deleteParts = async () => {
+  deletingAll.value = true
+  await client.from('project_parts').delete().in('id', selected.value.map(p => p.id))
+  emit('refresh')
+  deletingAll.value = false
+}
+
+const printTags = () => {
+  const routeData = router.resolve({ path: `/projects/${props.project.id}/print`, query: { ids: selected.value.map(p => p.id) } });
+  window.open(routeData.href, '_blank');
+}
+
 
 const printTag = (row: ProjectPart) => {
   qrPart.value = row

@@ -11,11 +11,13 @@
         <CommonQrCode
           :title="part.part === part.value ? part.part : part.part + ' ' + part.value"
           :subtitle="part.footprint"
-          :description="part.description"
+          :subsubtitle="(p ? p.parts.map(np => np.part === np.value ? np.part : np.part + ' ' + np.value).join(' ') : '')"
+          :description="part.description || ''"
           :description-size="2"
           :subtitle-size="2.5"
           :url="`${req.public.baseUrl}/parts/${uuidb64(part.id)}`"
         />
+        
       </div>
       <template #footer>
         <UButton
@@ -36,7 +38,7 @@
 <script lang="ts" setup>
 import type { CommonQrCode } from '#build/components';
 
-
+const client = useSupabaseClient()
 const req = useRuntimeConfig()
 const emit = defineEmits()
 
@@ -53,10 +55,17 @@ const props = defineProps({
   },
 });
 
+const part_id = ref(props.part.id)
+
+const {data: p} = await useAsyncData(`part-${props.part.id}`, async () => {
+  const { data } = await client.from('parts').select(`${partFields()}, parts(id, part, value)`).eq('id', part_id.value).single()
+
+  return data
+}, {
+  watch: [part_id]
+})
+
 const open = ref(false)
-
-
-
 
 const print = () => {
   const mywindow = window.open(`${req.public.baseUrl}/parts/${props.part.id}`, 'PRINT', 'height=400,width=600');
@@ -98,7 +107,10 @@ watch(
   () => props.open,
   () => {open.value = props.open}
 )
-
+watch(
+  () => props.part,
+  () => {part_id.value = props.part.id}
+)
 
 
 

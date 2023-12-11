@@ -17,7 +17,11 @@
       </tspan>
     </text>
 
-    <!-- <rect x="0" :y="(marginX+qrSize) * mul" width="100%" :height="(height - qrSize) * mul" fill="#ffffff" /> -->
+    <text v-if="subsubtitle" :x="maxsubsubLineLen > 68 / subsubtitleSize ? (marginX+qrSize)*mul : (width-marginX) * mul" :y="(3.7+marginY + subtitleSize) * mul" class="subsubtitle" :style="maxsubsubLineLen > 68 / subsubtitleSize ? 'text-anchor: start;' : 'text-anchor: end;'">
+      <tspan :x="maxsubsubLineLen > 68 / subsubtitleSize ? (marginX+qrSize) * mul : (width-marginX) * mul" :dy="subsubtitleSize * mul" v-for="line in subsubLines">
+        {{ line }}
+      </tspan>
+    </text>
 
     <text :x="marginX*mul" :y="(marginY+qrSize) * mul" class="description">
       <tspan :x="marginX*mul" :dy="descriptionSize * mul" v-for="line in descLines">
@@ -49,6 +53,16 @@ const props = defineProps({
     required: false,
     default: 1.75
   },
+  subsubtitle: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  subsubtitleSize: {
+    type: Number,
+    required: false,
+    default: 1.6
+  },
   description: {
     type: String,
     required: false,
@@ -71,6 +85,7 @@ const props = defineProps({
 
 const partLines = ref([props.subtitle])
 const descLines = ref([props.description])
+const subsubLines = ref([props.subsubtitle])
 
 const mul = 4
 const height = 17
@@ -111,6 +126,11 @@ const svgStyle = `
   font: ${props.descriptionSize * mul}px monaspace;
   fill: black;
 }
+
+.subsubtitle {
+  font: ${props.subsubtitleSize * mul}px monaspace;
+  fill: black;
+}
 `
 
 const qrSvg = ref('')
@@ -130,11 +150,18 @@ onMounted(async () => {
   partLines.value = (await Promise.all(props.subtitle.split('\n').map(async (l) => await getLines(l, (width - props.qrSize - marginX) * mul)))).flat()
   descLines.value = (await getLines(props.description, (width-marginX*2) * mul, 'description')).slice(0, 1)
 
+  subsubLines.value = (await getLines(props.subsubtitle, (width-marginX*2) * mul, 'subsubtitle')).slice(0, 3)
+
   emit('ready')
 })
 
 const maxLineLen = computed(() => {
   const ls = partLines.value.map(l => l.length)
+  return Math.max(...ls)
+})
+
+const maxsubsubLineLen = computed(() => {
+  const ls = subsubLines.value.map(l => l.length)
   return Math.max(...ls)
 })
 

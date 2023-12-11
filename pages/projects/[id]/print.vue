@@ -42,6 +42,7 @@ const rows = computed(() => {
       part: pp.parts.part,
       value: pp.parts.value,
       use: pp.parts.parent ? pp.parts.quantity_of + ' × ' + pp.parts.parent.part + ' ' + pp.parts.parent.value : '',
+      locations: pp.parts.parent ? pp.parts.parent.location_parts.map(lp => lp.locations.name).join(', ') : pp.parts.location_parts.map(lp => lp.locations.name).join(', '),
       footprint: pp.parts.footprint,
       quantity: pp.quantity,
       references: pp.references,
@@ -54,6 +55,7 @@ const ready = () => {
   cnt.value += 1
   if (cnt.value >= parts.value.length) {
     window.print()
+    window.close()
   }
 }
 
@@ -61,14 +63,28 @@ const ready = () => {
 </script>
 
 <style scoped>
-svg {
-  width: 54mm;
-  display: inline;
-  margin: 0;
-}
-
-body,
-html {
-  background: white;
-}
+  svg {
+    width: 54mm;
+    height: 17mm;
+    display: inline;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body, html, div {
+    background: white;
+  }
+  @media print {
+      svg {
+        width: 54mm !important;
+        height: 17mm;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body{
+        color-adjust: exact;
+        print-color-adjust: exact;
+        padding:0;
+        margin:0;
+      }
+    }
 </style>
