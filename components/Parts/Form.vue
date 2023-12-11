@@ -152,7 +152,7 @@ const props = defineProps({
 
 
 const saving = ref(false)
-const part_type = ref({ label: props.selectedPart.part })
+const part_type = ref({ label: props.selectedPart.part ? props.selectedPart.part : 'Select or create' })
 
 const { data: parts } = await useAsyncData('parts', async () => {
   const { data } = await client.from('parts').select(partFields()).order('created_at')
@@ -176,7 +176,7 @@ const { data: locations } = await useAsyncData('locations', async () => {
   return data
 })
 
-const selectedLocations = ref(props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }))
+const selectedLocations = ref(props.selectedPart.location_parts ? props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }) : [])
 
 const part_types = computed(() => {
   return parts.value.map((p: Part) => { return { label: p.part } })
@@ -228,6 +228,8 @@ const save = async () => {
         timeout: 4000,
         color: 'red'
       })
+      saving.value = false
+      return
     }
   } else {
     p.owner_id = user.value.id
@@ -242,6 +244,7 @@ const save = async () => {
         timeout: 4000,
         color: 'red'
       })
+      saving.value = false
       return;
     } else {
       part_id = r.data[0].id
