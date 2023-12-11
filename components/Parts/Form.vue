@@ -3,6 +3,10 @@
     <template #header>
       <div class="flex items-center justify-between">
         <h2 v-if="selectedPart.id">
+          <UTooltip text="Print label">
+            <UButton class="mr-8" icon="i-heroicons-qr-code" @click="printTag" />
+          </UTooltip>
+
           Editing <strong>{{ part_type.label }} {{ selectedPart.value }}</strong>
         </h2>
         <h2 v-else>Create new part</h2>
@@ -117,6 +121,8 @@
       </div>
       <UButton type="submit" class="hidden" @click="emit('save')" />
     </UForm>
+    <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
+
 
     <template #footer>
       <UButton class="mr-4" @click="save" :loading="saving">
@@ -152,6 +158,8 @@ const props = defineProps({
 
 
 const saving = ref(false)
+const qrModal = ref(false)
+const qrPart = ref({})
 const part_type = ref({ label: props.selectedPart.part ? props.selectedPart.part : 'Select or create' })
 
 const { data: parts } = await useAsyncData('parts', async () => {
@@ -163,6 +171,11 @@ const { data: parts } = await useAsyncData('parts', async () => {
 const setParent = () => {
   console.log('form setting parent')
   emit('setParent')
+}
+
+const printTag = () => {
+  qrPart.value = props.selectedPart
+  qrModal.value = true
 }
 
 watch(
