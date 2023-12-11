@@ -4,8 +4,13 @@
       :ui="{ body: { background: 'bg-slate-200 dark:bg-slate-800' }, divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
       <template #header>
         <div class="flex items-center justify-between">
-          <h2>{{ projectPart.parts.part === projectPart.parts.value ? projectPart.parts.part :
-            projectPart.parts.part + ' ' + projectPart.parts.value }} </h2>
+          <h2 v-if="projectPart.parts && projectPart.parts.part">
+            {{ projectPart.parts.part === projectPart.parts.value ? projectPart.parts.part :
+            projectPart.parts.part + ' ' + projectPart.parts.value }}
+          </h2>
+          <h2 v-else>
+            Add existing part
+          </h2>
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
         </div>
       </template>
@@ -14,10 +19,13 @@
           <USelectMenu v-model="projectPart.part_id" :options="parts" value-attribute="id" option-attribute="name">
             <template #label>
               <span
-                :class="[current.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
+                :class="[current && current.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
                 aria-hidden="true" />
-              <span class="truncate">
+              <span class="truncate" v-if="current">
                 {{ current.part === current.value ? current.part : current.part + ' ' + current.value }}
+              </span>
+              <span class="truncate" v-else>
+                None
               </span>
             </template>
             <template #option="{ option: part }">
@@ -74,7 +82,12 @@ const save = async () => {
   saving.value = true
   const pp = { ...props.projectPart }
   delete pp.parts
-  const r = await client.from('project_parts').update(pp).eq('id', props.projectPart.id)
+  let r
+  if (pp.id) {
+    r = await client.from('project_parts').update(pp).eq('id', props.projectPart.id)
+  } else {
+    r = await client.from('project_parts').insert(pp)
+  }
 
   if (r.error) {
     toast.add({

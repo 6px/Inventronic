@@ -6,6 +6,7 @@
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
           <UButton color="white" label="Add parts" trailing-icon="i-heroicons-chevron-down-20-solid" />
           <ProjectsUploadModal @change="kicadCSV($event)" :open="uploadModal" @close="uploadModal = false" />
+          <ProjectsProjectPartModal :open="newppModal" :projectPart="newppPart" @close="newppModal = false" @refresh="refresh" />
         </UDropdown>
       </div>
     </template>
@@ -111,17 +112,7 @@
       </template>
 
       <template #locations-data="{ row }">
-        <div v-if="row.parts.location_parts && row.parts.location_parts.length">
-          <div class="max-w-[150px] truncate overflow-hidden">
-            <UTooltip v-for="lp in row.parts.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
-              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                {{ lp.locations.name }}
-              </UButton>
-
-            </UTooltip>
-          </div>
-        </div>
-        <div v-else-if="row.parts.parent && row.parts.parent.location_parts && row.parts.parent.location_parts.length">
+        <div v-if="row.parts.parent && row.parts.parent.location_parts && row.parts.parent.location_parts.length">
           <div class="max-w-[150px] truncate overflow-hidden">
             <UTooltip v-for="lp in row.parts.parent.location_parts" :text="`${lp.quantity} items of ${row.parts.parent.part === row.parts.parent.value ? '' : row.parts.parent.part} ${row.parts.parent.value} in ${lp.locations.name}`">
               <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
@@ -131,6 +122,17 @@
             </UTooltip>
           </div>
         </div>
+        <div v-else-if="row.parts.location_parts && row.parts.location_parts.length">
+          <div class="max-w-[150px] truncate overflow-hidden">
+            <UTooltip v-for="lp in row.parts.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
+              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                {{ lp.locations.name }}
+              </UButton>
+
+            </UTooltip>
+          </div>
+        </div>
+        
         <div v-else>
           None
         </div>
@@ -147,7 +149,7 @@
     <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal = false" @refresh="emit('refresh')" />
 
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal = false"
-      @save="savePart" @setParent="setParent" />
+      @save="savePart" @setParent="setParent" @refresh="refresh" />
   </UCard>
 </template>
 
@@ -185,6 +187,9 @@ const deleting = ref(0)
 
 const ppModal = ref(false)
 const ppPart = ref({})
+
+const newppModal = ref(false)
+const newppPart = ref({project_id: props.project.id})
 
 const newParts = computed(() => {
   return projectParts.value.find(pp => !pp.id)
@@ -385,6 +390,13 @@ const items = [
     click: () => {
       console.log('Manually create part')
       partModal.value = true
+    }
+  }],
+  [{
+    label: 'Add existing part',
+    icon: 'i-heroicons-outline-plus',
+    click: () => {
+      newppModal.value = true
     }
   }],
 ]

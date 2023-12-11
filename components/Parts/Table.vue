@@ -23,7 +23,7 @@
           <UButton variant="link" :label="row.part" @click="editPart(row)" />
         </div>
         <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parent" @click="editPart(row.parent)">
-          {{ row.quantity_of }} × {{ row.parent.part === row.parent.value ? '' :  row.parent.part }} {{ row.parent.value }}
+          {{ row.quantity_of }} × {{ row.parent.part === row.parent.value ? '' : row.parent.part }} {{ row.parent.value }}
         </UButton>
       </template>
 
@@ -43,27 +43,26 @@
       </template>
 
       <template #locations-data="{ row }">
-        <div v-if="row.location_parts && row.location_parts.length">
+        <div v-if="row.parent && row.parent.location_parts && row.parent.location_parts.length">
+          <div class="max-w-[150px] truncate overflow-hidden">
+            <UTooltip v-for="lp in row.parent.location_parts"
+              :text="`${lp.quantity} items of ${row.parent.part === row.parent.value ? '' : row.parent.part} ${row.parent.value} in ${lp.locations.name}`">
+              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
+                {{ lp.locations.name }}
+              </UButton>
+            </UTooltip>
+          </div>
+        </div>
+        <div v-else-if="row.location_parts && row.location_parts.length">
           <div class="max-w-[150px] truncate overflow-hidden">
             <UTooltip v-for="lp in row.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
-
               <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
                 {{ lp.locations.name }}
               </UButton>
-
             </UTooltip>
           </div>
         </div>
-        <div v-else-if="row.parent && row.parent.location_parts && row.parent.location_parts.length">
-          <div class="max-w-[150px] truncate overflow-hidden">
-            <UTooltip v-for="lp in row.parent.location_parts" :text="`${lp.quantity} items of ${row.parent.part === row.parent.value ? '' : row.parent.part} ${row.parent.value} in ${lp.locations.name}`">
-              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                {{ lp.locations.name }}
-              </UButton>
 
-            </UTooltip>
-          </div>
-        </div>
         <div v-else>
           None
         </div>
@@ -122,7 +121,8 @@
     <PartsMove v-if="location" :open="moveModal" :location="location" @close="moveModal = false"
       @refresh="emit('refresh')" />
 
-    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false" @refresh="emit('refresh')" @setParent="setParent" />
+    <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" @close="partModal = false"
+      @refresh="emit('refresh')" @setParent="setParent" />
     <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
 
   </div>

@@ -88,8 +88,14 @@ const build = async () => {
     if(!part) {
       return
     }
+    // Remove from parent part
+    let loc
+    if (part.parent) {
+      loc = part.parent.location_parts.find(lp => lp.quantity > 0)
+    } else {
+      loc = part.location_parts.find(lp => lp.quantity > 0)
+    }
     // Remove from part location
-    const loc = part.location_parts.find(lp => lp.quantity > 0)
     if (!loc) {
       return
     }
