@@ -50,3 +50,8 @@
     font: 8px monaspace;
     fill: black;
   }
+  svg .subsubtitle {
+    font: 7px monaspace;
+    fill: black;
+    text-anchor:end;
+  }

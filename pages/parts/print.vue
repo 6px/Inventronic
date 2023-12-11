@@ -5,6 +5,7 @@
         :title="part.part === part.value ? part.part : part.part + ' ' + part.value"
         :subtitle="part.footprint + '\n' + (part.locations ? part.locations.name : '')"
         :description="part.description"
+        :subsubtitle="part.parts.map(np => np.part === np.value ? np.part : np.part + ' ' + np.value).join(' ')"
         :description-size="2"
         :subtitle-size="2.5"
         :url="`${config.public.baseUrl}/parts/${uuidb64(part.id)}`"
@@ -28,7 +29,7 @@ const client = useSupabaseClient()
 
 
 const {data: parts, refresh} = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields()).in('id', route.query.ids).order('created_at')
+  const { data } = await client.from('parts').select(`${partFields()}, parts(id, part, value)`).in('id', route.query.ids).order('created_at')
   
   return data
 })
@@ -37,7 +38,6 @@ const ready = () => {
   cnt.value += 1
   if (cnt.value >= parts.value.length) {
     window.print()
-    window.close()
   }
 }
 
