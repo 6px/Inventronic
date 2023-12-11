@@ -14,7 +14,7 @@
     <UForm class="space-y-4" @submit="save" :validate="validate" :state="selectedPart">
       <div class="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4">
         <UFormGroup label="Part of" name="parent_id">
-          <USelectMenu v-model="selectedPart.parent" :options="parts" searchable
+          <USelectMenu v-model="selectedPart.parent" :options="parts.sort((a, b) => a.part.localeCompare(b.part))" searchable
             :uiMenu="{ option: { container: 'w-full block' } }">
             <template #label>
               <span v-if="selectedPart.parent && selectedPart.parent.part" class="truncate">
@@ -179,7 +179,7 @@ const { data: locations } = await useAsyncData('locations', async () => {
 const selectedLocations = ref(props.selectedPart.location_parts ? props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }) : [])
 
 const part_types = computed(() => {
-  return parts.value.map((p: Part) => { return { label: p.part } })
+  return parts.value.map((p: Part) => { return { label: p.part } }).sort((a, b) => a.label.localeCompare(b.label))
 })
 
 const validate = (state: any): FormError[] => {
