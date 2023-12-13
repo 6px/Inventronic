@@ -86,8 +86,7 @@ const redirectTo = `${useRuntimeConfig().public.baseUrl}/confirm`
 
 watchEffect(() => {
   if (user.value && user.value.id) {
-    navigateTo('/')
-    //window.location='/'
+    navigateTo('/parts')
   }
 })
 

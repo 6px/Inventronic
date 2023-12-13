@@ -23,8 +23,8 @@ const props = defineProps({
 
 const open = ref(false)
 
+
 const setParent = () => {
-  console.log('modal setting parent')
   emit('setParent')
 }
 

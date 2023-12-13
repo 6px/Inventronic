@@ -276,7 +276,6 @@ let selectedPart: Part = ref({
 })
 
 const setParent = () => {
-  console.log('table setting parent')
   partModal.value = false
   selectedPart.value = selectedPart.value.parent
   partModal.value = true

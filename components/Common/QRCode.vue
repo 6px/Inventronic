@@ -141,7 +141,6 @@ onMounted(async () => {
     props.subtitle.split('\n')
       .map(
         async (l) => {
-          console.log('l', l)
           return await getLines(l, (width - 12) * mul)
         }
       )

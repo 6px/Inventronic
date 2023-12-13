@@ -122,8 +122,7 @@
             class="ml-2 shrink">
             {{ qty(row) }}
           </UBadge>
-          <UBadge v-else size="xs" color="red"
-            class="ml-2 shrink">
+          <UBadge v-else size="xs" color="red" class="ml-2 shrink">
             0
           </UBadge>
         </template>
@@ -188,6 +187,7 @@ const props = defineProps({
   },
 })
 
+const toast = useToast()
 const router = useRouter()
 const client = useSupabaseClient()
 const user = useSupabaseUser()
@@ -231,7 +231,6 @@ const refresh = () => {
 }
 
 const setParent = () => {
-  console.log('table setting parent')
   partModal.value = false
   selectedPart.value = selectedPart.value.parent
   partModal.value = true
@@ -318,7 +317,14 @@ const savePart = async () => {
     const r = await client.from('parts').update({ ...p }).eq('id', p.id).select(partFields())
       .eq('id', p.id)
     if (r.error) {
-      alert(r.error.message)
+      toast.add({
+        id: 'save_part_fail',
+        title: `Could not update part ${p.part}.`,
+        description: r.error.message,
+        icon: 'i-heroicons-outline-exclamation-triangle',
+        timeout: 10000,
+        color: 'red'
+      })
     } else {
       partModal.value = false;
 
@@ -330,7 +336,14 @@ const savePart = async () => {
     delete p.id
     const r = await client.from('parts').insert({ ...p }).select(partFields())
     if (r.error) {
-      alert(r.error.message)
+      toast.add({
+        id: 'create_part_fail',
+        title: `Could not create part ${p.part}.`,
+        description: r.error.message,
+        icon: 'i-heroicons-outline-exclamation-triangle',
+        timeout: 10000,
+        color: 'red'
+      })
     } else {
       partModal.value = false;
       const part = r.data[0]
@@ -367,7 +380,14 @@ const addPart = async (row) => {
   }).select(`id, parts(${partFields()}), quantity`)
 
   if (r2.error) {
-    alert(r2.error.message)
+    toast.add({
+      id: 'project_add_part_fail',
+      title: `Could not add part ${row.parts.part}.`,
+      description: r2.error.message,
+      icon: 'i-heroicons-outline-exclamation-triangle',
+      timeout: 10000,
+      color: 'red'
+    })
   } else {
     row.id = r2.data[0].id
     //refresh()
@@ -383,12 +403,17 @@ const createPart = async (row: ProjectPart) => {
   p.owner_id = user.value.id
   delete p.id
   const r = await client.from('parts').insert({ ...p }).select(partFields())
-  console.log('saving part', p)
-  console.log('part saved', r.data)
+
   if (r.error) {
-    alert(r.error.message)
+    toast.add({
+      id: 'create_part_fail',
+      title: `Could not create part ${p.part}.`,
+      description: r.error.message,
+      icon: 'i-heroicons-outline-exclamation-triangle',
+      timeout: 10000,
+      color: 'red'
+    })
   } else {
-    console.log('part saved', r.data)
     const newPart = r.data[0]
     row.parts = newPart
     const r2 = await client.from('project_parts').insert({
@@ -399,7 +424,14 @@ const createPart = async (row: ProjectPart) => {
     }).select()
 
     if (r2.error) {
-      alert(r2.error.message)
+      toast.add({
+        id: 'project_add_part_fail',
+        title: `Could not add part ${row.parts.part}.`,
+        description: r2.error.message,
+        icon: 'i-heroicons-outline-exclamation-triangle',
+        timeout: 10000,
+        color: 'red'
+      })
     } else {
       row.id = r2.data[0].id
       //refresh()
@@ -416,7 +448,6 @@ const items = [
       src: 'https://user-images.githubusercontent.com/352202/53980744-60746100-4111-11e9-9f8c-17ca6b50efd8.png'
     },
     click: () => {
-      console.log('Add from kicad BOM')
       uploadModal.value = true
     }
   }],
@@ -424,6 +455,7 @@ const items = [
     label: 'Create part',
     icon: 'i-heroicons-outline-plus-circle',
     click: () => {
+      selectedPart.value = {}
       partModal.value = true
     }
   }],

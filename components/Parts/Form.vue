@@ -169,7 +169,6 @@ const { data: parts } = await useAsyncData('parts', async () => {
 })
 
 const setParent = () => {
-  console.log('form setting parent')
   emit('setParent')
 }
 
@@ -227,7 +226,6 @@ const save = async () => {
 
   let part_id = p.id
 
-  console.log('saving part', p)
 
   if (part_id) {
     p.owner_id = user.value.id
@@ -270,7 +268,6 @@ const save = async () => {
   await client.from('location_parts').delete().eq('part_id', part_id)
   // Create of update location_parts
   for await (const loc of selectedLocations.value) {
-    console.log('saving ', loc)
     const r = await client.from('location_parts').insert({ part_id: part_id, location_id: loc.locations.id, quantity: loc.quantity })
     if (r.error) {
       let msg = r.error.message

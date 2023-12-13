@@ -89,7 +89,6 @@ const showNav = ref(false)
 
 function digestMessage(message: String) {
   const hashDigest = sha256(message);
-  console.log(hashDigest)
   return hashDigest
 }
 

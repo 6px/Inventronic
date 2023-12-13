@@ -67,7 +67,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['editPart', 'refresh'])
-
+const toast = useToast()
 const client = useSupabaseClient()
 const limitingPart = ref({})
 const missing = ref([])
@@ -76,7 +76,14 @@ const buildnum = ref(0)
 
 const build = async () => {
   if (!buildnum.value || buildnum.value > nparts) {
-    alert('you do not have enough parts to build ' + buildnum + ' of this project')
+    toast.add({
+      id: 'project_build_fail',
+      title: `Could not build ${props.project.name}.`,
+      description: 'You do not have enough parts to build ' + buildnum + ' of this project',
+      icon: 'i-heroicons-outline-exclamation-triangle',
+      timeout: 10000,
+      color: 'red'
+    })
     return
   }
 
