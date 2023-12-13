@@ -7,15 +7,16 @@
           <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
         </div>
       </template>
-
-      <CommonQrCode
-        :title="project.name"
-        :subtitle="project.description"
-        :description="project.url"
-        :description-size="1.75"
-        :subtitle-size="2.5"
-        :url="project.url"
-      />
+      <div id="image">
+        <CommonQrCode
+          :title="project.name"
+          :subtitle="project.description || ''"
+          :description="project.url || ''"
+          :description-size="1.75"
+          :subtitle-size="2.5"
+          :url="project.url || project.name"
+        />
+      </div>
       <template #footer>
         <UButton
           class="mx-4"
@@ -64,12 +65,12 @@ const print = () => {
     const css = mywindow.document.createTextNode(`
     @media print {
       svg {
-        width: 50mm !important;
+        width: 54mm !important;
         padding:0;
         margin:0;
       }
       body{
-        width: 50mm !important; 
+        width: 54mm !important; 
         height: 17mm !important; 
         color-adjust: exact;
         padding:0;

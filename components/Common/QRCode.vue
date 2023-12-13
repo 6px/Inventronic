@@ -147,8 +147,6 @@ onMounted(async () => {
       )
   )
   partLines.value = (await Promise.all(props.subtitle.split('\n').map(async (l) => await getLines(l, (width - props.qrSize - marginX*2) * mul)))).flat()
-  descLines.value = (await getLines(props.description, (width-marginX*2) * mul, 'description')).slice(0, 1)
-
   subsubLines.value = (await getLines(props.subsubtitle, (width - props.qrSize - marginX*2) * mul, 'subsubtitle')).slice(0, 3)
 
   emit('ready')

@@ -1,5 +1,11 @@
 <template>
   <div class="w-full my-2">
+    <UContainer>
+    <UBreadcrumb
+      divider="/"
+      :links="[{ label: 'Projects', to: '/projects' }, { label: project.name, to:`/projects/${project.id}` }]"
+    />
+  </UContainer>
     <h1 class="mb-8 text-4xl font-bold u-text-white text-center">
       {{ project.name }} 
       <UTooltip text="Print label">
@@ -11,7 +17,7 @@
     </h1>
     <UContainer>
       <div class="md:grid md:grid-cols-2 md:gap-x-2">
-        <ProjectsForm :project="project" @refresh="refresh" />
+        <ProjectsForm :project="project" @saved="refresh" />
         <ProjectsDetails class="mt-2 md:mt-0" :project="project" :parts="parts" @editPart="editPart($event)" @refresh="refresh" />
       </div>
       
