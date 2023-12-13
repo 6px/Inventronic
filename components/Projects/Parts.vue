@@ -356,7 +356,7 @@ const addPart = async (row) => {
     part_id: row.parts.id,
     quantity: row.quantity,
     references: row.references,
-  }).select('id, parts(id, part, value, footprint, description, quantity, locations(id, name)), quantity')
+  }).select(`id, parts(${partFields()}), quantity`)
 
   if (r2.error) {
     alert(r2.error.message)
