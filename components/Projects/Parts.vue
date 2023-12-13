@@ -122,6 +122,10 @@
             class="ml-2 shrink">
             {{ qty(row) }}
           </UBadge>
+          <UBadge v-else size="xs" color="red"
+            class="ml-2 shrink">
+            0
+          </UBadge>
         </template>
 
         <template #locations-data="{ row }">
@@ -222,13 +226,6 @@ const rows = computed(() => {
   return props.project.project_parts.slice((page.value - 1) * pageCount, (page.value) * pageCount)
 })
 
-const { data: locations } = await useAsyncData('locations', async () => {
-  const { data } = await client.from('locations').select().order('created_at')
-
-  return data
-})
-
-
 const refresh = () => {
   emit('refresh')
 }
@@ -280,12 +277,6 @@ const saveQuantity = async (row: ProjectPart) => {
   saveQty.value[row.id] = true
   await client.from('project_parts').update({ quantity: row.quantity }).eq('id', row.id)
   saveQty.value[row.id] = false
-}
-
-const saveLocation = async (row: ProjectPart) => {
-  // TODO update part location in table
-  await client.from('parts').update({ location_id: row.parts.location_id }).eq('id', row.id)
-  refresh()
 }
 
 const editPart = (part: Part) => {
@@ -381,7 +372,6 @@ const createPart = async (row: ProjectPart) => {
   creating.value[row.parts.part + row.parts.value] = true
 
   const p = { ...row.parts }
-  p.location_id = parseInt(p.location_id, 10)
   p.owner_id = user.value.id
   delete p.id
   const r = await client.from('parts').insert({ ...p }).select(partFields())

@@ -19,7 +19,7 @@
           <USelectMenu v-model="projectPart.part_id" :options="parts" value-attribute="id" option-attribute="name">
             <template #label>
               <span
-                :class="[current && current.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
+                :class="[current && qty(current) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
                 aria-hidden="true" />
               <span class="truncate" v-if="current">
                 {{ current.part === current.value ? current.part : current.part + ' ' + current.value }}
@@ -30,7 +30,7 @@
             </template>
             <template #option="{ option: part }">
               <span
-                :class="[part.quantity > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
+                :class="[qty(part) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
                 aria-hidden="true" />
               <span class="truncate">
                 {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
@@ -73,7 +73,7 @@ const open = ref(false)
 const saving = ref(false)
 
 const { data: parts, refresh } = await useAsyncData('parts', async () => {
-  const { data } = await client.from('parts').select(partFields()).order('created_at')
+  const { data } = await client.from('parts').select(partFields()).order('part')
 
   return data
 })
@@ -104,6 +104,13 @@ const save = async () => {
     saving.value = false
     emit('close')
   }
+}
+
+const qty = (part: Part) => {
+  if (part.parent) {
+    return Math.round(100 * part.parent.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) / part.quantity_of) / 100
+  }
+  return Math.round(100 * part.location_parts.reduce((acc, lp) => acc + lp.quantity, 0)) / 100
 }
 
 const current = computed(() => parts.value.find(p => p.id === props.projectPart.part_id))

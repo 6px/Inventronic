@@ -123,7 +123,7 @@ const nparts = computed(() => {
       qty = part.location_parts.reduce((acc: number, lp: LocationPart) => {
         return acc + lp.quantity
       }, 0)
-    } else if (part.parent) {
+    } else if (part && part.parent) {
       //TODO handle case where part is made up of another part
       qty = part.parent.location_parts.reduce((acc: number, lp: LocationPart) => {
         return acc + lp.quantity

@@ -63,8 +63,6 @@ export default async (files: Array<any>, parts: Array<Part>, project: Project) =
                 description: line[descCol],
                 value: line[valCol],
                 footprint: line[fpCol],
-                quantity: 0,
-                location_id: null,
               }
   
               const pp: ProjectPart = {
