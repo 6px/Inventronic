@@ -29,12 +29,19 @@
               </span>
             </template>
             <template #option="{ option: part }">
-              <span
-                :class="[qty(part) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
-                aria-hidden="true" />
-              <span class="truncate">
-                {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
-              </span>
+              <div>
+                <span
+                  :class="[qty(part) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full mr-1']"
+                  aria-hidden="true" />
+                <span class="truncate">
+                  {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
+                </span>
+                <div class="text-xs text-slate-400 ml-3">
+                {{ part.footprint }}
+              </div>
+              </div>
+              
+              
             </template>
           </USelectMenu>
         </UFormGroup>
