@@ -6,24 +6,24 @@
     </svg:style>
     <!-- <rect width="100%" height="100%" fill="white" /> -->
 
-    <text :x="title.length > 16 ? (marginX+qrSize)*mul : (width-marginX) * mul" :y="(3+marginY) * mul" class="name" :style="title.length > 16 ? 'text-anchor: start;' : ''">
+    <text :x="title.length >= 16 ? (marginX+qrSize+0.5)*mul : (width-marginX) * mul" :y="(3+marginY) * mul" class="name" :style="title.length >= 16 ? 'text-anchor: start;' : ''">
       {{ title }}
     </text>
 
-    <text :x="maxLineLen > 68 / subtitleSize ? (marginX+qrSize) * mul : (width-marginX) * mul" :y="(3.25+marginY) * mul" class="parts"
+    <text :x="maxLineLen > 68 / subtitleSize ? (marginX+qrSize+0.5) * mul : (width-marginX) * mul" :y="(3.25+marginY) * mul" class="parts"
       :style="maxLineLen > 68 / subtitleSize ? 'text-anchor:start;' : ''">
-      <tspan :x="maxLineLen > 68 / subtitleSize ? (marginX+qrSize) * mul : (width-marginX) * mul" :dy="subtitleSize * mul" v-for="line in partLines">
+      <tspan :x="maxLineLen > 68 / subtitleSize ? (marginX+qrSize+0.5) * mul : (width-marginX) * mul" :dy="subtitleSize * mul" v-for="line in partLines">
         {{ line }}
       </tspan>
     </text>
 
-    <text v-if="subsubtitle" :x="maxsubsubLineLen > 68 / subsubtitleSize ? (marginX+qrSize)*mul : (width-marginX) * mul" :y="(3.7+marginY + subtitleSize) * mul" class="subsubtitle" :style="maxsubsubLineLen > 68 / subsubtitleSize ? 'text-anchor: start;' : 'text-anchor: end;'">
-      <tspan :x="maxsubsubLineLen > 68 / subsubtitleSize ? (marginX+qrSize) * mul : (width-marginX) * mul" :dy="subsubtitleSize * mul" v-for="line in subsubLines">
+    <text v-if="subsubtitle" :x="maxsubsubLineLen > 68 / subsubtitleSize ? (marginX+qrSize+0.5)*mul : (width-marginX) * mul" :y="(3.7+marginY + subtitleSize) * mul" class="subsubtitle" :style="maxsubsubLineLen > 68 / subsubtitleSize ? 'text-anchor: start;' : 'text-anchor: end;'">
+      <tspan :x="maxsubsubLineLen > 68 / subsubtitleSize ? (marginX+qrSize+0.5) * mul : (width-marginX) * mul" :dy="subsubtitleSize * mul" v-for="line in subsubLines">
         {{ line }}
       </tspan>
     </text>
 
-    <text :x="marginX*mul" :y="(marginY+qrSize-descriptionSize*0.25) * mul" class="description">
+    <text :x="marginX*mul" :y="(marginY+qrSize-descriptionSize*0.1) * mul" class="description">
       <tspan :x="marginX*mul" :dy="descriptionSize * mul" v-for="line in descLines">
         {{ line }}
       </tspan>
