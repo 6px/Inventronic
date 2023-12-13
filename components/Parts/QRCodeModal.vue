@@ -37,7 +37,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { CommonQrCode } from '#build/components';
 
 const client = useSupabaseClient()
 const req = useRuntimeConfig()
@@ -110,7 +109,7 @@ watch(
 )
 watch(
   () => props.part,
-  () => {part_id.value = props.part.id}
+  () => {part_id.value = props.part && props.part.id ? props.part.id : 0}
 )
 
 

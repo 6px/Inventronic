@@ -1,5 +1,5 @@
 <template>
-  <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+  <UCard :class="modal ? '' : 'm-2 md:m-8'" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
     <template #header>
       <div class="flex items-center justify-between">
         <h2 v-if="selectedPart.id">

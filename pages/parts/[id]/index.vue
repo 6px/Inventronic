@@ -1,10 +1,6 @@
 <template>
 
-    <PartsForm :modal="false" :selectedPart="part" :saving="saving" @save="savePart" @setParent="router.push(`/parts/${uuidb64(part.parent.id)}`)" />
-
-    <PartsQRCodeModal :partModal="qrModal" :selectedPart="part" @close="qrModal=false" />
-
-    <UButton class="mr-2" label="" icon="i-heroicons-outline-qr-code" @click="qrModal=true" />
+    <PartsForm :modal="false" :selectedPart="part" :saving="saving" @save="savePart" @setParent="setParent" />
 
 </template>
 
@@ -23,6 +19,7 @@
   const {data: part, refresh} = await useAsyncData(`part-${route.params.id}`, async () => {
     const { data } = await client.from('parts').select(partFields()).eq('id', b64uuid(route.params.id)).order('created_at')
 
+    console.log('single part', data)
     return data[0]
   })
 
@@ -37,6 +34,11 @@ useHead({
   title: part.value.part + ' ' + part.value.value, 
 })
 
+const setParent = () => {
+  if (part.value.parent && part.value.parent.id) {
+    router.push(`/parts/${uuidb64(part.value.parent.id)}`)
+  }
+}
   const savePart = async () => {
     saving.value = true
     const p: Part = { ...part.value }
