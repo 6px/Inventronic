@@ -8,6 +8,7 @@
         :subsubtitle="part.parts.map(np => np.part === np.value ? np.part : np.part + ' ' + np.value).join(' ')"
         :description-size="2"
         :subtitle-size="2.5"
+        :qrSize="11"
         :url="`${config.public.baseUrl}/parts/${uuidb64(part.id)}`"
         @ready="ready"
       >

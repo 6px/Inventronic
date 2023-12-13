@@ -23,7 +23,7 @@
       </tspan>
     </text>
 
-    <text :x="marginX*mul" :y="(marginY+qrSize) * mul" class="description">
+    <text :x="marginX*mul" :y="(marginY+qrSize-descriptionSize*0.25) * mul" class="description">
       <tspan :x="marginX*mul" :dy="descriptionSize * mul" v-for="line in descLines">
         {{ line }}
       </tspan>

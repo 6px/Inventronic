@@ -15,6 +15,7 @@
           :description="part.description || ''"
           :description-size="2"
           :subtitle-size="2.5"
+          :qrSize="11"
           :url="`${req.public.baseUrl}/parts/${uuidb64(part.id)}`"
         />
         
