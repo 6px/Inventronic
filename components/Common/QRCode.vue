@@ -146,7 +146,6 @@ onMounted(async () => {
         }
       )
   )
-  console.log('split', ln.flat())
   partLines.value = (await Promise.all(props.subtitle.split('\n').map(async (l) => await getLines(l, (width - props.qrSize - marginX) * mul)))).flat()
   descLines.value = (await getLines(props.description, (width-marginX*2) * mul, 'description')).slice(0, 1)
 
