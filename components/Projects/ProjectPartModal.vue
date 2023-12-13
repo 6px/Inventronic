@@ -33,7 +33,7 @@
                 :class="[qty(part) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
                 aria-hidden="true" />
               <span class="truncate">
-                {{qty(part)}} {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
+                {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
               </span>
             </template>
           </USelectMenu>
@@ -101,6 +101,7 @@ const save = async () => {
     saving.value = false
   } else {
     emit('refresh')
+    refresh()
     saving.value = false
     emit('close')
   }
