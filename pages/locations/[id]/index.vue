@@ -1,9 +1,14 @@
 <template>
   <div class="w-full my-2">
-    <h1 class="mb-1 text-4xl font-bold u-text-white text-center">
+    <UContainer>
+      <UBreadcrumb divider=">"
+        :links="[{ label: 'Dashboard', to: '/' }, { label: 'Locations', to: '/locations' }, { label: location.name, to: '/locations/'+location.id }]" />
+    </UContainer>
+    <h1 class="mt-6 text-4xl font-bold u-text-white text-center">
       {{ location.name }}
       <UButton class="ml-4" icon="i-heroicons-outline-qr-code" @click="qrcode = true" />
     </h1>
+    
     <div class="mb-6 text-sm text-slate-500 text-center">{{ location.description }}</div>
 
     <UContainer>

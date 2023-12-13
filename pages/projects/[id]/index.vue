@@ -1,12 +1,12 @@
 <template>
   <div class="w-full my-2">
     <UContainer>
-    <UBreadcrumb
-      divider="/"
-      :links="[{ label: 'Projects', to: '/projects' }, { label: project.name, to:`/projects/${project.id}` }]"
-    />
-  </UContainer>
-    <h1 class="mb-8 text-4xl font-bold u-text-white text-center">
+      <UBreadcrumb
+        divider=">"
+        :links="[{ label: 'Dashboard', to: '/' }, { label: 'Projects', to: '/projects' }, { label: project.name, to:`/projects/${project.id}` }]"
+      />
+    </UContainer>
+    <h1 class="my-8 text-4xl font-bold u-text-white text-center">
       {{ project.name }} 
       <UTooltip text="Print label">
         <UButton class="ml-4" icon="i-heroicons-outline-qr-code" @click="qrModal=true"/>

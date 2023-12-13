@@ -1,37 +1,39 @@
 <template>
-
-    <PartsForm :modal="false" :selectedPart="part" :saving="saving" @save="savePart" @setParent="setParent" />
-
+  <UContainer>
+    <UBreadcrumb divider=">"
+      :links="[{ label: 'Dashboard', to: '/' }, { label: 'Parts', to: '/parts' }, { label: part.part + ' ' + part.value, to: `/parts/${uuidb64(part.id)}` }]" />
+  </UContainer>
+  <PartsForm :modal="false" :selectedPart="part" :saving="saving" @save="savePart" @setParent="setParent" />
 </template>
 
 <script lang="ts" setup>
 
-  const route = useRoute()
-  const router = useRouter()
-  const client = useSupabaseClient()
-  const user = useSupabaseUser()
+const route = useRoute()
+const router = useRouter()
+const client = useSupabaseClient()
+const user = useSupabaseUser()
 
-  const qrModal = ref(false)
+const qrModal = ref(false)
 
-  const saving = ref(false)
+const saving = ref(false)
 
 
-  const {data: part, refresh} = await useAsyncData(`part-${route.params.id}`, async () => {
-    const { data } = await client.from('parts').select(partFields()).eq('id', b64uuid(route.params.id)).order('created_at')
+const { data: part, refresh } = await useAsyncData(`part-${route.params.id}`, async () => {
+  const { data } = await client.from('parts').select(partFields()).eq('id', b64uuid(route.params.id)).order('created_at')
 
-    console.log('single part', data)
-    return data[0]
+  console.log('single part', data)
+  return data[0]
+})
+
+if (!part.value) {
+  showError({
+    statusCode: 404,
+    statusMessage: 'Page Not Found'
   })
-
-  if (!part.value) {
-    showError({
-      statusCode: 404,
-      statusMessage: 'Page Not Found'
-    })
-  }
+}
 
 useHead({
-  title: part.value.part + ' ' + part.value.value, 
+  title: part.value.part + ' ' + part.value.value,
 })
 
 const setParent = () => {
@@ -39,24 +41,22 @@ const setParent = () => {
     router.push(`/parts/${uuidb64(part.value.parent.id)}`)
   }
 }
-  const savePart = async () => {
-    saving.value = true
-    const p: Part = { ...part.value }
-    console.log('saving', p)
-    delete p.locations
+const savePart = async () => {
+  saving.value = true
+  const p: Part = { ...part.value }
+  console.log('saving', p)
+  delete p.locations
 
-    if (p.id) {
-      p.owner_id = user.value.id
-      const r = await client.from('parts').update({ ...p }).select(partFields())
+  if (p.id) {
+    p.owner_id = user.value.id
+    const r = await client.from('parts').update({ ...p }).select(partFields())
       .eq('id', p.id)
-      if (r.error) {
-        alert(r.error.message)
-      }
-      saving.value = false
+    if (r.error) {
+      alert(r.error.message)
     }
+    saving.value = false
   }
+}
 </script>
 
-<style>
-
-</style>
+<style></style>

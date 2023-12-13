@@ -1,6 +1,12 @@
 <template>
   <div class="w-full my-2">
-    <h1 class="mb-6 text-4xl font-bold u-text-white text-center">
+    <UContainer>
+      <UBreadcrumb
+        divider=">"
+        :links="[{ label: 'Dashboard', to: '/' }, { label: 'Projects', to: '/projects' }]"
+      />
+    </UContainer>
+    <h1 class="my-6 text-4xl font-bold u-text-white text-center">
       Projects
     </h1>
     <UContainer body-class="overflow-hidden">
