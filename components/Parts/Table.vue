@@ -20,7 +20,7 @@
     <UTable v-model:sort="sort" :rows="rows" :columns="columns" :ui="{ td: { base: '' } }" v-model="selected">
       <template #part-data="{ row }">
         <div>
-          <UButton variant="link" :label="row.part" @click="editPart(row)" />
+          <UButton  class="text-sm px-0" variant="link" :label="row.part" @click="editPart(row)" />
         </div>
         <UButton size="xs" class="text-xs px-0" variant="link" v-if="row.parent" @click="editPart(row.parent)">
           {{ row.quantity_of }} × {{ row.parent.part === row.parent.value ? '' : row.parent.part }} {{ row.parent.value }}
@@ -184,22 +184,8 @@ const sorted = computed(() => {
       case 'footprint':
         cmp = a.footprint.localeCompare(b.footprint)
         break;
-      case 'locations.name':
-        if (a.locations && b.locations) {
-          cmp = a.locations.name.localeCompare(b.locations.name)
-          break;
-        }
-        if (a.locations) {
-          cmp = 1
-          break;
-        }
-        if (b.locations) {
-          cmp = -1
-          break;
-        }
-
       case 'quantity':
-        cmp = a.quantity - b.quantity
+        cmp = qty(a) - qty(b)
         break;
       case 'min_quantity':
         cmp = a.min_quantity - b.min_quantity
@@ -242,7 +228,7 @@ const columns = [
   {
     key: "locations",
     label: "Locations",
-    sortable: true,
+    sortable: false,
   },
   {
     key: "footprint",

@@ -192,7 +192,7 @@ const { data: locations } = await useAsyncData('locations', async () => {
 const selectedLocations = ref(props.selectedPart.location_parts ? props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }) : [])
 
 const part_types = computed(() => {
-  return parts.value.map((p: Part) => { return { label: p.part } }).sort((a, b) => a.label.localeCompare(b.label))
+  return [...new Set(parts.value.map((p: Part) => { return { label: p.part } }).sort((a, b) => a.label.localeCompare(b.label)))]
 })
 
 const validate = (state: any): FormError[] => {
@@ -261,6 +261,7 @@ const save = async () => {
       return;
     } else {
       part_id = r.data[0].id
+      emit('saved', r.data[0])
     }
   }
 

@@ -169,7 +169,7 @@
     <ProjectsProjectPartModal :open="ppModal" :projectPart="ppPart" @close="ppModal = false" @refresh="emit('refresh')" />
 
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal = false"
-      @save="savePart" @setParent="setParent" @refresh="refresh" />
+      @save="savePart" @setParent="setParent" @refresh="refresh" @saved="partSaved" />
   </UCard>
 </template>
 
@@ -349,6 +349,14 @@ const savePart = async () => {
   saving.value = false
 }
 
+const partSaved = (part: Part) => {
+  addPart({
+    parts: part,
+    quantity: 0,
+    reference: 0,
+  })
+}
+
 const addPart = async (row) => {
   adding.value[row.parts.part + row.parts.value] = true
   const r2 = await client.from('project_parts').insert({
@@ -376,9 +384,11 @@ const createPart = async (row: ProjectPart) => {
   delete p.id
   const r = await client.from('parts').insert({ ...p }).select(partFields())
   console.log('saving part', p)
+  console.log('part saved', r.data)
   if (r.error) {
     alert(r.error.message)
   } else {
+    console.log('part saved', r.data)
     const newPart = r.data[0]
     row.parts = newPart
     const r2 = await client.from('project_parts').insert({
@@ -414,7 +424,6 @@ const items = [
     label: 'Create part',
     icon: 'i-heroicons-outline-plus-circle',
     click: () => {
-      console.log('Manually create part')
       partModal.value = true
     }
   }],
