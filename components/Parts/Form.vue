@@ -1,28 +1,30 @@
 <template>
-  <UCard :class="modal ? '' : 'm-2 md:m-8'" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h2 v-if="selectedPart.id">
-          <UTooltip text="Print label">
-            <UButton class="mr-8" icon="i-heroicons-qr-code" @click="printTag" />
-          </UTooltip>
+  <UForm class="space-y-4" :validate="validate" @submit="save" :state="state">
+    <UCard :class="modal ? '' : 'm-2 md:m-8'" :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h2 v-if="selectedPart.id">
+            <UTooltip text="Print label">
+              <UButton class="mr-8" icon="i-heroicons-qr-code" @click="printTag" />
+            </UTooltip>
 
-          Editing <strong>{{ part_type.label }} {{ selectedPart.value }}</strong>
-        </h2>
-        <h2 v-else>Create new part</h2>
-        <UButton v-if="modal" color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
-          @click="emit('close')" />
-      </div>
-    </template>
+            Editing <strong>{{ part_type.label }} {{ selectedPart.value }}</strong>
+          </h2>
+          <h2 v-else>Create new part</h2>
+          <UButton v-if="modal" color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+            @click="emit('close')" />
+        </div>
+      </template>
 
-    <UForm class="space-y-4" @submit="save" :validate="validate" :state="selectedPart">
+
       <div class="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4">
         <UFormGroup label="Part of" name="parent_id">
-          <USelectMenu v-model="selectedPart.parent" :options="parts.sort((a, b) => a.part.localeCompare(b.part))" searchable
+          <USelectMenu v-model="state.parent" :options="parts.sort((a, b) => a.part.localeCompare(b.part))" searchable
             :uiMenu="{ option: { container: 'w-full block' } }">
             <template #label>
               <span v-if="selectedPart.parent && selectedPart.parent.part" class="truncate">
-                {{ selectedPart.parent.part === selectedPart.parent.value ? selectedPart.parent.part : selectedPart.parent.part + ' ' + selectedPart.parent.value }}
+                {{ selectedPart.parent.part === selectedPart.parent.value ? selectedPart.parent.part :
+                  selectedPart.parent.part + ' ' + selectedPart.parent.value }}
 
               </span>
               <span v-else>None</span>
@@ -40,13 +42,13 @@
                       class="truncate shrink text-slate-600 dark:text-slate-200">
                       <UBadge color="white" v-for="lp in part.location_parts" size="sm" class="text-xs">
                         {{ lp.locations.name }}
-                      </UBadge>                    
+                      </UBadge>
                     </div>
 
                     <div v-else class="truncate shrink text-slate-600 dark:text-slate-200"></div>
                   </div>
                   <div class="text-xs text-slate-400 ">
-                    {{ part.footprint}}
+                    {{ part.footprint }}
                   </div>
                 </div>
 
@@ -57,43 +59,44 @@
           </USelectMenu>
         </UFormGroup>
         <UFormGroup label="Quantity of" name="qty_of">
-          <UInput type="number" step="0.05" v-model=selectedPart.quantity_of color="white" variant="outline"
+          <UInput type="number" step="0.05" v-model=state.quantity_of color="white" variant="outline"
             placeholder="Quantity of referenced part" />
         </UFormGroup>
         <UFormGroup label="Part" name="part">
-          <USelectMenu v-model="part_type" :options="part_types" searchable creatable>
+          <USelectMenu v-model="state.part" :options="part_types" searchable creatable>
           </USelectMenu>
         </UFormGroup>
         <UFormGroup label="Value" name="value">
-          <UInput v-model=selectedPart.value color="white" variant="outline" placeholder="Part value" />
+          <UInput v-model=state.value color="white" variant="outline" placeholder="Part value" />
         </UFormGroup>
         <UFormGroup label="Description" name="description">
-          <UInput v-model=selectedPart.description color="white" variant="outline" placeholder="Description" />
+          <UInput v-model=state.description color="white" variant="outline" placeholder="Description" />
         </UFormGroup>
         <UFormGroup label="Footprint" name="footprint">
-          <UInput v-model=selectedPart.footprint color="white" variant="outline" placeholder="Footprint" />
+          <UInput v-model=state.footprint color="white" variant="outline" placeholder="Footprint" />
         </UFormGroup>
 
         <UFormGroup label="Minimum quantity" name="min_quantity">
-          <UInput v-model=selectedPart.min_quantity color="white" variant="outline" placeholder="0" />
+          <UInput v-model=state.min_quantity color="white" variant="outline" placeholder="0" />
         </UFormGroup>
         <UFormGroup label="Price" name="price">
-          <UInput v-model=selectedPart.price step="0.01" color="white" type="number" variant="outline" placeholder="" />
+          <UInput v-model=state.price step="0.01" color="white" type="number" variant="outline" placeholder="" />
         </UFormGroup>
         <UFormGroup label="Ordering URL" name="ordering_url">
-          <UInput v-model=selectedPart.ordering_url color="white" variant="outline" placeholder="" />
+          <UInput v-model=state.ordering_url color="white" variant="outline" placeholder="" />
         </UFormGroup>
 
       </div>
-      <div v-if="selectedPart.parent && selectedPart.parent.id">
+      <div v-if="state.parent && state.parent.id">
         <h2>Locations</h2>
-        <UTable v-if="selectedPart.parent && selectedPart.parent.location_parts && selectedPart.parent.location_parts.length" :rows="[...selectedPart.parent.location_parts.map((lp:LocationPart) => { return {name: lp.locations.name, quantity: lp.quantity + ' ' + selectedPart.parent.part + ' ' + selectedPart.parent.value}}), {name: 'TOTAL', quantity: selectedPart.parent.location_parts.reduce((acc: number, lp: LocationPart) => acc + lp.quantity, 0)}]" />
+        <UTable v-if="state.parent && state.parent.location_parts && state.parent.location_parts.length"
+          :rows="[...state.parent.location_parts.map((lp: LocationPart) => { return { name: lp.locations.name, quantity: lp.quantity + ' ' + state.parent.part + ' ' + state.parent.value } }), { name: 'TOTAL', quantity: state.parent.location_parts.reduce((acc: number, lp: LocationPart) => acc + lp.quantity, 0) }]" />
         <div v-else class="text-center py-4 text-slate-400 text-sm">
           No stock.
-          <UButton class="px-0" variant="link" label="Edit parent part" @click="setParent" /> 
+          <UButton class="px-0" variant="link" label="Edit parent part" @click="setParent" />
           to add stock at selected locations
         </div>
-        </div>
+      </div>
       <div v-else>
         <UFormGroup label="Locations" name="locations">
           <div v-for="lp in selectedLocations" class="flex flex-row items-end mb-4">
@@ -110,32 +113,37 @@
             <UFormGroup label="Quantity" class="grow ml-4">
               <UInput type="number" step="0.05" v-model="lp.quantity" />
             </UFormGroup>
-            <UButton class="shrink ml-4 h-8 w-8 mb-1" icon="i-heroicons-outline-trash" color="red" @click="deleteLocation(lp)" />
+            <UButton class="shrink ml-4 h-8 w-8 mb-1" icon="i-heroicons-outline-trash" color="red"
+              @click="deleteLocation(lp)" />
           </div>
 
 
         </UFormGroup>
-      
+
         <UButton icon="i-heroicons-outline-plus" label="Add location"
-        @click="selectedLocations.push({key: Math.random()*1000000, quantity: 0, locations: {} })" />
+          @click="selectedLocations.push({ key: Math.random() * 1000000, quantity: 0, locations: {} })" />
       </div>
       <UButton type="submit" class="hidden" @click="emit('save')" />
-    </UForm>
-    <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
+
+      <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
 
 
-    <template #footer>
-      <UButton class="mr-4" @click="save" :loading="saving">
-        <span v-if="saving">Saving...</span>
-        <span v-else>Save</span>
-      </UButton>
-      <span v-if="modal !== false">or</span>
-      <UButton v-if="modal !== false" variant="link" color="white" class="ml-0" label="Cancel" @click="$emit('close')" />
-    </template>
-  </UCard>
+      <template #footer>
+        <UButton class="mr-4" type="submit" :loading="saving">
+          <span v-if="saving">Saving...</span>
+          <span v-else>Save</span>
+        </UButton>
+        <span v-if="modal !== false">or</span>
+        <UButton v-if="modal !== false" variant="link" color="white" class="ml-0" label="Cancel"
+          @click="$emit('close')" />
+      </template>
+    </UCard>
+  </UForm>
 </template>
 
 <script lang="ts" setup>
+import type { FormError } from '@nuxt/ui/dist/runtime/types';
+
 
 const toast = useToast()
 
@@ -168,6 +176,18 @@ const { data: parts } = await useAsyncData('parts', async () => {
   return data
 })
 
+const state = reactive({
+  part: props.selectedPart.part,
+  value: props.selectedPart.value,
+  description: props.selectedPart.description,
+  footprint: props.selectedPart.footprint,
+  min_quantity: props.selectedPart.min_quantity,
+  price: props.selectedPart.price,
+  ordering_url: props.selectedPart.ordering_url,
+  parent: props.selectedPart.parent,
+  location_parts: props.selectedPart.location_parts,
+})
+
 const setParent = () => {
   emit('setParent')
 }
@@ -179,7 +199,7 @@ const printTag = () => {
 
 watch(
   () => props.selectedPart,
-  () => {part_type.value = { label: props.selectedPart.part }}
+  () => { part_type.value = { label: props.selectedPart.part } }
 )
 
 const { data: locations } = await useAsyncData('locations', async () => {
@@ -188,16 +208,20 @@ const { data: locations } = await useAsyncData('locations', async () => {
   return data
 })
 
-const selectedLocations = ref(props.selectedPart.location_parts ? props.selectedPart.location_parts.map((lp: LocationPart) => { return { id: lp.id, quantity: lp.quantity, locations: lp.locations } }) : [])
+const selectedLocations = ref(state.location_parts ? state.location_parts.map((lp: LocationPart) => {
+  return { id: lp.id, quantity: lp.quantity, locations: lp.locations }
+}) : [])
 
 const part_types = computed(() => {
-  return [...new Set(parts.value.map((p: Part) => { return { label: p.part } }).sort((a, b) => a.label.localeCompare(b.label)))]
+  const v = parts.value.map((p: Part) => p.part)
+  const set = [...new Set(v)]
+  return set.sort((a, b) => a.localeCompare(b)).map(l => { return { label: l } })
 })
 
 const validate = (state: any): FormError[] => {
   const errors = []
-  if (!state.name) errors.push({ path: 'name', message: 'Required' })
-  if (!state.quantity) errors.push({ path: 'quantity', message: 'Required' })
+  if (!state.part) errors.push({ path: 'part', message: 'Required' })
+  if (!state.value) errors.push({ path: 'value', message: 'Required' })
   return errors
 }
 
@@ -212,8 +236,8 @@ const deleteLocation = async (lp: LocationPart) => {
 
 const save = async () => {
   saving.value = true
-  const p = { ...props.selectedPart }
-  p.part = part_type.value.label
+  const p = { ...state }
+
   delete p.location_parts
   delete p.project_parts
   delete p.quantity
@@ -224,7 +248,7 @@ const save = async () => {
 
   delete p.parent
 
-  let part_id = p.id
+  let part_id = props.selectedPart.id
 
 
   if (part_id) {

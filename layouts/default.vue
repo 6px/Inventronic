@@ -12,6 +12,7 @@
     <meta name="description" content="Easily manage your electronic parts for your projects.">
   </Head>
   <AppContainer>
+    <NuxtLoadingIndicator />
     <AppHeader />
     <PageContainer>
       <slot />

@@ -222,8 +222,17 @@ const newParts = computed(() => {
 const page = ref(1)
 const pageCount = 20
 
+const sorted = computed(() => {
+  return props.project.project_parts.sort((a: ProjectPart, b: ProjectPart) => {
+    if (a.parts.part === b.parts.part) {
+      return a.parts.value.localeCompare(b.parts.value)
+    }
+    return a.parts.part.localeCompare(b.parts.part)
+  })
+})
+
 const rows = computed(() => {
-  return props.project.project_parts.slice((page.value - 1) * pageCount, (page.value) * pageCount)
+  return sorted.value.slice((page.value - 1) * pageCount, (page.value) * pageCount)
 })
 
 const refresh = () => {
