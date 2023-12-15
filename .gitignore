@@ -8,6 +8,9 @@ dist
 
 # Node dependencies
 node_modules
+docker/volumes/db/data
+docker/volumes/storage
+docker/docker-compose.override.yml
 
 # Logs
 logs

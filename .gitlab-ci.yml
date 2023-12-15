@@ -2,7 +2,9 @@ build:
   image: docker:24
   stage: build
   services:
-    - docker:24-dind
+    - name: docker:24-dind
+      alias: docker
+      
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   script:

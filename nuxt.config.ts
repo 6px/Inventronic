@@ -15,6 +15,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   ssr: true,
   supabase: {
+    url: process.browser ? process.env.SUPABASE_URL : process.env.SERVER_SUPABASE_URL,
     redirectOptions: {
       login: '/',
       callback: '/confirm',
