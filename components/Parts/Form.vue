@@ -248,6 +248,7 @@ const save = async () => {
 
   delete p.parent
 
+  p.part = p.part.label
   let part_id = props.selectedPart.id
 
 
