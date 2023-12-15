@@ -1,6 +1,10 @@
 version: "3.8"
 
 services:
+  inventronic:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
   mail:
     container_name: supabase-mail
     image: inbucket/inbucket:3.0.3
