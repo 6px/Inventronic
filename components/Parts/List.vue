@@ -6,6 +6,7 @@
     <UContainer
       body-class="overflow-hidden"
     >
+      <!-- TODO display as table only for wide screens -->
       <PartsTable :parts="parts" @refresh="refresh" />
     </UContainer>
   </div>

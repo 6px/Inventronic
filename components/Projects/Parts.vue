@@ -21,6 +21,7 @@
 
         </UButtonGroup>
       </div>
+      <!-- TODO display as table only for wide screens -->
       <UTable v-model="selected" :rows="rows" :columns="columns" :ui="{ td: { base: '' } }">
         <template #id-data="{ row }">
           <div class="flex flex-row">

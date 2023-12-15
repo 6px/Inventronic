@@ -25,6 +25,7 @@ services:
         condition: service_healthy
     environment:
       SUPABASE_URL: ${SUPABASE_URL}
+      SERVER_URL: http://kong:8000
       APP_BASE_URL: ${BASE_URL}
       SUPABASE_KEY: ${SUPABASE_KEY}
     ports:

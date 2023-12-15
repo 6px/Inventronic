@@ -6,16 +6,17 @@ export default defineNuxtConfig({
       isCustomElement: tag => tag.includes('svg:')
     }
   },
-  modules: ['@nuxtjs/supabase', '@nuxt/ui', '@nuxtjs/color-mode'],
+  modules: ['jfoucher-nuxt-supabase', '@nuxt/ui', '@nuxtjs/color-mode'],
   runtimeConfig: {
     public: {
-      baseUrl: process.env.BASE_URL || 'http://localhost:3000'
+      baseUrl: process.env.BASE_URL || 'http://localhost:3000',
     },
   },
   css: ['~/assets/css/main.css'],
   ssr: true,
   supabase: {
-    url: process.browser ? process.env.SUPABASE_URL : process.env.SERVER_URL,
+    url: process.env.SUPABASE_URL,
+    serverUrl: process.env.SERVER_URL || process.env.SUPABASE_URL,
     redirectOptions: {
       login: '/',
       callback: '/confirm',

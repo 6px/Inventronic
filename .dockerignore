@@ -1,3 +1,8 @@
 docker
 node_modules
 img
+.nuxt
+.output
+.git
+.gitignore
+README.md

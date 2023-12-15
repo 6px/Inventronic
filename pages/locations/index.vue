@@ -1,16 +1,25 @@
 <template>
   <div class="w-full my-2">
     <UContainer>
-      <UBreadcrumb divider=">"
-        :links="[{ label: 'Dashboard', to: '/' }, { label: 'Locations', to: '/locations' }]" />
+      <UBreadcrumb divider=">" :links="[{ label: 'Dashboard', to: '/' }, { label: 'Locations', to: '/locations' }]" />
     </UContainer>
     <h1 class="my-6 text-4xl font-bold u-text-white text-center">
       Locations
     </h1>
-   
+
     <UContainer body-class="overflow-hidden" class="px-2 md:px-4 lg:px-6">
       <LocationsTree v-if="locations?.length > 0" :locations="locations" :depth="0" @refresh="refresh" />
-      <UButton class="mt-6" label="Create location" @click="create" />
+      <UButton v-if="locations?.length > 0" class="mt-6" label="Create location" @click="create" />
+      <div v-else class="text-center my-16">
+        <div class="text-xl font-bold my-8">
+          You have not yet created a storage location
+        </div>
+        <div>
+          <UButton @click="create" size="xl" class="uppercase text-xl text-monaspace font-bold pb-2 px-12">
+            Do it now
+          </UButton>
+        </div>
+      </div>
     </UContainer>
     <LocationsCreate :open="locationModal" @refresh="refresh" @close="locationModal = false" />
   </div>
