@@ -9,4 +9,4 @@ else
     sed -i 's|SERVER_URL|'$SUPABASE_URL'|g' /app/server/chunks/nitro/node-server.mjs
 fi
 sed -i 's|SUPABASE_URL|'$SUPABASE_URL'|g' /app/server/chunks/nitro/node-server.mjs
-node /app/server/index.mjs
+exec node /app/server/index.mjs
