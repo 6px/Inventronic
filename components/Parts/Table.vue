@@ -36,36 +36,11 @@
       </template>
 
       <template #quantity-data="{ row }">
-        <UBadge :color="qty(row) <= row.min_quantity ? 'red' : 'primary'"
-          :variant="qty(row) <= row.min_quantity ? 'solid' : 'outline'">
-          {{ qty(row) }}
-        </UBadge>
+        <PartsQuantity :part="row" />
       </template>
 
       <template #locations-data="{ row }">
-        <div v-if="row.parent && row.parent.location_parts && row.parent.location_parts.length">
-          <div class="max-w-[150px] truncate overflow-hidden">
-            <UTooltip v-for="lp in row.parent.location_parts"
-              :text="`${lp.quantity} items of ${row.parent.part === row.parent.value ? '' : row.parent.part} ${row.parent.value} in ${lp.locations.name}`">
-              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                {{ lp.locations.name }}
-              </UButton>
-            </UTooltip>
-          </div>
-        </div>
-        <div v-else-if="row.location_parts && row.location_parts.length">
-          <div class="max-w-[150px] truncate overflow-hidden">
-            <UTooltip v-for="lp in row.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
-              <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                {{ lp.locations.name }}
-              </UButton>
-            </UTooltip>
-          </div>
-        </div>
-
-        <div v-else>
-          None
-        </div>
+        <PartsLocation :part="row" />
       </template>
 
 
@@ -162,15 +137,6 @@ const sort = ref({
   direction: 'asc'
 })
 
-
-
-const qty = (row: Part) => {
-  if (row.parent) {
-    return Math.round(100 * row.parent.location_parts.reduce((acc, lp) => lp.quantity + acc, 0) / row.quantity_of)/100
-  }
-  return row.location_parts ? Math.round(100 * row.location_parts.reduce((acc, lp) => lp.quantity + acc, 0))/100 : 0
-}
-
 const sorted = computed(() => {
   return props.parts.sort((a: Part, b: Part) => {
     let cmp = 0
@@ -185,7 +151,7 @@ const sorted = computed(() => {
         cmp = a.footprint.localeCompare(b.footprint)
         break;
       case 'quantity':
-        cmp = qty(a) - qty(b)
+        cmp = partQty(a) - partQty(b)
         break;
       case 'min_quantity':
         cmp = a.min_quantity - b.min_quantity

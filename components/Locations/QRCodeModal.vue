@@ -8,14 +8,14 @@
         </div>
       </template>
       <div id="image">
-        <CommonQrCode
+        <CommonQRCode
           :title="location.name"
           :qrSize="12"
           :subtitle="location.description + '\n' + location.location_parts.length + (location.location_parts.length === 1 ? ' part' : ' parts')"
           :description="`${req.public.baseUrl}/locations/${uuidb64(props.location.id)}`"
           :url="`${req.public.baseUrl}/locations/${uuidb64(props.location.id)}`"
         >
-        </CommonQrCode>
+        </CommonQRCode>
       </div>
       <template #footer>
         <UButton
@@ -34,7 +34,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { CommonQrCode } from '#build/components';
 
 
 const req = useRuntimeConfig()

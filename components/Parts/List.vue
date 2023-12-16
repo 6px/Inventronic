@@ -7,7 +7,7 @@
       body-class="overflow-hidden"
     >
       <!-- TODO display as table only for wide screens -->
-      <PartsTable :parts="parts" @refresh="refresh" />
+      <PartsTable :parts="parts" @refresh="refresh" class="hidden lg:block" />
     </UContainer>
   </div>
 

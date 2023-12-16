@@ -8,7 +8,7 @@
         </div>
       </template>
       <div id="image">
-        <CommonQrCode
+        <CommonQRCode
           :title="project.name"
           :subtitle="project.description || ''"
           :description="project.url || ''"
@@ -34,7 +34,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { CommonQrCode } from '#build/components';
 
 
 const req = useRuntimeConfig()

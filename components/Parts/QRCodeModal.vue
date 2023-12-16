@@ -8,7 +8,7 @@
         </div>
       </template>
       <div id="image">
-        <CommonQrCode
+        <CommonQRCode
           :title="part.part === part.value ? part.part : part.part + ' ' + part.value"
           :subtitle="part.footprint"
           :subsubtitle="(p ? p.parts.map(np => np.part === np.value ? np.part : np.part + ' ' + np.value).join(' ') : '')"

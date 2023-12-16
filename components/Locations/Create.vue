@@ -1,43 +1,36 @@
 <template>
   <UModal v-model="open" @close="emit('close')">
-    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 v-if="location.id">Editing {{ location.name }}</h2>
-          <h2 v-else-if="parent">Create new location in <strong>{{ parent.name }}</strong></h2>
-          <h2 v-else>Create new top-level location</h2>
-          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="emit('close')" />
-        </div>
-      </template>
+    <UForm class="space-y-4" @submit="save" :validate="validate" :state="location">
 
-      <UForm class="space-y-4" @submit="save" :validate="validate" :state="location">
+      <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h2 v-if="location.id">Editing {{ location.name }}</h2>
+            <h2 v-else-if="parent">Create new location in <strong>{{ parent.name }}</strong></h2>
+            <h2 v-else>Create new top-level location</h2>
+            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+              @click="emit('close')" />
+          </div>
+        </template>
+
         <UFormGroup label="Name" name="name">
           <UInput v-model=location.name color="white" variant="outline" placeholder="Location name" />
         </UFormGroup>
-        <UFormGroup label="Description" name="description">
+        <UFormGroup label="Description" name="description" class="mt-4">
           <UInput v-model=location.description color="white" variant="outline" placeholder="Description" />
         </UFormGroup>
-      </UForm>
 
-      <template #footer>
-        <UButton
-          class="mr-4"
-          @click="save"
-          :loading="saving"
-        >
-          <span v-if="saving">Saving...</span>
-          <span v-else>Save</span>
-        </UButton>
-        or
-        <UButton
-          variant="link"
-          color="white"
-          class="ml-0"
-          label="Cancel"
-          @click="$emit('close')"
-        />
-      </template>
-    </UCard>
+        <template #footer>
+          <UButton class="mr-4" type="submit" :loading="saving">
+            <span v-if="saving">Saving...</span>
+            <span v-else>Save</span>
+          </UButton>
+          or
+          <UButton variant="link" color="white" class="ml-0" label="Cancel" @click="$emit('close')" />
+        </template>
+      </UCard>
+    </UForm>
+
   </UModal>
 </template>
 
@@ -59,19 +52,26 @@ const user = useSupabaseUser()
 const toast = useToast()
 
 const emit = defineEmits()
-const location = reactive({
+const defaultLocation = {
   name: "",
   description: "",
   parent_id: props.parent ? props.parent.id : null,
-  owner_id: null
-})
+  owner_id: user.id,
+}
+const location = reactive({ ...defaultLocation })
 
 const open = ref(false)
 const saving = ref(false)
 
 watch(
   () => props.open,
-  () => {open.value = props.open}
+  () => {
+    open.value = props.open
+    location.name = ""
+    location.description = ""
+    location.parent_id = props.parent ? props.parent.id : null
+    location.owner_id = user.id
+  }
 )
 
 const save = async () => {
@@ -81,7 +81,7 @@ const save = async () => {
   if (p.id) {
     p.owner_id = user.value.id
     const r = await client.from('locations').update({ ...p }).select('id, name')
-    .eq('id', p.id)
+      .eq('id', p.id)
     if (r.error) {
       toast.add({
         id: 'location_save_error',
@@ -126,7 +126,5 @@ const validate = (state: any): FormError[] => {
 
 </script>
 
-<style>
-
-</style>
+<style></style>
 

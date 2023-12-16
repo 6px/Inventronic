@@ -8,7 +8,7 @@
         </div>
       </template>
       <div id="image">
-        <CommonQrCode
+        <CommonQRCode
           :title="projectPart.parts.part === projectPart.parts.value ? projectPart.parts.part : projectPart.parts.part + ' ' + projectPart.parts.value"
           :subtitle="projectPart.references"
           :description="projectPart.parts.footprint"
@@ -34,7 +34,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { CommonQrCode } from '#build/components';
 
 
 const req = useRuntimeConfig()

@@ -3,8 +3,9 @@
     <UContainer>
       <div class="flex justify-between items-center">
         <div class="text-slate-200 dark:text-slate-700 text-sm">
-          Created by <br class="block md:hidden"> 
-          <a target="_blank" href="https://6px.eu">Six Pixels</a>
+          <a target="_blank" href="https://6px.eu">
+            <img class="w-18 md:w-24" src="/img/6px.png" />
+          </a>
         </div>
         <div class="text-slate-200 dark:text-slate-700 text-sm">
           <a target="_blank" href="__VERSION_LINK__">__VERSION__</a>

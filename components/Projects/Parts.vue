@@ -108,52 +108,17 @@
         </template>
 
         <template #quantity-data="{ row }">
-          <div
-            class="shrink flex flex-row space-between form-input relative w-18 disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-sm p-0 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400">
-            <UInput v-model="row.quantity" variant="none" class="w-20" />
-            <UButton class="rounded-s-none m-0" @click="saveQuantity(row)"
-              :icon="saveQty[row.id] ? '' : 'i-heroicons-outline-arrow-down-on-square'" :loading="saveQty[row.id]" />
+          <div>
+            {{ row.quantity }}
           </div>
         </template>
 
-
-
         <template #parts.quantity-data="{ row }">
-          <UBadge v-if="row.id && row.parts.id" size="xs" :color="row.quantity > qty(row) ? 'red' : 'green'"
-            class="ml-2 shrink">
-            {{ qty(row) }}
-          </UBadge>
-          <UBadge v-else size="xs" color="red" class="ml-2 shrink">
-            0
-          </UBadge>
+          <PartsQuantity :part="row.parts" />
         </template>
 
         <template #locations-data="{ row }">
-          <div v-if="row.parts.parent && row.parts.parent.location_parts && row.parts.parent.location_parts.length">
-            <div class="max-w-[150px] truncate overflow-hidden">
-              <UTooltip v-for="lp in row.parts.parent.location_parts"
-                :text="`${lp.quantity} items of ${row.parts.parent.part === row.parts.parent.value ? '' : row.parts.parent.part} ${row.parts.parent.value} in ${lp.locations.name}`">
-                <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                  {{ lp.locations.name }}
-                </UButton>
-
-              </UTooltip>
-            </div>
-          </div>
-          <div v-else-if="row.parts.location_parts && row.parts.location_parts.length">
-            <div class="max-w-[150px] truncate overflow-hidden">
-              <UTooltip v-for="lp in row.parts.location_parts" :text="`${lp.quantity} items in ${lp.locations.name}`">
-                <UButton class="p-0 mr-2" variant="link" :to="`/locations/${uuidb64(lp.locations.id)}`">
-                  {{ lp.locations.name }}
-                </UButton>
-
-              </UTooltip>
-            </div>
-          </div>
-
-          <div v-else>
-            None
-          </div>
+          <PartsLocation :part="row.parts" />
         </template>
       </UTable>
       <div class="text-right" v-if="newParts">
@@ -174,8 +139,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { UButton, UTooltip } from '#ui-colors/components';
-
 
 const props = defineProps({
   project: {
@@ -245,17 +208,6 @@ const setParent = () => {
   selectedPart.value = selectedPart.value.parent
   partModal.value = true
 }
-
-
-
-
-const qty = (row) => {
-  if (row.parts.parent) {
-    return Math.round(100 * row.parts.parent.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) / row.parts.quantity_of) / 100
-  }
-  return Math.round(100 * row.parts.location_parts.reduce((acc, lp) => acc + lp.quantity, 0)) / 100
-}
-
 
 watch(
   () => props.project,

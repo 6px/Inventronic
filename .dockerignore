@@ -5,4 +5,7 @@ img
 .output
 .git
 .gitignore
+.gitlab-ci.yml
+LICENSE.md
 README.md
+!docker/entrypoint.sh

@@ -90,16 +90,9 @@ const buildableProjects = computed(() => {
 
 const lowQuantityParts = computed(() => {
   return parts.value.filter((p: Part) => {
-    return p.min_quantity > qty(p)
+    return p.min_quantity > partQty(p)
   })
 })
-
-const qty = (row: Part) => {
-  if (row.parent) {
-    return Math.round(100 * row.parent.location_parts.reduce((acc, lp) => lp.quantity + acc, 0) / row.quantity_of) / 100
-  }
-  return row.location_parts ? Math.round(100 * row.location_parts.reduce((acc, lp) => lp.quantity + acc, 0)) / 100 : 0
-}
 
 
 const nparts = (row) => {

@@ -87,7 +87,7 @@
         </UFormGroup>
 
       </div>
-      <div v-if="state.parent && state.parent.id">
+      <div v-if="state.parent && state.parent.id" class="mt-4">
         <h2>Locations</h2>
         <UTable v-if="state.parent && state.parent.location_parts && state.parent.location_parts.length"
           :rows="[...state.parent.location_parts.map((lp: LocationPart) => { return { name: lp.locations.name, quantity: lp.quantity + ' ' + state.parent.part + ' ' + state.parent.value } }), { name: 'TOTAL', quantity: state.parent.location_parts.reduce((acc: number, lp: LocationPart) => acc + lp.quantity, 0) }]" />
@@ -97,7 +97,7 @@
           to add stock at selected locations
         </div>
       </div>
-      <div v-else>
+      <div v-else class="mt-4">
         <UFormGroup label="Locations" name="locations">
           <div v-for="lp in selectedLocations" class="flex flex-row items-end mb-4">
             <UFormGroup label="Location" class="grow">
@@ -123,7 +123,6 @@
         <UButton icon="i-heroicons-outline-plus" label="Add location"
           @click="selectedLocations.push({ key: Math.random() * 1000000, quantity: 0, locations: {} })" />
       </div>
-      <UButton type="submit" class="hidden" @click="emit('save')" />
 
       <PartsQRCodeModal :open="qrModal" :part="qrPart" @close="qrModal = false" />
 
@@ -309,7 +308,6 @@ const save = async () => {
         timeout: 10000,
         color: 'red'
       })
-      return;
     }
   }
   saving.value = false

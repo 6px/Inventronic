@@ -19,7 +19,7 @@
           <USelectMenu v-model="projectPart.part_id" :options="parts" value-attribute="id" option-attribute="name">
             <template #label>
               <span
-                :class="[current && qty(current) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
+                :class="[current && partQty(current) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full']"
                 aria-hidden="true" />
               <span class="truncate" v-if="current">
                 {{ current.part === current.value ? current.part : current.part + ' ' + current.value }}
@@ -31,7 +31,7 @@
             <template #option="{ option: part }">
               <div>
                 <span
-                  :class="[qty(part) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full mr-1']"
+                  :class="[partQty(part) > projectPart.quantity ? 'bg-green-400' : 'bg-red-400', 'inline-block h-2 w-2 flex-shrink-0 rounded-full mr-1']"
                   aria-hidden="true" />
                 <span class="truncate">
                   {{ part.part === part.value ? part.part : part.part + ' ' + part.value }}
@@ -46,7 +46,7 @@
           </USelectMenu>
         </UFormGroup>
         <UFormGroup label="Quantity" class="mb-4" name="quantity">
-          <UInput v-model="projectPart.quantity" />
+          <UInput type="number" step="0.05" v-model="projectPart.quantity" />
         </UFormGroup>
         <UFormGroup label="References" name="references">
           <UInput v-model="projectPart.references" />
@@ -112,13 +112,6 @@ const save = async () => {
     saving.value = false
     emit('close')
   }
-}
-
-const qty = (part: Part) => {
-  if (part.parent) {
-    return Math.round(100 * part.parent.location_parts.reduce((acc, lp) => acc + lp.quantity, 0) / part.quantity_of) / 100
-  }
-  return Math.round(100 * part.location_parts.reduce((acc, lp) => acc + lp.quantity, 0)) / 100
 }
 
 const current = computed(() => parts.value.find(p => p.id === props.projectPart.part_id))
