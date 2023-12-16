@@ -1,10 +1,6 @@
 #!/bin/sh
 trap 'pkill -P $$; exit 1;' TERM INT
 
-
-
-echo "server url $SERVER_URL"
-
 sed -i 's|APP_BASE_URL|'$BASE_URL'|g' /app/server/chunks/nitro/node-server.mjs
 sed -i 's/SUPABASE_KEY/'$SUPABASE_KEY'/g' /app/server/chunks/nitro/node-server.mjs
 if [ -n "$SERVER_URL" ]; then
