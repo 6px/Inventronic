@@ -69,13 +69,9 @@
 
           <div class="mt-8 md:mt-0 md:flex justify-center items-center hidden">
             <video controls width="300">
-              <source src="/img/locations.webm" type="video/webm" />
-
               <source src="/img/locations.mp4" type="video/mp4" />
 
               Download the
-              <a href="/img/locations.webm">WEBM</a>
-              or
               <a href="/img/locations.mp4">MP4</a>
               video.
             </video>
@@ -104,7 +100,6 @@
               video.
             </video>
           </div>
-
 
           <div class="leading-6 flex justify-center items-center">
             <div>
