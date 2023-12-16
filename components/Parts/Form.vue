@@ -22,9 +22,9 @@
           <USelectMenu v-model="state.parent" :options="parts.sort((a, b) => a.part.localeCompare(b.part))" searchable
             :uiMenu="{ option: { container: 'w-full block' } }">
             <template #label>
-              <span v-if="selectedPart.parent && selectedPart.parent.part" class="truncate">
-                {{ selectedPart.parent.part === selectedPart.parent.value ? selectedPart.parent.part :
-                  selectedPart.parent.part + ' ' + selectedPart.parent.value }}
+              <span v-if="state.parent && state.parent.part" class="truncate">
+                {{ state.parent.part === state.parent.value ? state.parent.part :
+                  state.parent.part + ' ' + state.parent.value }}
 
               </span>
               <span v-else>None</span>

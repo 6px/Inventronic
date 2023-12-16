@@ -116,7 +116,16 @@ async function signin(event: FormSubmitEvent<any>) {
       email: loginstate.email,
       password: loginstate.password,
     })
-    if (data) {
+    if (error) {
+      toast.add({
+          id: 'signup_email_fail',
+          title: 'Sign up error',
+          description: 'Could not create your account: ' + error.message,
+          icon: 'i-heroicons-outline-check-circle',
+          timeout: 10000,
+          color: 'red'
+        })
+    } else if (data) {
       if (data.session === null) {
         toast.add({
           id: 'signup_email_confirm',
