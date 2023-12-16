@@ -1,16 +1,19 @@
 build:
-  image: docker:buildx
+  image: snickch/buildx:latest
   stage: build
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: docker
 
-  before_script:
-  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-  - docker buildx create --use
-      
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-    PLATFORM: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,darwin/amd64,darwin/arm64
+    PLATFORM: linux/amd64,linux/arm64/v8,linux/arm/v6,linux/arm/v7
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+
+  before_script:
+  - docker run --privileged --rm tonistiigi/binfmt --install all
+  - docker buildx create --use
 
   script:
     - sed -i 's|__VERSION__|'$CI_COMMIT_REF_NAME'|g' components/AppFooter.vue
@@ -27,5 +30,5 @@ build:
     - docker push jonathanfoucher/inventronic:latest
     - docker push jonathanfoucher/inventronic:$CI_COMMIT_TAG
   only:
-    - main
+    - tags
 
