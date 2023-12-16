@@ -16,7 +16,7 @@
         </div>
         <div>
           <UButton @click="create" size="xl" class="uppercase text-xl text-monaspace font-bold pb-2 px-12">
-            Do it now
+            <span class="text-white">Do it now</span>
           </UButton>
         </div>
       </div>

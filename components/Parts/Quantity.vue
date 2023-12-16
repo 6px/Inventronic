@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UBadge v-if="part.id" size="xs" :color="part.min_quantity < partQty(part) ? 'red' : 'green'"
+    <UBadge v-if="part.id" size="xs" :color="part.min_quantity < partQty(part) ? 'green' : 'red'"
       class="ml-2 shrink">
       {{ partQty(part) }}
     </UBadge>
