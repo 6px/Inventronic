@@ -32,6 +32,8 @@ Or create a `.env` file and use this command:
 
 A compose file is provided to create a self-hosted instance of supabase and inventronic at once. To use it, follow this procedure:
 
+- clone this repository: `git clone https://github.com/6px/Inventronic.git`
+- enter the project directory: `cd Inventronic`
 - enter the `docker` subdirectory: `cd docker`
 - copy `docker/.env.example` to `.env`: `cp .env.example .env`
 - edit `.env` to your convenience. Check the [supabase self-hosting docs](https://supabase.com/docs/guides/self-hosting/docker) for details

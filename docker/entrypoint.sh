@@ -9,7 +9,6 @@ sed -i 's|APP_BASE_URL|'$BASE_URL'|g' /app/server/chunks/nitro/node-server.mjs
 sed -i 's/SUPABASE_KEY/'$SUPABASE_KEY'/g' /app/server/chunks/nitro/node-server.mjs
 if [ -n "$SERVER_URL" ]; then
     if [ "$SERVER_URL" = "SERVER_URL" ]; then
-        echo "changing server url $SERVER_URL"   
         SERVER_URL=$SUPABASE_URL
     fi
     sed -i 's|SERVER_URL|'$SERVER_URL'|g' /app/server/chunks/nitro/node-server.mjs
