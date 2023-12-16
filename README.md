@@ -16,6 +16,7 @@ Electronic components management
 - Print labels with QR codes to stick on containers, so that you always know where everything is.
 - Add parts to project from a kicad BOM file.
 - Always know how many of each project you can make with the parts in stock.
+- Dashboard with basic information about the parts in stock
 
 # Prepare your supabase instance
 Create an account and a project on supabase.com or self-host an instance using [their documentation](https://supabase.com/docs/guides/self-hosting).
