@@ -55,13 +55,9 @@
           </div>
           <div class="mt-8 md:mt-0 flex justify-center items-center">
             <video controls width="300">
-              <source src="/img/projects.webm" type="video/webm" />
-
               <source src="/img/projects.mp4" type="video/mp4" />
 
               Download the
-              <a href="/img/projects.webm">WEBM</a>
-              or
               <a href="/img/projects.mp4">MP4</a>
               video.
             </video>
