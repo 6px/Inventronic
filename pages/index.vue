@@ -100,7 +100,7 @@
           <div class="leading-6 flex justify-center items-center">
             <div>
               <h2
-                class="md:mb-4 mb-2 text-xl md:text-2xl text-monaspace font-bold text-center md:text-right text-primary-600 uppercase">
+                class="md:mb-4 mt-8 md:mt-0 mb-2 text-xl md:text-2xl text-monaspace font-bold text-center md:text-right text-primary-600 uppercase">
                 Stick some labels
               </h2>
               <div class="md:text-right text-lg">
@@ -113,10 +113,10 @@
           </div>
           <div class="mt-8 md:mt-0 flex justify-center items-center">
             <video controls width="300">
-              <source src="/img/projects.mp4" type="video/mp4" />
+              <source src="/img/label.mp4" type="video/mp4" />
 
               Download the
-              <a href="/img/projects.mp4">MP4</a>
+              <a href="/img/label.mp4">MP4</a>
               video.
             </video>
           </div>
