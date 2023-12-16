@@ -11,7 +11,7 @@ const user = useSupabaseUser()
 
 watch(user, () => {
   if (user.value) {
-    return navigateTo('/parts/')
+    return navigateTo('/')
   }
 }, { immediate: true })
 </script>

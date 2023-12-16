@@ -59,7 +59,7 @@
     </UContainer>
 
     <LocationsCreate :open="create" :parent="location" @close="create = false" @refresh="refresh" />
-    <LocationsQrCodeModal :open="qrcode" :location="location" @close="qrcode = false" />
+    <LocationsQRCodeModal :open="qrcode" :location="location" @close="qrcode = false" />
   </div>
 </template>
 

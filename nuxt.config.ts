@@ -10,19 +10,20 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+      supabase: {
+        url: process.env.SUPABASE_URL,
+        serverUrl: process.env.SERVER_URL || process.env.SUPABASE_URL,
+        redirectOptions: {
+          login: '/',
+          callback: '/confirm',
+          exclude: ['/login']
+        },
+      },
     },
   },
   css: ['~/assets/css/main.css'],
   ssr: true,
-  supabase: {
-    url: process.env.SUPABASE_URL,
-    serverUrl: process.env.SERVER_URL || process.env.SUPABASE_URL,
-    redirectOptions: {
-      login: '/',
-      callback: '/confirm',
-      exclude: ['/login']
-    },
-  },
+
   colorMode: {
     preference: 'system',
     fallback: 'light',

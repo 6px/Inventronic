@@ -104,15 +104,9 @@
 </template>
 
 <script lang="ts" setup>
-import type { NuxtLink, UDivider } from '#build/components';
-import type { UButton } from '#ui-colors/components';
 
 const client = useSupabaseClient()
-const user = useSupabaseUser()
-
 const router = useRouter()
-
-const config = useRuntimeConfig()
 
 const props = defineProps({
   parts: {

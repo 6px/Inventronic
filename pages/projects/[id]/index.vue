@@ -25,7 +25,7 @@
 
     </UContainer>
     <PartsPartModal :partModal="partModal" :selectedPart="selectedPart" :saving="saving" @close="partModal=false" @save="savePart" />
-    <ProjectsQrCodeModal :project="project" :open="qrModal"  @close="qrModal=false" />
+    <ProjectsQRCodeModal :project="project" :open="qrModal"  @close="qrModal=false" />
   </div>
 </template>
 

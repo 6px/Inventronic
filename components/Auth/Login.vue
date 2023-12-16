@@ -1,15 +1,13 @@
+
+
 <template>
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="u-bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <div>
-                <div class="relative">
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 u-bg-white text-gray-500"> Connect with </span>
-                    </div>
-                </div>
-                <slot />
-            </div>
-        </div>
+    <div class="container md:max-w-xl md:mx-auto mx-2">
+        <UCard>
+            <template #header>
+                <div class="px-2 u-bg-white text-gray-500 text-center"> Connect with </div>
+            </template>
+            <slot />
+        </UCard>
     </div>
 </template>
 
