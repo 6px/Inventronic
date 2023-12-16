@@ -4,6 +4,8 @@ Electronic components management
 
 ![Parts UI](/img/parts.png)
 
+![Locations view](/img/locations.png)
+
 ![Project view](/img/project.png)
 
 # Features
