@@ -23,4 +23,4 @@ RUN chmod 755 /entrypoint.sh
 
 EXPOSE 3000
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+CMD [ "/entrypoint.sh" ]

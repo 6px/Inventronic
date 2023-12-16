@@ -26,11 +26,13 @@
         <div class="mb-2">
           Please check your inbox for a confirmation link, or input the code you received below
         </div>
+        <UForm @submit="checkOtp" :validate="validate" :state="state">
         <UFormGroup label="Code">
           <UInput v-model="otp" color="white" placeholder="a six digit number" class="mb-2" />
         </UFormGroup>
-        <UButton class="mt-3" block label="Login" color="black" :loading="otpLoading" :disabled="otpLoading"
+        <UButton type="submit" class="mt-3" block label="Login" color="black" :loading="otpLoading" :disabled="otpLoading"
           @click="checkOtp" />
+        </UForm>
       </div>
       <UDivider v-if="emailSignUpOk===false && emailSignInOk===false" class="my-8">OR</UDivider>
       <div v-if="emailSignUpOk===false && emailSignInOk===false">
@@ -48,11 +50,13 @@
         <div class="mb-2">
           Please check your inbox for a login link, or input the OTP you received below
         </div>
-        <UFormGroup label="Code">
-          <UInput v-model="otp" color="white" placeholder="a six digit number" class="mb-2" />
-        </UFormGroup>
-        <UButton class="mt-3" block label="Login" color="black" :loading="otpLoading" :disabled="otpLoading"
-          @click="checkOtp" />
+        <UForm @submit="checkOtp" :validate="validate" :state="state">
+          <UFormGroup label="Code">
+            <UInput v-model="otp" color="white" placeholder="a six digit number" class="mb-2" />
+          </UFormGroup>
+          <UButton type="submit" class="mt-3" block label="Login" color="black" :loading="otpLoading" :disabled="otpLoading"
+            @click="checkOtp" />
+        </UForm>
       </div>
     </AuthLogin>
   </div>
